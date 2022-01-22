@@ -61,7 +61,7 @@ class Logic():
         self.aux_state()
 
 fs=Logic()
-
+#test
 while True:
     time.sleep(.05)
     fs.update()
