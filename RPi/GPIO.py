@@ -9,6 +9,8 @@ def setup(a, b):
 def output(a, b):
    print (a)
 def cleanup():
-   print ('a')
+   print ('pins released as inputs')
 def setwarnings(flag):
    print ('False')
+def input(number):
+   print(number)
