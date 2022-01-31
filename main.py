@@ -1,5 +1,7 @@
 import kivy
 import logic
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.label import Label
@@ -8,20 +10,12 @@ from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
 from threading import Thread
-from queue import Queue
+from kivy.uix.screenmanager import NoTransition
 
 kivy.require('2.0.0')
-#Window.fullscreen = 'auto'
-datashare=Queue(0)
+Window.fullscreen = 'auto'
 
-def clean_list(list,element):
-    while True:
-        try:
-            list.remove(element)
-        except ValueError:
-            break
-
-class ControlGrid(FloatLayout):
+class ControlGrid(Screen):
     def test_fire(self,button):
         if button.state == 'down':
             print('all on by switch')
@@ -54,12 +48,27 @@ class ControlGrid(FloatLayout):
             print('lights off by switch')
             logic.fs.devices['lights']=0
 
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        if keycode[1]=='m':
+            print('sytem actuation')
+            self.manager.current='alert'
+            logic.fs.conditions['micro_switch']=1
+        elif keycode[1]=='c':
+            print('sytem rearmed')
+            self.manager.current='main'
+        elif keycode[1]=='h':
+            print('heat sensor activated')
+
+    def _keyboard_closed(self):
+        print("keyboard unbound")
 
     def __init__(self, **kwargs):
         super(ControlGrid, self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
         bg_image = Image(source='media\istockphoto-1169326482-640x640.jpg', allow_stretch=True, keep_ratio=False)
+        self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
 
         quick=ToggleButton(text="[size=50][b][color=#000000]  Hood [/color][/b][/size]",
@@ -94,11 +103,73 @@ class ControlGrid(FloatLayout):
         self.add_widget(fans)
         self.add_widget(lights)
 
-    
+    def micro_actuation():
+        ControlGrid.manager.current='alert'
+
+class ActuationScreen(Screen):
+
+    def acknowledgement(self,button):
+        print('actuation acknowledged')
+
+
+    def reset_system(self,button):
+            print('system reset')
+            self.manager.current='main'
+
+    def __init__(self, **kwargs):
+        super(ActuationScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source='media\istockphoto-1169326482-640x640.jpg', allow_stretch=True, keep_ratio=False)
+
+        alert=Button(text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
+                    size_hint =(.96, .45),
+                    pos_hint = {'x':.02, 'y':.5},
+                    background_normal='',
+                    background_down='',
+                    background_color=(190/250, 10/250, 10/250,.9),
+                    markup=True)
+        self.widgets['alert']=alert
+
+        acknowledge=Button(text="[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
+                    size_hint =(.45, .40),
+                    pos_hint = {'x':.03, 'y':.05},
+                    background_normal='',
+                    background_down='',
+                    background_color=(217/250, 94/250, 10/250,.99),
+                    markup=True)
+        self.widgets['acknowledge']=acknowledge
+        acknowledge.bind(on_release=self.acknowledgement)
+
+
+        reset=Button(text="[size=32][b][color=#000000] Reset [/color][/b][/size]",
+                    size_hint =(.45, .40),
+                    pos_hint = {'x':.52, 'y':.05},
+                    background_normal='',
+                    background_down='',
+                    background_color=(217/250, 94/250, 1/250,.99),
+                    markup=True)
+        self.widgets['reset']=reset
+        reset.bind(on_release=self.reset_system)
+
+        def pulse():
+            self.anime = Animation(background_color=(249/250, 0/250, 0/250,1), duration=1.5)+Animation(background_color=(249/250, 200/250, 200/250,1), duration=.2)
+            self.anime.repeat = True
+            self.anime.start(alert)
+        pulse()
+
+        self.add_widget(bg_image)
+        self.add_widget(alert)
+        self.add_widget(acknowledge)
+        self.add_widget(reset)
+
+
 class Hood_Control(App):
     def build(self):
-        return ControlGrid()
-
+        context_screen=ScreenManager(transition=NoTransition())
+        context_screen.add_widget(ControlGrid(name='main'))
+        context_screen.add_widget(ActuationScreen(name='alert'))
+        return context_screen
 
 logic_control = Thread(target=logic.logic,daemon=True)
 logic_control.start()
@@ -106,7 +177,7 @@ try:
     Hood_Control().run()
 except KeyboardInterrupt:
     print('Keyboard Inturrupt')
-except Exception as e:
-    print(e)
+# except Exception as e:
+#     print(e)
 finally:
     logic.clean_exit()
