@@ -1,5 +1,6 @@
 import kivy
 import logic
+import RPi.GPIO as GPIO
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.animation import Animation
 from kivy.app import App
@@ -11,9 +12,11 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
 from threading import Thread
 from kivy.uix.screenmanager import NoTransition
+from kivy.uix.screenmanager import FallOutTransition
+from kivy.uix.screenmanager import RiseInTransition
 
 kivy.require('2.0.0')
-Window.fullscreen = 'auto'
+#Window.fullscreen = 'auto'
 
 class ControlGrid(Screen):
     def test_fire(self,button):
@@ -34,11 +37,11 @@ class ControlGrid(Screen):
         if button.state == 'down':
             print('fans on by switch')
             logic.fs.devices['exhaust']=1
-            logic.fs.devices['mnau']=1
+            logic.fs.devices['mau']=1
         elif button.state == 'normal':
             print('fans off by switch')
             logic.fs.devices['exhaust']=0
-            logic.fs.devices['mnau']=0
+            logic.fs.devices['mau']=0
     
     def lights_switch(self,button):
         if button.state == 'down':
@@ -51,13 +54,21 @@ class ControlGrid(Screen):
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1]=='m':
             print('sytem actuation')
+            GPIO.micro=1
             self.manager.current='alert'
             logic.fs.conditions['micro_switch']=1
         elif keycode[1]=='c':
             print('sytem rearmed')
+            self.widgets['fans'].text = '[size=32][b][color=#000000] Fans [/color][/b][/size]'
+            GPIO.heatsensor=0
+            GPIO.micro=0
             self.manager.current='main'
         elif keycode[1]=='h':
             print('heat sensor activated')
+            self.widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+            GPIO.heatsensor=1
+            #self.widgets['fans'].state='down'
+            self.fans_switch(self.widgets['fans'])
 
     def _keyboard_closed(self):
         print("keyboard unbound")
@@ -66,7 +77,7 @@ class ControlGrid(Screen):
         super(ControlGrid, self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source='media\istockphoto-1169326482-640x640.jpg', allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source='source code\media\qt=q_95.png', allow_stretch=True, keep_ratio=False)
         self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
@@ -120,7 +131,7 @@ class ActuationScreen(Screen):
         super(ActuationScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source='media\istockphoto-1169326482-640x640.jpg', allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source='source code\media\qt=q_95.png', allow_stretch=True, keep_ratio=False)
 
         alert=Button(text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
                     size_hint =(.96, .45),
@@ -166,7 +177,7 @@ class ActuationScreen(Screen):
 
 class Hood_Control(App):
     def build(self):
-        context_screen=ScreenManager(transition=NoTransition())
+        context_screen=ScreenManager()#transition=FallOutTransition()
         context_screen.add_widget(ControlGrid(name='main'))
         context_screen.add_widget(ActuationScreen(name='alert'))
         return context_screen
