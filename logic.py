@@ -46,48 +46,52 @@ class Logic():
         self.fired=False
         self.sensor_target=time.time()
 
-        self.devices={
-            'exhaust':0,
-            'mau':0,
-            'lights':0,
-            'dry_contact':0
+        '''two dictionaries are used to share data between two threads.
+        moli: main out logic in, is written too in main and read in logic.
+        milo: main in logic out, is written too in logic and read in main.
+        '''
+        self.moli={
+            'exhaust':off,
+            'mau':off,
+            'lights':off,
+            'dry_contact':off
         }
-        self.conditions={
-            'fans':0,
-            'lights':0,
-            'heat_sensor':0,
-            'micro_switch':0
+        self.milo={
+            'fans':off,
+            'lights':off,
+            'heat_sensor':off,
+            'micro_switch':off
         }
 
     def normal(self):
         if micro_switch():
             print('micro_switch')
             self.state='Fire'
-            self.conditions['micro_switch']=1
+            self.milo['micro_switch']=on
         else:
-            if self.devices['exhaust']==1:
+            if self.moli['exhaust']==on:
                 GPIO.output(exfan1.pin,on)
-                self.conditions['fans']=1
-            elif self.devices['exhaust']==0:
+                self.milo['fans']=on
+            elif self.moli['exhaust']==off:
                 GPIO.output(exfan1.pin,off)
-                self.conditions['fans']=0
-            if self.devices['mau']==1:
+                self.milo['fans']=off
+            if self.moli['mau']==on:
                 GPIO.output(mau1.pin,on)
-                self.conditions['fans']=1
-            elif self.devices['mau']==0:
+                self.milo['fans']=on
+            elif self.moli['mau']==off:
                 GPIO.output(mau1.pin,off)
-                self.conditions['fans']=0
+                self.milo['fans']=off
             if heat_sensor():
-                self.conditions['heat_sensor']=1
+                self.milo['heat_sensor']=on
                 self.heat_trip()
             else:
-                self.conditions['heat_sensor']=0
-            if self.devices['lights']==1:
+                self.milo['heat_sensor']=off
+            if self.moli['lights']==on:
                 GPIO.output(lights_pin,on)
-                self.conditions['lights']=1
-            elif self.devices['lights']==0:
+                self.milo['lights']=on
+            elif self.moli['lights']==off:
                 GPIO.output(lights_pin,off)
-                self.conditions['lights']=0
+                self.milo['lights']=off
             # if self.devices['dry_contact']==1:
             #     GPIO.output(dry_contact.pin,on)
             # elif self.devices['dry_contact']==0:
@@ -116,12 +120,12 @@ class Logic():
     def heat_sensor(self):
             if self.sensor_target>=time.time():
                 GPIO.output(exfan1.pin,on)
-                self.devices['exhaust']=1
-                self.devices['mau']=1
+                self.moli['exhaust']=on
+                self.moli['mau']=on
             else:
                 GPIO.output(exfan1.pin,off)
-                self.devices['exhaust']=0
-                self.devices['mau']=0
+                self.moli['exhaust']=off
+                self.moli['mau']=off
                 clean_list(self.aux_state,'heat_sensor')
 
 
@@ -141,7 +145,7 @@ class Logic():
         if not micro_switch():
             self.fired = False
             self.state='Normal'
-            self.conditions['micro_switch']=0
+            self.conditions['micro_switch']=off
 
     def auxillary(self):
         if 'Trouble' in self.aux_state:
