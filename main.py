@@ -18,8 +18,10 @@ from kivy.uix.screenmanager import RiseInTransition
 kivy.require('2.0.0')
 #Window.fullscreen = 'auto'
 
+generic_image='media\istockphoto-1169326482-640x640.jpg'
+
 class ControlGrid(Screen):
-    def test_fire(self,button):
+    def quick_start(self,button):
         if button.state == 'down':
             print('all on by switch')
             self.widgets['fans'].state='down'
@@ -36,27 +38,27 @@ class ControlGrid(Screen):
     def fans_switch(self,button):
         if button.state == 'down':
             print('fans on by switch')
-            logic.fs.devices['exhaust']=1
-            logic.fs.devices['mau']=1
+            logic.fs.moli['exhaust']=1
+            logic.fs.moli['mau']=1
         elif button.state == 'normal':
             print('fans off by switch')
-            logic.fs.devices['exhaust']=0
-            logic.fs.devices['mau']=0
+            logic.fs.moli['exhaust']=0
+            logic.fs.moli['mau']=0
     
     def lights_switch(self,button):
         if button.state == 'down':
             print('lights on by switch')
-            logic.fs.devices['lights']=1
+            logic.fs.moli['lights']=1
         elif button.state == 'normal':
             print('lights off by switch')
-            logic.fs.devices['lights']=0
+            logic.fs.moli['lights']=0
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1]=='m':
             print('sytem actuation')
             GPIO.micro=1
             self.manager.current='alert'
-            logic.fs.conditions['micro_switch']=1
+            logic.fs.moli['micro_switch']=1
         elif keycode[1]=='c':
             print('sytem rearmed')
             self.widgets['fans'].text = '[size=32][b][color=#000000] Fans [/color][/b][/size]'
@@ -77,7 +79,7 @@ class ControlGrid(Screen):
         super(ControlGrid, self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source='source code\media\qt=q_95.png', allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
         self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
@@ -89,7 +91,7 @@ class ControlGrid(Screen):
                     background_color=(47/250, 247/250, 54/250,.85),
                     markup=True)
         self.widgets['quick']=quick
-        quick.bind(on_press=self.test_fire)
+        quick.bind(on_press=self.quick_start)
 
         fans=ToggleButton(text="[size=32][b][color=#000000] Fans [/color][/b][/size]",
                     size_hint =(.45, .40),
@@ -121,17 +123,22 @@ class ActuationScreen(Screen):
 
     def acknowledgement(self,button):
         print('actuation acknowledged')
+        self.anime.cancel(self.widgets['alert'])
+        self.widgets['alert'].background_color=(190/250, 10/250, 10/250,.9)
+        self.widgets['alert'].text="[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]"
 
 
     def reset_system(self,button):
             print('system reset')
+            GPIO.heatsensor=0
+            GPIO.micro=0
             self.manager.current='main'
 
     def __init__(self, **kwargs):
         super(ActuationScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source='source code\media\qt=q_95.png', allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         alert=Button(text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
                     size_hint =(.96, .45),

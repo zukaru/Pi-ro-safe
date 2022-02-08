@@ -22,9 +22,9 @@ mau1=mau.Mau(24)
 #lights=GPIO.input(26)
 lights_pin=26
 
-def heat_sensor():
+def heat_sensor_active():
     return GPIO.input(12,'h')
-def micro_switch():
+def micro_switch_active():
     return GPIO.input(16,'m')
 
 def clean_exit():
@@ -57,21 +57,24 @@ class Logic():
             'dry_contact':off
         }
         self.milo={
-            'fans':off,
+            'exhaust':off,
+            'mau':off,
             'lights':off,
             'heat_sensor':off,
+            'dry_contact':off,
             'micro_switch':off
         }
 
     def normal(self):
-        if micro_switch():
+        if micro_switch_active():
             print('micro_switch')
             self.state='Fire'
             self.milo['micro_switch']=on
         else:
             if self.moli['exhaust']==on:
                 GPIO.output(exfan1.pin,on)
-                self.milo['fans']=on
+                self.milo['exhaust']=on
+                self.milo['mau']=on
             elif self.moli['exhaust']==off:
                 GPIO.output(exfan1.pin,off)
                 self.milo['fans']=off
@@ -81,7 +84,7 @@ class Logic():
             elif self.moli['mau']==off:
                 GPIO.output(mau1.pin,off)
                 self.milo['fans']=off
-            if heat_sensor():
+            if heat_sensor_active():
                 self.milo['heat_sensor']=on
                 self.heat_trip()
             else:
@@ -105,27 +108,30 @@ class Logic():
             #     self.state='Off'
     def heat_trip(self):
         if self.sensor_target<=time.time():
-            self.sensor_target=time.time()+5
-            self.aux_state.append('heat_sensor')
-            print('tripa')
-        elif self.sensor_target>=time.time()+8:
-            self.sensor_target=time.time()+20
-            self.aux_state.append('heat_sensor')
-            print('tripb')
-        elif self.sensor_target>=time.time()+5:
             self.sensor_target=time.time()+10
             self.aux_state.append('heat_sensor')
-            print('tripc')
+            print('tripa')
+        # elif self.sensor_target<=time.time()+8:
+        #     self.sensor_target=time.time()+20
+        #     self.aux_state.append('heat_sensor')
+        #     print('tripb')
+        # elif self.sensor_target>=time.time()+5:
+        #     self.sensor_target=time.time()+10
+        #     self.aux_state.append('heat_sensor')
+        #     print('tripc')
 
     def heat_sensor(self):
             if self.sensor_target>=time.time():
                 GPIO.output(exfan1.pin,on)
-                self.moli['exhaust']=on
-                self.moli['mau']=on
+                self.milo['exhaust']=on
+                self.milo['mau']=on
+                self.milo['heat_sensor']=on
+
             else:
                 GPIO.output(exfan1.pin,off)
-                self.moli['exhaust']=off
-                self.moli['mau']=off
+                self.milo['exhaust']=off
+                self.milo['mau']=off
+                self.milo['heat_sensor']=off
                 clean_list(self.aux_state,'heat_sensor')
 
 
@@ -142,10 +148,10 @@ class Logic():
             # GPIO.output(dry contacts,on)
             # GPIO.output(dry contacts,on)
             self.fired = True
-        if not micro_switch():
+        if not micro_switch_active():
             self.fired = False
             self.state='Normal'
-            self.conditions['micro_switch']=off
+            self.milo['micro_switch']=off
 
     def auxillary(self):
         if 'Trouble' in self.aux_state:
