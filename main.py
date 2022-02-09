@@ -14,6 +14,7 @@ from threading import Thread
 from kivy.uix.screenmanager import NoTransition
 from kivy.uix.screenmanager import FallOutTransition
 from kivy.uix.screenmanager import RiseInTransition
+from kivy.clock import Clock
 
 kivy.require('2.0.0')
 #Window.fullscreen = 'auto'
@@ -181,9 +182,25 @@ class ActuationScreen(Screen):
         self.add_widget(acknowledge)
         self.add_widget(reset)
 
+def listen(*args):
+    event_log=logic.fs.milo
+
+    if event_log['exhaust']==1:
+        print('exhaust fan heard')
+    if event_log['mau']==1:
+        print('mau fan heard')
+    if event_log['lights']==1:
+        print('lights heard')
+    if event_log['heat_sensor']==1:
+        print('heat_sensor heard')
+    if event_log['dry_contact']==1:
+        print('dry_contact heard')
+    if event_log['micro_switch']==1:
+        print('micro_switch heard')
 
 class Hood_Control(App):
     def build(self):
+        listener_event=Clock.schedule_interval(listen, .75)
         context_screen=ScreenManager()#transition=FallOutTransition()
         context_screen.add_widget(ControlGrid(name='main'))
         context_screen.add_widget(ActuationScreen(name='alert'))

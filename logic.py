@@ -74,16 +74,16 @@ class Logic():
             if self.moli['exhaust']==on:
                 GPIO.output(exfan1.pin,on)
                 self.milo['exhaust']=on
-                self.milo['mau']=on
+                #self.milo['mau']=on
             elif self.moli['exhaust']==off:
                 GPIO.output(exfan1.pin,off)
-                self.milo['fans']=off
+                self.milo['exhaust']=off
             if self.moli['mau']==on:
                 GPIO.output(mau1.pin,on)
-                self.milo['fans']=on
+                self.milo['mau']=on
             elif self.moli['mau']==off:
                 GPIO.output(mau1.pin,off)
-                self.milo['fans']=off
+                self.milo['mau']=off
             if heat_sensor_active():
                 self.milo['heat_sensor']=on
                 self.heat_trip()
