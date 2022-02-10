@@ -187,9 +187,15 @@ def listen(app_object,*args):
     event_log=logic.fs.milo
 
     if event_log['exhaust']==1:
-        print(dir(app_object))
-        print(app_object)
-        #app_object.widgets['fans'].state='down'
+        if 'fans' in app_object.children[0].widgets:
+            if app_object.children[0].widgets['fans'].state=='down':
+                app_object.children[0].widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+            else:
+                app_object.children[0].widgets['fans'].text='[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+    elif event_log['exhaust']==0 and 'fans' in app_object.children[0].widgets:
+        if app_object.children[0].widgets['fans'].state=='normal':
+            app_object.children[0].widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+
     if event_log['mau']==1:
         print('mau fan heard')
     if event_log['lights']==1:
@@ -203,11 +209,12 @@ def listen(app_object,*args):
 
 class Hood_Control(App):
     def build(self):
-        listener_event=Clock.schedule_interval(partial(listen, self.root),.75)
-        context_screen=ScreenManager()#transition=FallOutTransition()
-        context_screen.add_widget(ControlGrid(name='main'))
-        context_screen.add_widget(ActuationScreen(name='alert'))
-        return context_screen
+        
+        self.context_screen=ScreenManager()#transition=FallOutTransition()
+        self.context_screen.add_widget(ControlGrid(name='main'))
+        self.context_screen.add_widget(ActuationScreen(name='alert'))
+        listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
+        return self.context_screen
 
 logic_control = Thread(target=logic.logic,daemon=True)
 logic_control.start()
