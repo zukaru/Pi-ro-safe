@@ -134,7 +134,14 @@ class ActuationScreen(Screen):
             print('system reset')
             GPIO.heatsensor=0
             GPIO.micro=0
+            self.widgets['alert'].text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
+            self.pulse()
             self.manager.current='main'
+
+    def pulse(self):
+            self.anime = Animation(background_color=(249/250, 0/250, 0/250,1), duration=1.5)+Animation(background_color=(249/250, 200/250, 200/250,1), duration=.2)
+            self.anime.repeat = True
+            self.anime.start(self.widgets['alert'])
 
     def __init__(self, **kwargs):
         super(ActuationScreen,self).__init__(**kwargs)
@@ -171,12 +178,7 @@ class ActuationScreen(Screen):
                     markup=True)
         self.widgets['reset']=reset
         reset.bind(on_release=self.reset_system)
-
-        def pulse():
-            self.anime = Animation(background_color=(249/250, 0/250, 0/250,1), duration=1.5)+Animation(background_color=(249/250, 200/250, 200/250,1), duration=.2)
-            self.anime.repeat = True
-            self.anime.start(alert)
-        pulse()
+        self.pulse()
 
         self.add_widget(bg_image)
         self.add_widget(alert)
@@ -185,7 +187,7 @@ class ActuationScreen(Screen):
 
 def listen(app_object,*args):
     event_log=logic.fs.milo
-
+ #exhaust
     if event_log['exhaust']==1:
         if 'fans' in app_object.children[0].widgets:
             if app_object.children[0].widgets['fans'].state=='down':
@@ -195,15 +197,26 @@ def listen(app_object,*args):
     elif event_log['exhaust']==0 and 'fans' in app_object.children[0].widgets:
         if app_object.children[0].widgets['fans'].state=='normal':
             app_object.children[0].widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
-
+#mau
     if event_log['mau']==1:
         print('mau fan heard')
+#lights
     if event_log['lights']==1:
         print('lights heard')
+#heat sensor
     if event_log['heat_sensor']==1:
+       # if 'alert' in app_object.children[0].widgets:
         print('heat_sensor heard')
+        print(app_object.children)
+    else:
+        print ('else')
+        #     app_object.children[0].widgets['alert'].text = "[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
+        # elif event_log['heat_sensor']==0:
+        #     app_object.children[0].widgets['alert'].text = "[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
+#dry contact
     if event_log['dry_contact']==1:
         print('dry_contact heard')
+#micro switch
     if event_log['micro_switch']==1:
         print('micro_switch heard')
 
