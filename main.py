@@ -185,6 +185,24 @@ class ActuationScreen(Screen):
         self.add_widget(acknowledge)
         self.add_widget(reset)
 
+class SettingsScreen(Screen):
+    def __init__(self, **kwargs):
+        super(SettingsScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=ToggleButton(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+                        size_hint =(.4, .25),
+                        pos_hint = {'x':.02, 'y':.02},
+                        background_down='',
+                        background_color=(1/250, 1/250, 1/250,.85),
+                        markup=True)
+        self.widgets['back']=back
+        back.bind(on_press=self.settings_back)
+    def settings_back (self):
+        self.manager.current='main'
+
 def listen(app_object,*args):
     event_log=logic.fs.milo
  #exhaust
@@ -205,14 +223,7 @@ def listen(app_object,*args):
         print('lights heard')
 #heat sensor
     if event_log['heat_sensor']==1:
-       # if 'alert' in app_object.children[0].widgets:
         print('heat_sensor heard')
-        print(app_object.children)
-    else:
-        print ('else')
-        #     app_object.children[0].widgets['alert'].text = "[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
-        # elif event_log['heat_sensor']==0:
-        #     app_object.children[0].widgets['alert'].text = "[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
 #dry contact
     if event_log['dry_contact']==1:
         print('dry_contact heard')
@@ -226,6 +237,7 @@ class Hood_Control(App):
         self.context_screen=ScreenManager()#transition=FallOutTransition()
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
+        self.context_screen.add_widget(SettingsScreen(name='settings'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen
 

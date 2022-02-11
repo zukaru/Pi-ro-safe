@@ -135,8 +135,6 @@ class Logic():
                 clean_list(self.aux_state,'heat_sensor')
 
 
-
-
     def trouble(self):
         pass
 
