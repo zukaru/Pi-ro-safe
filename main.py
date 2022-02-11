@@ -88,7 +88,7 @@ class ControlGrid(Screen):
 
         quick=ToggleButton(text="[size=50][b][color=#000000]  Hood [/color][/b][/size]",
                     size_hint =(.96, .45),
-                    pos_hint = {'x':.02, 'y':.5},
+                    pos_hint = {'x':.02, 'y':.53},
                     background_down='',
                     background_color=(47/250, 247/250, 54/250,.85),
                     markup=True)
@@ -96,8 +96,8 @@ class ControlGrid(Screen):
         quick.bind(on_press=self.quick_start)
 
         fans=ToggleButton(text="[size=32][b][color=#000000] Fans [/color][/b][/size]",
-                    size_hint =(.45, .40),
-                    pos_hint = {'x':.03, 'y':.05},
+                    size_hint =(.45, .35),
+                    pos_hint = {'x':.03, 'y':.15},
                     background_down='',
                     background_color=(0/250, 159/250, 232/250,.85),
                     markup=True)
@@ -105,21 +105,33 @@ class ControlGrid(Screen):
         fans.bind(on_press=self.fans_switch)
 
         lights=ToggleButton(text="[size=32][b][color=#000000] Lights [/color][/b][/size]",
-                    size_hint =(.45, .40),
-                    pos_hint = {'x':.52, 'y':.05},
+                    size_hint =(.45, .35),
+                    pos_hint = {'x':.52, 'y':.15},
                     background_down='',
                     background_color=(245/250, 216/250, 41/250,.85),
                     markup=True)
         self.widgets['lights']=lights
         lights.bind(on_press=self.lights_switch)
 
+        settings_button=Button(text='',
+                    size_hint =(.12, .12),
+                    pos_hint = {'x':.01, 'y':.001},
+                    background_normal=r'media\17-173465_setting-icon-clip-art.png',
+                    
+                    markup=True)#background_color=(245/250, 216/250, 41/250,.85)
+        self.widgets['lights']=lights
+        settings_button.bind(on_press=self.open_settings)
+
         self.add_widget(bg_image)
         self.add_widget(quick)
         self.add_widget(fans)
         self.add_widget(lights)
+        self.add_widget(settings_button)
 
     def micro_actuation():
         ControlGrid.manager.current='alert'
+    def open_settings(self,button):
+        self.manager.current='settings'
 
 class ActuationScreen(Screen):
 
@@ -196,12 +208,17 @@ class SettingsScreen(Screen):
                         size_hint =(.4, .25),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
-                        background_color=(1/250, 1/250, 1/250,.85),
+                        background_color=(200/250, 200/250, 200/250,.85),
                         markup=True)
         self.widgets['back']=back
         back.bind(on_press=self.settings_back)
-    def settings_back (self):
+
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        
+    def settings_back (self,button):
         self.manager.current='main'
+
 
 def listen(app_object,*args):
     event_log=logic.fs.milo
