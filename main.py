@@ -16,11 +16,16 @@ from kivy.uix.screenmanager import FallOutTransition
 from kivy.uix.screenmanager import RiseInTransition
 from kivy.clock import Clock
 from functools import partial
+from kivy.uix.behaviors import ButtonBehavior
 
 kivy.require('2.0.0')
-#Window.fullscreen = 'auto'
+Window.fullscreen = 'auto'
 
-generic_image='media\istockphoto-1169326482-640x640.jpg'
+generic_image=r'media\istockphoto-1169326482-640x640.jpg'
+settings_icon=r'media\tiny gear.png'
+
+class IconButton(ButtonBehavior, Image):
+    pass
 
 class ControlGrid(Screen):
     def quick_start(self,button):
@@ -113,13 +118,10 @@ class ControlGrid(Screen):
         self.widgets['lights']=lights
         lights.bind(on_press=self.lights_switch)
 
-        settings_button=Button(text='',
-                    size_hint =(.12, .12),
-                    pos_hint = {'x':.01, 'y':.001},
-                    background_normal=r'media\17-173465_setting-icon-clip-art.png',
-                    
-                    markup=True)#background_color=(245/250, 216/250, 41/250,.85)
-        self.widgets['lights']=lights
+        settings_button=IconButton(source=settings_icon, allow_stretch=True, keep_ratio=True)
+        settings_button.size_hint =(.10, .10)
+        settings_button.pos_hint = {'x':.01, 'y':.02}
+        self.widgets['settings_button']=settings_button
         settings_button.bind(on_press=self.open_settings)
 
         self.add_widget(bg_image)
