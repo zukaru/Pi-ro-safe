@@ -12,17 +12,21 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.core.window import Window
 from threading import Thread
 from kivy.uix.screenmanager import NoTransition
+from kivy.uix.screenmanager import SlideTransition
 from kivy.uix.screenmanager import FallOutTransition
 from kivy.uix.screenmanager import RiseInTransition
 from kivy.clock import Clock
 from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.scrollview import ScrollView
 
 kivy.require('2.0.0')
-Window.fullscreen = 'auto'
+#Window.fullscreen = 'auto'
 
 generic_image=r'media\istockphoto-1169326482-640x640.jpg'
 settings_icon=r'media\tiny gear.png'
+trouble_icon=r'media\trouble icon.png'
+trouble_icon_dull=r'media\trouble icon dull.png'
 
 class IconButton(ButtonBehavior, Image):
     pass
@@ -64,8 +68,8 @@ class ControlGrid(Screen):
         if keycode[1]=='m':
             print('sytem actuation')
             GPIO.micro=1
-            self.manager.current='alert'
             logic.fs.moli['micro_switch']=1
+            self.micro_actuation()
         elif keycode[1]=='c':
             print('sytem rearmed')
             self.widgets['fans'].text = '[size=32][b][color=#000000] Fans [/color][/b][/size]'
@@ -124,16 +128,29 @@ class ControlGrid(Screen):
         self.widgets['settings_button']=settings_button
         settings_button.bind(on_press=self.open_settings)
 
+        trouble_button=IconButton(source=trouble_icon_dull, allow_stretch=True, keep_ratio=True)
+        trouble_button.size_hint =(.10, .10)
+        trouble_button.pos_hint = {'x':.89, 'y':.02}
+        self.widgets['trouble_button']=trouble_button
+        trouble_button.bind(on_press=self.open_trouble)
+        trouble_button.color=(1,1,1,.15)
+
         self.add_widget(bg_image)
         self.add_widget(quick)
         self.add_widget(fans)
         self.add_widget(lights)
         self.add_widget(settings_button)
+        self.add_widget(trouble_button)
 
-    def micro_actuation():
-        ControlGrid.manager.current='alert'
+    def micro_actuation(self):
+        self.manager.transition = SlideTransition(direction='left')
+        self.manager.current='alert'
     def open_settings(self,button):
+        self.parent.transition = SlideTransition(direction='right')
         self.manager.current='settings'
+    def open_trouble(self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        self.manager.current='trouble'
 
 class ActuationScreen(Screen):
 
@@ -150,6 +167,7 @@ class ActuationScreen(Screen):
             GPIO.micro=0
             self.widgets['alert'].text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
             self.pulse()
+            self.parent.transition = SlideTransition(direction='right')
             self.manager.current='main'
 
     def pulse(self):
@@ -206,7 +224,7 @@ class SettingsScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=ToggleButton(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
                         size_hint =(.4, .25),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
@@ -219,6 +237,33 @@ class SettingsScreen(Screen):
         self.add_widget(back)
         
     def settings_back (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+        self.manager.current='main'
+
+class TroubleScreen(Screen):
+    def __init__(self, **kwargs):
+        super(TroubleScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+                        size_hint =(.4, .25),
+                        pos_hint = {'x':.02, 'y':.02},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.85),
+                        markup=True)
+        self.widgets['back']=back
+        back.bind(on_press=self.trouble_back)
+
+
+
+
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        
+    def trouble_back (self,button):
+        self.parent.transition = SlideTransition(direction='up')
         self.manager.current='main'
 
 
@@ -257,6 +302,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
+        self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen
 
