@@ -135,12 +135,23 @@ class ControlGrid(Screen):
         trouble_button.bind(on_press=self.open_trouble)
         trouble_button.color=(1,1,1,.15)
 
+        fs_logo=Image(source='media\qt=q_95.png',
+                size_hint_x=.25,
+                size_hint_y=.25,
+                pos_hint = {'x':.2, 'center_y':.07})
+
+        version_info=Label(text='[size=22][color=#000000][i]-Version 1.0.0-[/i][/color][/size]',
+                markup=True,
+                pos_hint = {'x':.15, 'center_y':.07})
+
         self.add_widget(bg_image)
         self.add_widget(quick)
         self.add_widget(fans)
         self.add_widget(lights)
         self.add_widget(settings_button)
         self.add_widget(trouble_button)
+        self.add_widget(fs_logo)
+        self.add_widget(version_info)
 
     def micro_actuation(self):
         self.manager.transition = SlideTransition(direction='left')
@@ -248,7 +259,7 @@ class TroubleScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
-                        size_hint =(.4, .25),
+                        size_hint =(.4, .15),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.85),
@@ -256,7 +267,7 @@ class TroubleScreen(Screen):
         self.widgets['back']=back
         back.bind(on_press=self.trouble_back)
 
-
+        trouble_details=Label()
 
 
         self.add_widget(bg_image)
