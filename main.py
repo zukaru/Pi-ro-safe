@@ -9,6 +9,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from threading import Thread
 from kivy.uix.screenmanager import NoTransition
@@ -69,13 +70,11 @@ class ControlGrid(Screen):
             print('sytem actuation')
             GPIO.micro=1
             logic.fs.moli['micro_switch']=1
-            self.micro_actuation()
         elif keycode[1]=='c':
             print('sytem rearmed')
             self.widgets['fans'].text = '[size=32][b][color=#000000] Fans [/color][/b][/size]'
             GPIO.heatsensor=0
             GPIO.micro=0
-            self.manager.current='main'
         elif keycode[1]=='h':
             print('heat sensor activated')
             self.widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
@@ -239,17 +238,95 @@ class SettingsScreen(Screen):
                         size_hint =(.4, .25),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
-                        background_color=(200/250, 200/250, 200/250,.85),
+                        background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['back']=back
         back.bind(on_press=self.settings_back)
 
+        logs=Button(text="[size=40][b][color=#000000]  Device Logs [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.05, 'y':.78},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['logs']=logs
+        logs.bind(on_press=self.device_logs)
+
+        sys_report=Button(text="[size=40][b][color=#000000]  System Report [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.05, 'y':.56},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['sys_report']=sys_report
+        back.bind(on_press=self.sys_report)
+
+        temp1=Button(text="[size=40][b][color=#000000]  temp1 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.05, 'y':.34},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp1']=temp1
+        temp1.bind(on_press=self.temp1_func)
+
+        temp2=Button(text="[size=40][b][color=#000000]  temp2 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.54, 'y':.78},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp2']=temp2
+        temp2.bind(on_press=self.temp2_func)
+
+        temp3=Button(text="[size=40][b][color=#000000]  temp3 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.54, 'y':.56},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp3']=temp3
+        temp3.bind(on_press=self.temp3_func)
+
+        temp4=Button(text="[size=40][b][color=#000000]  temp4 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.54, 'y':.34},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp4']=temp4
+        temp4.bind(on_press=self.temp4_func)
+
         self.add_widget(bg_image)
         self.add_widget(back)
+        self.add_widget(logs)
+        self.add_widget(sys_report)
+        self.add_widget(temp1)
+        self.add_widget(temp2)
+        self.add_widget(temp3)
+        self.add_widget(temp4)
         
     def settings_back (self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
+    def device_logs (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        #self.manager.current='logs'
+    def sys_report (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        #self.manager.current='sys_report'
+    def temp1_func (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        #self.manager.current='sys_report'
+    def temp2_func (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        #self.manager.current='sys_report'
+    def temp3_func (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        #self.manager.current='sys_report'
+    def temp4_func (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        #self.manager.current='sys_report'
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
@@ -257,20 +334,85 @@ class TroubleScreen(Screen):
         self.cols = 2
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        test_image = Image(source=r'media\qt=q_95.png', allow_stretch=True, keep_ratio=False)
 
         back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.02, 'y':.02},
-                        background_down='',
-                        background_color=(200/250, 200/250, 200/250,.85),
-                        markup=True)
+                    size_hint =(.4, .15),
+                    pos_hint = {'x':.02, 'y':.02},
+                    background_down='',
+                    background_color=(200/250, 200/250, 200/250,.85),
+                    markup=True)
         self.widgets['back']=back
         back.bind(on_press=self.trouble_back)
 
-        trouble_details=Label()
+        trouble_details=Label(
+            text='''[size=24]Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Integer quam ipsum, posuere a consequat eget, convallis vel orci. Nullam
+varius libero eros, vel tristique dolor mattis vel. Quisque nibh nunc,
+fermentum quis scelerisque at, tincidunt ut tellus. Vestibulum ac rhoncus
+velit. In id mattis elit. Mauris scelerisque, nisi id dignissim fringilla,
+ipsum felis posuere urna, vel fringilla justo odio et eros. Integer aliquet
+erat vel est consequat facilisis. Nullam ultrices placerat ante, non interdum
+sapien eleifend eu. Donec consectetur, tellus at interdum varius, arcu nisi
+varius metus, sed porttitor neque lectus a nulla. Suspendisse vehicula faucibus pharetra.
+Integer quis sapien mi. Class aptent taciti sociosqu ad litora torquent per
+conubia nostra, per inceptos himenaeos. Suspendisse potenti. Curabitur et ante at
+enim consequat condimentum. Mauris at ornare lorem. Donec mollis urna et ipsum
+pulvinar consequat. Mauris quis justo in leo sodales euismod. Aenean ut ultricies
+purus. Praesent quis leo facilisis, varius metus vel, malesuada sem. Orci varius
+natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed
+non dignissim magna, a porta ante. Vivamus porttitor consectetur leo lacinia
+finibus. Nam dignissim accumsan fermentum.
+Aliquam erat volutpat. Etiam et blandit mi, non porttitor nisi. Donec vel placerat
+massa. Nunc pharetra finibus mauris, vel suscipit mauris feugiat et. Cras lacinia
+eleifend sem sed dignissim. Ut cursus tortor id viverra cursus. Vestibulum commodo,
+leo laoreet volutpat scelerisque, erat diam pellentesque sem, ut pellentesque sem
+turpis nec lacus. Duis semper enim dui, eget posuere velit pretium quis. Proin
+vitae nisl vel odio mattis tempor sit amet ac felis. Nullam interdum nisi ut varius
+vestibulum. Proin vitae malesuada nisi, in maximus massa. Nam ac varius justo.
+Nam gravida sem non magna tincidunt, eget pulvinar velit vestibulum. Donec
+eget massa eu nisl placerat gravida sed at lorem. Quisque pellentesque nunc
+sit amet ex mattis sollicitudin. Fusce euismod quam sed lectus rhoncus finibus.
+Vestibulum vel finibus lectus, vitae scelerisque enim. Maecenas malesuada congue metus.
+Vestibulum vitae ligula massa. Quisque lacinia maximus cursus. Integer eu
+elementum leo. Vivamus lacinia, ipsum et cursus convallis, neque ante venenatis ex,
+vel sodales diam eros non nunc. Nullam sit amet rhoncus mi, semper porttitor mauris.
+Praesent quam magna, varius eget est non, tempor blandit turpis. Nullam sed luctus felis,
+a egestas ante. Ut leo justo, hendrerit in nisi nec, tempus vehicula dui.
+In dignissim, augue ut tristique tempus, mi leo sollicitudin tellus,
+eu molestie diam massa euismod purus. Cras quis lacus elementum, hendrerit arcu id,
+maximus dolor. Phasellus condimentum posuere blandit. Sed ut ante vitae nisi facilisis maximus.
+Donec nisi mi, malesuada sed quam et, mollis mollis nisi. Curabitur ac ornare arcu.
+Cras ornare est quis erat pulvinar, non tristique mi lacinia. Nam nec purus nulla.
+Quisque tempor, dolor nec ultrices iaculis, est libero sodales tellus,
+non faucibus felis justo et justo. Maecenas vulputate sapien quis molestie condimentum.
+Etiam at convallis arcu. Nulla ornare, lectus at consequat malesuada,
+augue massa luctus purus, ac ultrices ante elit nec eros. Mauris rhoncus dolor ac
+enim volutpat, nec dapibus tellus dignissim. Aenean purus nisi, mollis et
+quam gravida, lacinia fermentum justo. Nulla pellentesque quis ipsum non
+scelerisque. Fusce et tempor velit. Vestibulum tempus at arcu at blandit. Pellentesqueut posuere orci.[/size]''',
+            markup=True,
+            size_hint_y=None,
+            )
+        trouble_details.size=trouble_details.texture_size
 
+        trouble_layout=GridLayout(
+            size_hint_y=None,
+            cols=1)
+        trouble_layout.height=trouble_layout.minimum_height
+
+        trouble_scroll=ScrollView(
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint =(.9, .80),
+            pos_hint = {'center_x':.5, 'y':.18}
+            )
 
         self.add_widget(bg_image)
+        trouble_layout.add_widget(test_image)
+        trouble_scroll.add_widget(trouble_layout)
+        self.add_widget(trouble_scroll)
+        
         self.add_widget(back)
         
     def trouble_back (self,button):
@@ -279,37 +421,56 @@ class TroubleScreen(Screen):
 
 
 def listen(app_object,*args):
+    print(app_object.current+'<<<<<<<<<<<<<<<<<<')
     event_log=logic.fs.milo
- #exhaust
-    if event_log['exhaust']==1:
-        if 'fans' in app_object.children[0].widgets:
-            if app_object.children[0].widgets['fans'].state=='down':
-                app_object.children[0].widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
-            else:
-                app_object.children[0].widgets['fans'].text='[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
-    elif event_log['exhaust']==0 and 'fans' in app_object.children[0].widgets:
-        if app_object.children[0].widgets['fans'].state=='normal':
-            app_object.children[0].widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
-#mau
-    if event_log['mau']==1:
-        print('mau fan heard')
-#lights
-    if event_log['lights']==1:
-        print('lights heard')
-#heat sensor
-    if event_log['heat_sensor']==1:
-        print('heat_sensor heard')
-#dry contact
-    if event_log['dry_contact']==1:
-        print('dry_contact heard')
-#micro switch
-    if event_log['micro_switch']==1:
-        print('micro_switch heard')
+    pass_flag=False
+    if len(app_object.children)is 2:
+        widgets=app_object.children[1].widgets
+    elif len(app_object.children)is 1:
+        widgets=app_object.children[0].widgets
+    else:
+        pass_flag=True
+
+    if pass_flag:
+        pass
+    else:
+    #exhaust
+        if event_log['exhaust']==1:
+            if 'fans' in widgets:
+                if widgets['fans'].state=='down':
+                    widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+                else:
+                    widgets['fans'].text='[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+        elif event_log['exhaust']==0 and 'fans' in widgets:
+            if widgets['fans'].state=='normal':
+                widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+    #mau
+        if event_log['mau']==1:
+            print('mau fan heard')
+    #lights
+        if event_log['lights']==1:
+            print('lights heard')
+    #heat sensor
+        if event_log['heat_sensor']==1:
+            print('heat_sensor heard')
+    #dry contact
+        if event_log['dry_contact']==1:
+            print('dry_contact heard')
+    #micro switch
+        if event_log['micro_switch']==1:
+            print('micro_switch heard')
+            if app_object.current=='main':
+                app_object.transition = SlideTransition(direction='left')
+                app_object.current='alert'
+        elif event_log['micro_switch']==0:
+            if app_object.current=='alert':
+                app_object.transition = SlideTransition(direction='right')
+                app_object.current='main'
 
 class Hood_Control(App):
     def build(self):
         
-        self.context_screen=ScreenManager()#transition=FallOutTransition()
+        self.context_screen=ScreenManager()
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
@@ -323,7 +484,5 @@ try:
     Hood_Control().run()
 except KeyboardInterrupt:
     print('Keyboard Inturrupt')
-# except Exception as e:
-#     print(e)
 finally:
     logic.clean_exit()
