@@ -50,6 +50,10 @@ class Logic():
         moli: main out logic in, is written too in main and read in logic.
         milo: main in logic out, is written too in logic and read in main.
         '''
+        self.troubles={
+            'heat_override':0
+        }
+
         self.moli={
             'exhaust':off,
             'mau':off,
@@ -62,7 +66,9 @@ class Logic():
             'lights':off,
             'heat_sensor':off,
             'dry_contact':off,
-            'micro_switch':off
+            'micro_switch':off,
+            'troubles':self.troubles
+
         }
 
     def normal(self):
@@ -136,7 +142,10 @@ class Logic():
 
 
     def trouble(self):
-        pass
+        if heat_sensor_active() and not self.moli['exhaust']==1:
+            self.milo['troubles']['heat_override']=1
+        else:
+            self.milo['troubles']['heat_override']=0
 
     def fire(self):
         if not self.fired:
@@ -152,8 +161,7 @@ class Logic():
             self.milo['micro_switch']=off
 
     def auxillary(self):
-        if 'Trouble' in self.aux_state:
-            self.trouble()
+        self.trouble()
         if 'heat_sensor' in self.aux_state:
             self.heat_sensor()
 

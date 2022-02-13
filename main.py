@@ -72,14 +72,11 @@ class ControlGrid(Screen):
             logic.fs.moli['micro_switch']=1
         elif keycode[1]=='c':
             print('sytem rearmed')
-            self.widgets['fans'].text = '[size=32][b][color=#000000] Fans [/color][/b][/size]'
             GPIO.heatsensor=0
             GPIO.micro=0
         elif keycode[1]=='h':
             print('heat sensor activated')
-            self.widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
             GPIO.heatsensor=1
-            #self.widgets['fans'].state='down'
             self.fans_switch(self.widgets['fans'])
 
     def _keyboard_closed(self):
@@ -327,6 +324,7 @@ class SettingsScreen(Screen):
     def temp4_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
+        pass
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
@@ -421,7 +419,6 @@ scelerisque. Fusce et tempor velit. Vestibulum tempus at arcu at blandit. Pellen
 
 
 def listen(app_object,*args):
-    print(app_object.current+'<<<<<<<<<<<<<<<<<<')
     event_log=logic.fs.milo
     pass_flag=False
     if len(app_object.children)is 2:
@@ -466,6 +463,22 @@ def listen(app_object,*args):
             if app_object.current=='alert':
                 app_object.transition = SlideTransition(direction='right')
                 app_object.current='main'
+    #troubles
+        trouble_log=event_log['troubles']
+        if trouble_log['heat_override']==1:
+            if app_object.current=='main':
+                if 'fans' in widgets:
+                    widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+                if 'trouble_button' in widgets:
+                    widgets['trouble_button'].source=trouble_icon
+                    widgets['trouble_button'].color=(1,1,1,1)
+        elif trouble_log['heat_override']==0:
+            if 'trouble_button' in widgets:
+                if widgets['trouble_button'].source==trouble_icon:
+                    widgets['trouble_button'].source=trouble_icon_dull
+                    widgets['trouble_button'].color=(1,1,1,.15)
+
+
 
 class Hood_Control(App):
     def build(self):
