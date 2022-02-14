@@ -22,7 +22,7 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 
 kivy.require('2.0.0')
-#Window.fullscreen = 'auto'
+Window.fullscreen = 'auto'
 
 generic_image=r'media\istockphoto-1169326482-640x640.jpg'
 settings_icon=r'media\tiny gear.png'
@@ -390,14 +390,15 @@ enim volutpat, nec dapibus tellus dignissim. Aenean purus nisi, mollis et
 quam gravida, lacinia fermentum justo. Nulla pellentesque quis ipsum non
 scelerisque. Fusce et tempor velit. Vestibulum tempus at arcu at blandit. Pellentesqueut posuere orci.[/size]''',
             markup=True,
-            size_hint_y=None,
+            color = (0,0,0,1)
             )
         trouble_details.size=trouble_details.texture_size
 
         trouble_layout=GridLayout(
             size_hint_y=None,
-            cols=1)
-        trouble_layout.height=trouble_layout.minimum_height
+            cols=1
+            )
+        #trouble_layout.height=trouble_layout.minimum_height
 
         trouble_scroll=ScrollView(
             do_scroll_y=True,
@@ -407,7 +408,7 @@ scelerisque. Fusce et tempor velit. Vestibulum tempus at arcu at blandit. Pellen
             )
 
         self.add_widget(bg_image)
-        trouble_layout.add_widget(test_image)
+        trouble_layout.add_widget(trouble_details)
         trouble_scroll.add_widget(trouble_layout)
         self.add_widget(trouble_scroll)
         
@@ -456,7 +457,7 @@ def listen(app_object,*args):
     #micro switch
         if event_log['micro_switch']==1:
             print('micro_switch heard')
-            if app_object.current=='main':
+            if app_object.current!='alert':
                 app_object.transition = SlideTransition(direction='left')
                 app_object.current='alert'
         elif event_log['micro_switch']==0:
@@ -477,7 +478,6 @@ def listen(app_object,*args):
                 if widgets['trouble_button'].source==trouble_icon:
                     widgets['trouble_button'].source=trouble_icon_dull
                     widgets['trouble_button'].color=(1,1,1,.15)
-
 
 
 class Hood_Control(App):
