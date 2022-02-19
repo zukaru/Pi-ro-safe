@@ -22,7 +22,7 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 
 kivy.require('2.0.0')
-Window.fullscreen = 'auto'
+#Window.fullscreen = 'auto'
 
 generic_image=r'media\istockphoto-1169326482-640x640.jpg'
 settings_icon=r'media\tiny gear.png'
@@ -69,7 +69,6 @@ class ControlGrid(Screen):
         if keycode[1]=='m':
             print('sytem actuation')
             GPIO.micro=1
-            logic.fs.moli['micro_switch']=1
         elif keycode[1]=='c':
             print('sytem rearmed')
             GPIO.heatsensor=0
@@ -149,9 +148,6 @@ class ControlGrid(Screen):
         self.add_widget(fs_logo)
         self.add_widget(version_info)
 
-    def micro_actuation(self):
-        self.manager.transition = SlideTransition(direction='left')
-        self.manager.current='alert'
     def open_settings(self,button):
         self.parent.transition = SlideTransition(direction='right')
         self.manager.current='settings'
@@ -163,7 +159,7 @@ class ActuationScreen(Screen):
 
     def acknowledgement(self,button):
         print('actuation acknowledged')
-        self.anime.cancel(self.widgets['alert'])
+        self.anime.cancel_all(self.widgets['alert'])
         self.widgets['alert'].background_color=(190/250, 10/250, 10/250,.9)
         self.widgets['alert'].text="[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]"
 
@@ -175,7 +171,6 @@ class ActuationScreen(Screen):
             self.widgets['alert'].text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
             self.pulse()
             self.parent.transition = SlideTransition(direction='right')
-            self.manager.current='main'
 
     def pulse(self):
             self.anime = Animation(background_color=(249/250, 0/250, 0/250,1), duration=1.5)+Animation(background_color=(249/250, 200/250, 200/250,1), duration=.2)

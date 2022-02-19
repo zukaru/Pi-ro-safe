@@ -1,25 +1,27 @@
 from random import randint
 BOARD = 1
+BCM = 1
 OUT = 1
 IN = 1
+PUD_DOWN = 1
 micro=0
 heatsensor=0
 def setmode(a):
-   print (a)
-def setup(a, b):
-   print (a)
+   pass
+def setup(a, b,pull_up_down=1):
+   pass
 def output(a, b):
-   print (a)
-   if b is 1:
-      print ('on')
+   pass
+   if b == 1:
+      pass
    else:
-      print('off')
+      pass
 def cleanup():
    print ('pins released as inputs')
 def setwarnings(flag):
-   print ('False')
+   pass
 def input(number,source):
-   print(number)
+   pass
    if source =='m':
       if micro == 1:
          return True
@@ -32,3 +34,4 @@ def input(number,source):
          
       else:
          return False
+   
