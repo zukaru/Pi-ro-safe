@@ -417,9 +417,9 @@ scelerisque. Fusce et tempor velit. Vestibulum tempus at arcu at blandit. Pellen
 def listen(app_object,*args):
     event_log=logic.fs.milo
     pass_flag=False
-    if len(app_object.children)is 2:
+    if len(app_object.children)== 2:
         widgets=app_object.children[1].widgets
-    elif len(app_object.children)is 1:
+    elif len(app_object.children)== 1:
         widgets=app_object.children[0].widgets
     else:
         pass_flag=True
