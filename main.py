@@ -1,3 +1,4 @@
+import os
 import kivy
 import logic
 import RPi.GPIO as GPIO
@@ -23,11 +24,18 @@ from kivy.uix.scrollview import ScrollView
 
 kivy.require('2.0.0')
 #Window.fullscreen = 'auto'
-
-generic_image=r'media\istockphoto-1169326482-640x640.jpg'
-settings_icon=r'media\tiny gear.png'
-trouble_icon=r'media\trouble icon.png'
-trouble_icon_dull=r'media\trouble icon dull.png'
+if os.name == 'nt':
+    generic_image=r'media\istockphoto-1169326482-640x640.jpg'
+    settings_icon=r'media\tiny gear.png'
+    trouble_icon=r'media\trouble icon.png'
+    trouble_icon_dull=r'media\trouble icon dull.png'
+    logo=r'media\qt=q_95.png'
+if os.name == 'posix':
+    generic_image=r'media/istockphoto-1169326482-640x640.jpg'
+    settings_icon=r'media/tiny gear.png'
+    trouble_icon=r'media/trouble icon.png'
+    trouble_icon_dull=r'media/trouble icon dull.png'
+    logo=r'media/qt=q_95.png'
 
 class IconButton(ButtonBehavior, Image):
     pass
@@ -130,7 +138,7 @@ class ControlGrid(Screen):
         trouble_button.bind(on_press=self.open_trouble)
         trouble_button.color=(1,1,1,.15)
 
-        fs_logo=Image(source='media\qt=q_95.png',
+        fs_logo=Image(source=logo,
                 size_hint_x=.25,
                 size_hint_y=.25,
                 pos_hint = {'x':.2, 'center_y':.07})
@@ -494,3 +502,4 @@ except KeyboardInterrupt:
     print('Keyboard Inturrupt')
 finally:
     logic.clean_exit()
+    quit()
