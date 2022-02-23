@@ -159,7 +159,7 @@ class Logic():
 
     def auxillary(self):
         self.trouble()
-        if 'heat_sensor' in self.aux_state:
+        if 'heat_sensor' in self.aux_state and not self.fired:
             self.heat_sensor()
 
     def state_manager(self):
