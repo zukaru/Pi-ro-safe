@@ -38,7 +38,7 @@ if os.name == 'posix':
     def fan_switch_on():
         return GPIO.input(14)
     def light_switch_on():
-        return GPIO.input(15,)
+        return GPIO.input(15)
 def clean_exit():
     GPIO.cleanup()
 
