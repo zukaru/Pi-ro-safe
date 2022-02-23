@@ -6,7 +6,7 @@ heat_sensor_timer=10
 channels_in = [14,15,18,23]
 
 #outputs: ex fan relay, mau relay, lights, additional relays
-channels_out = [25,8,26,12]
+channels_out = [25,8,7,12]
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -19,8 +19,8 @@ on=1
 
 exfan1=exhaust.Exhaust(25)
 mau1=mau.Mau(8)
-#lights=GPIO.input(26)
-lights_pin=26
+#lights=GPIO.input(7)
+lights_pin=7
 
 def heat_sensor_active():
     return GPIO.input(18,'h')
