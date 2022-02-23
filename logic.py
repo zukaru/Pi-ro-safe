@@ -19,6 +19,7 @@ on=1
 
 exfan1=exhaust.Exhaust(25)
 mau1=mau.Mau(8)
+dry_contact=12
 #lights=GPIO.input(7)
 lights_pin=7
 if os.name == 'nt':
@@ -89,6 +90,9 @@ class Logic():
             self.state='Fire'
             self.milo['micro_switch']=on
         else:
+
+            GPIO.output(dry_contact,on)
+
             if self.moli['exhaust']==on or fan_switch_on():
                 GPIO.output(exfan1.pin,on)
                 self.milo['exhaust']=on
@@ -156,8 +160,7 @@ class Logic():
             GPIO.output(exfan1.pin,on)
             GPIO.output(mau1.pin,off)
             GPIO.output(lights_pin,off)
-            # GPIO.output(dry contacts,on)
-            # GPIO.output(dry contacts,on)
+            GPIO.output(dry_contact,off)
             self.fired = True
         if not micro_switch_active():
             self.fired = False
