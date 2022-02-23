@@ -21,16 +21,24 @@ exfan1=exhaust.Exhaust(25)
 mau1=mau.Mau(8)
 #lights=GPIO.input(7)
 lights_pin=7
-
-def heat_sensor_active():
-    return GPIO.input(18,'h')
-def micro_switch_active():
-    return GPIO.input(23,'m')
-def fan_switch_on():
-    return GPIO.input(14,'f')
-def light_switch_on():
-    return GPIO.input(15,'l')
-
+if os.name == 'nt':
+    def heat_sensor_active():
+        return GPIO.input(18,'h')
+    def micro_switch_active():
+        return GPIO.input(23,'m')
+    def fan_switch_on():
+        return GPIO.input(14,'f')
+    def light_switch_on():
+        return GPIO.input(15,'l')
+if os.name == 'posix':
+    def heat_sensor_active():
+        return GPIO.input(18)
+    def micro_switch_active():
+        return GPIO.input(23)
+    def fan_switch_on():
+        return GPIO.input(14)
+    def light_switch_on():
+        return GPIO.input(15,)
 def clean_exit():
     GPIO.cleanup()
 
