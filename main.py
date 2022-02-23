@@ -440,8 +440,6 @@ def listen(app_object,*args):
             if 'fans' in widgets:
                 if widgets['fans'].state=='down':
                     widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
-                else:
-                    widgets['fans'].text='[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
         elif event_log['exhaust']==0 and 'fans' in widgets:
             if widgets['fans'].state=='normal':
                 widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
