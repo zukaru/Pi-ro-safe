@@ -335,7 +335,7 @@ class TroubleScreen(Screen):
         self.cols = 2
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
-        test_image = Image(source=r'media\qt=q_95.png', allow_stretch=True, keep_ratio=False)
+        test_image = Image(source=logo, allow_stretch=True, keep_ratio=False)
 
         back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
                     size_hint =(.4, .15),

@@ -35,7 +35,7 @@ if os.name == 'posix':
     def heat_sensor_active():
         return GPIO.input(18)
     def micro_switch_active():
-        return GPIO.input(23)
+        return  not GPIO.input(23)
     def fan_switch_on():
         return GPIO.input(14)
     def light_switch_on():
