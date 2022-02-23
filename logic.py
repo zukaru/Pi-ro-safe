@@ -124,10 +124,9 @@ class Logic():
             # elif not self.switch():
             #     self.state='Off'
     def heat_trip(self):
-        if self.sensor_target<=time.time():
-            self.sensor_target=time.time()+heat_sensor_timer
-            self.aux_state.append('heat_sensor')
-            print('heat trip')
+        self.sensor_target=time.time()+heat_sensor_timer
+        self.aux_state.append('heat_sensor')
+        print('heat trip')
 
     def heat_sensor(self):
             if self.sensor_target>=time.time():
