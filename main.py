@@ -177,6 +177,7 @@ class ActuationScreen(Screen):
             GPIO.heatsensor=0
             GPIO.micro=0
             self.widgets['alert'].text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
+            self.anime.cancel_all(self.widgets['alert'])
             self.pulse()
             self.parent.transition = SlideTransition(direction='right')
 
@@ -463,6 +464,8 @@ def listen(app_object,*args):
                 app_object.current='alert'
         elif event_log['micro_switch']==0:
             if app_object.current=='alert':
+                if 'alert' in widgets:
+                    widgets['alert'].anime.cancel_all(widgets['alert'])
                 app_object.transition = SlideTransition(direction='right')
                 app_object.current='main'
     #troubles
