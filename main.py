@@ -192,11 +192,6 @@ class ActuationScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        def repulse(self):
-            self.anime = Animation(background_color=(249/250, 0/250, 0/250,1), duration=1.5)+Animation(background_color=(249/250, 200/250, 200/250,1), duration=.2)
-            self.anime.repeat = True
-            self.anime.start(self.widgets['alert'])
-
         alert=Button(text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.5},

@@ -141,8 +141,9 @@ class Logic():
                 self.milo['heat_sensor']=on
                 print('heat timer active')
             else:
-                GPIO.output(exfan1.pin,off)
-                GPIO.output(mau1.pin,off)
+                if self.moli['exhaust']==off and self.moli['mau']==off:
+                    GPIO.output(exfan1.pin,off)
+                    GPIO.output(mau1.pin,off)
                 self.milo['exhaust']=off
                 self.milo['mau']=off
                 self.milo['heat_sensor']=off
