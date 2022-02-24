@@ -192,6 +192,11 @@ class ActuationScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
+        def repulse(self):
+            self.anime = Animation(background_color=(249/250, 0/250, 0/250,1), duration=1.5)+Animation(background_color=(249/250, 200/250, 200/250,1), duration=.2)
+            self.anime.repeat = True
+            self.anime.start(self.widgets['alert'])
+
         alert=Button(text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.5},
@@ -464,8 +469,7 @@ def listen(app_object,*args):
                 app_object.current='alert'
         elif event_log['micro_switch']==0:
             if app_object.current=='alert':
-                if 'alert' in widgets:
-                    widgets['alert'].anime.cancel_all(widgets['alert'])
+                app_object.get_screen('alert').reset_system(widgets['alert'])
                 app_object.transition = SlideTransition(direction='right')
                 app_object.current='main'
     #troubles
