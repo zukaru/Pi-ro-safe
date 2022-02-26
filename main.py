@@ -1,5 +1,6 @@
 import os
 import kivy
+from numpy import spacing
 import logic
 import RPi.GPIO as GPIO
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -21,6 +22,8 @@ from kivy.clock import Clock
 from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
+from kivy.graphics import Rectangle, Color
+from kivy.properties import ListProperty
 
 kivy.require('2.0.0')
 #Window.fullscreen = 'auto'
@@ -39,6 +42,45 @@ if os.name == 'posix':
 
 class IconButton(ButtonBehavior, Image):
     pass
+
+class trouble_template(Label):
+    def __init__(self,trouble_tag,trouble_text='',link_text=None,ref_tag=None, **kwargs):
+        if link_text == None:
+            link_text=''
+        else:
+            link_text='\n'+str(link_text)
+        super().__init__(text=f'''[size=24][b]{trouble_tag}[/b][/size]
+        [size=18][i]{trouble_text}[/i][/size][size=20][color=#de2500][i][ref={ref_tag}]{link_text}[/ref][/i][/color][/size]''',
+        markup=True,
+        size_hint_y=None,
+        size_hint_x=1,
+        color = (0,0,0,1),
+        **kwargs)
+        self.bind(pos=self.update_rect)
+        self.bind(size=self.update_rect)
+        with self.canvas.before:
+                    Color(245/250, 216/250, 41/250,.85)
+                    self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = (self.size[0], self.size[1])
+        
+# disabled=True,
+#         background_disabled_normal='',
+#         background_color=(245/250, 216/250, 41/250,.85),
+#         disabled_color = (0,0,0,1),
+class EventpassGridLayout(GridLayout):
+    pass
+    # def on_touch_down(self, touch):
+    #         super(EventpassGridLayout, self).on_touch_down(touch)
+    # # def on_touch_down(self, touch):
+    # #     for child in self.children:
+    # #         if child.dispatch('on_touch_down', touch):
+    # #             return True
+    #         for i in self.children:
+    #             print(touch)
+    #             i.on_ref_press(touch)
+
 
 class ControlGrid(Screen):
     def quick_start(self,button):
@@ -336,7 +378,6 @@ class TroubleScreen(Screen):
         self.cols = 2
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
-        test_image = Image(source=logo, allow_stretch=True, keep_ratio=False)
 
         back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
                     size_hint =(.4, .15),
@@ -347,77 +388,42 @@ class TroubleScreen(Screen):
         self.widgets['back']=back
         back.bind(on_press=self.trouble_back)
 
-        trouble_details=Label(
-            text='''[size=24]Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Integer quam ipsum, posuere a consequat eget, convallis vel orci. Nullam
-varius libero eros, vel tristique dolor mattis vel. Quisque nibh nunc,
-fermentum quis scelerisque at, tincidunt ut tellus. Vestibulum ac rhoncus
-velit. In id mattis elit. Mauris scelerisque, nisi id dignissim fringilla,
-ipsum felis posuere urna, vel fringilla justo odio et eros. Integer aliquet
-erat vel est consequat facilisis. Nullam ultrices placerat ante, non interdum
-sapien eleifend eu. Donec consectetur, tellus at interdum varius, arcu nisi
-varius metus, sed porttitor neque lectus a nulla. Suspendisse vehicula faucibus pharetra.
-Integer quis sapien mi. Class aptent taciti sociosqu ad litora torquent per
-conubia nostra, per inceptos himenaeos. Suspendisse potenti. Curabitur et ante at
-enim consequat condimentum. Mauris at ornare lorem. Donec mollis urna et ipsum
-pulvinar consequat. Mauris quis justo in leo sodales euismod. Aenean ut ultricies
-purus. Praesent quis leo facilisis, varius metus vel, malesuada sem. Orci varius
-natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed
-non dignissim magna, a porta ante. Vivamus porttitor consectetur leo lacinia
-finibus. Nam dignissim accumsan fermentum.
-Aliquam erat volutpat. Etiam et blandit mi, non porttitor nisi. Donec vel placerat
-massa. Nunc pharetra finibus mauris, vel suscipit mauris feugiat et. Cras lacinia
-eleifend sem sed dignissim. Ut cursus tortor id viverra cursus. Vestibulum commodo,
-leo laoreet volutpat scelerisque, erat diam pellentesque sem, ut pellentesque sem
-turpis nec lacus. Duis semper enim dui, eget posuere velit pretium quis. Proin
-vitae nisl vel odio mattis tempor sit amet ac felis. Nullam interdum nisi ut varius
-vestibulum. Proin vitae malesuada nisi, in maximus massa. Nam ac varius justo.
-Nam gravida sem non magna tincidunt, eget pulvinar velit vestibulum. Donec
-eget massa eu nisl placerat gravida sed at lorem. Quisque pellentesque nunc
-sit amet ex mattis sollicitudin. Fusce euismod quam sed lectus rhoncus finibus.
-Vestibulum vel finibus lectus, vitae scelerisque enim. Maecenas malesuada congue metus.
-Vestibulum vitae ligula massa. Quisque lacinia maximus cursus. Integer eu
-elementum leo. Vivamus lacinia, ipsum et cursus convallis, neque ante venenatis ex,
-vel sodales diam eros non nunc. Nullam sit amet rhoncus mi, semper porttitor mauris.
-Praesent quam magna, varius eget est non, tempor blandit turpis. Nullam sed luctus felis,
-a egestas ante. Ut leo justo, hendrerit in nisi nec, tempus vehicula dui.
-In dignissim, augue ut tristique tempus, mi leo sollicitudin tellus,
-eu molestie diam massa euismod purus. Cras quis lacus elementum, hendrerit arcu id,
-maximus dolor. Phasellus condimentum posuere blandit. Sed ut ante vitae nisi facilisis maximus.
-Donec nisi mi, malesuada sed quam et, mollis mollis nisi. Curabitur ac ornare arcu.
-Cras ornare est quis erat pulvinar, non tristique mi lacinia. Nam nec purus nulla.
-Quisque tempor, dolor nec ultrices iaculis, est libero sodales tellus,
-non faucibus felis justo et justo. Maecenas vulputate sapien quis molestie condimentum.
-Etiam at convallis arcu. Nulla ornare, lectus at consequat malesuada,
-augue massa luctus purus, ac ultrices ante elit nec eros. Mauris rhoncus dolor ac
-enim volutpat, nec dapibus tellus dignissim. Aenean purus nisi, mollis et
-quam gravida, lacinia fermentum justo. Nulla pellentesque quis ipsum non
-scelerisque. Fusce et tempor velit. Vestibulum tempus at arcu at blandit. Pellentesqueut posuere orci.[/size]''',
-            markup=True,
-            color = (0,0,0,1)
-            )
-        trouble_details.size=trouble_details.texture_size
+        trouble_details=trouble_template('-No active troubles detected-')
+        self.widgets['trouble_details']=trouble_details
+        # trouble_details.bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
+        # trouble_details.bind(width=lambda instance, value: setattr(instance, 'text_size', (value, None)))
 
-        trouble_layout=GridLayout(
+        trouble_layout=EventpassGridLayout(
             size_hint_y=None,
-            cols=1
+            size_hint_x=1,
+            cols=1,
+            padding=10,
+            spacing=(1,5)
             )
-        #trouble_layout.height=trouble_layout.minimum_height
+        self.widgets['trouble_layout']=trouble_layout
+        trouble_layout.bind(minimum_height=trouble_layout.setter('height'))
 
         trouble_scroll=ScrollView(
+            bar_width=8,
             do_scroll_y=True,
             do_scroll_x=False,
+            size_hint_y=None,
+            size_hint_x=1,
             size_hint =(.9, .80),
             pos_hint = {'center_x':.5, 'y':.18}
             )
+        self.widgets['trouble_scroll']=trouble_scroll
 
         self.add_widget(bg_image)
         trouble_layout.add_widget(trouble_details)
         trouble_scroll.add_widget(trouble_layout)
+        
+        
         self.add_widget(trouble_scroll)
-        
         self.add_widget(back)
+
         
+
     def trouble_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='main'
@@ -432,7 +438,6 @@ def listen(app_object,*args):
         widgets=app_object.children[0].widgets
     else:
         pass_flag=True
-
     if pass_flag:
         pass
     else:
@@ -446,19 +451,18 @@ def listen(app_object,*args):
                 widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
     #mau
         if event_log['mau']==1:
-            print('mau fan heard')
+            pass
     #lights
         if event_log['lights']==1:
-            print('lights heard')
+            pass
     #heat sensor
         if event_log['heat_sensor']==1:
-            print('heat_sensor heard')
+            pass
     #dry contact
         if event_log['dry_contact']==1:
-            print('dry_contact heard')
+            pass
     #micro switch
         if event_log['micro_switch']==1:
-            print('micro_switch heard')
             if app_object.current!='alert':
                 app_object.transition = SlideTransition(direction='left')
                 app_object.current='alert'
@@ -469,18 +473,57 @@ def listen(app_object,*args):
                 app_object.current='main'
     #troubles
         trouble_log=event_log['troubles']
-        if trouble_log['heat_override']==1:
-            if app_object.current=='main':
-                if 'fans' in widgets:
-                    widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
-                if 'trouble_button' in widgets:
+        troubles_screen=app_object.get_screen('trouble')
+        trouble_display=troubles_screen.widgets['trouble_layout']
+
+        if 1 in trouble_log.values():#if any troubles detected
+            if 'trouble_button' in widgets:
                     widgets['trouble_button'].source=trouble_icon
                     widgets['trouble_button'].color=(1,1,1,1)
-        elif trouble_log['heat_override']==0:
+            if 'trouble_details' in troubles_screen.widgets:
+                trouble_display.remove_widget(troubles_screen.widgets['trouble_details'])
+                del troubles_screen.widgets['trouble_details']
+        else:#if no troubles detected
             if 'trouble_button' in widgets:
                 if widgets['trouble_button'].source==trouble_icon:
                     widgets['trouble_button'].source=trouble_icon_dull
                     widgets['trouble_button'].color=(1,1,1,.15)
+            if 'trouble_details' not in troubles_screen.widgets:
+                trouble_details=trouble_template('No active troubles detected')
+                troubles_screen.widgets['trouble_details']=trouble_details
+                trouble_display.add_widget(trouble_details)
+    #heat trouble
+        if trouble_log['heat_override']==1:
+            if app_object.current!='alert':
+                if 'fans' in widgets:
+                    widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+                if 'heat_trouble' not in troubles_screen.widgets:
+                    heat_trouble=trouble_template('                        -Heat Sensor-',
+                    'Unsafe temps detected in hood; fan override activated',
+                    link_text='                                Turn on fans',ref_tag='fans')
+
+                    def test(a,b):
+                        print('werk\n'*20)
+                        app_object.get_screen('main').widgets['fans'].state = 'down'
+                        app_object.get_screen('main').fans_switch(app_object.get_screen('main').widgets['fans'])
+
+                    heat_trouble.bind(on_ref_press=test)
+                    troubles_screen.widgets['heat_trouble']=heat_trouble
+                    troubles_screen.widgets['heat_trouble'].bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
+                    
+                    
+                    trouble_display.add_widget(heat_trouble)
+                    # def print_it(instance, value):
+                    #             print('User click on', value)
+                    #             app_object.get_screen('main').widgets['fans'].state = 'down'
+                    #             app_object.get_screen('main').fans_switch(app_object.get_screen('main').widgets['fans'])
+                    # widget = Label(text='Hello [ref=world]World[/ref]', markup=True)
+                    # widget.bind(on_ref_press=print_it)
+                    # trouble_display.add_widget(widget)
+        elif trouble_log['heat_override']==0:
+            if 'heat_trouble' in troubles_screen.widgets:
+                trouble_display.remove_widget(troubles_screen.widgets['heat_trouble'])
+                del troubles_screen.widgets['heat_trouble']
 
 
 class Hood_Control(App):
