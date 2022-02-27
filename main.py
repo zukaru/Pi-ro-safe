@@ -427,14 +427,14 @@ def listen(app_object,*args):
     if pass_flag:
         pass
     else:
+        main_screen=app_object.get_screen('main')
     #exhaust
         if event_log['exhaust']==1:
-            if 'fans' in widgets:
-                if widgets['fans'].state=='down':
-                    widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
-        elif event_log['exhaust']==0 and 'fans' in widgets:
-            if widgets['fans'].state=='normal':
-                widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+            if main_screen.widgets['fans'].state=='down':
+                main_screen.widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+        elif event_log['exhaust']==0:
+            if main_screen.widgets['fans'].state=='down':
+                main_screen.widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
     #mau
         if event_log['mau']==1:
             pass
@@ -463,17 +463,15 @@ def listen(app_object,*args):
         trouble_display=troubles_screen.widgets['trouble_layout']
 
         if 1 in trouble_log.values():#if any troubles detected
-            if 'trouble_button' in widgets:
-                    widgets['trouble_button'].source=trouble_icon
-                    widgets['trouble_button'].color=(1,1,1,1)
+            main_screen.widgets['trouble_button'].source=trouble_icon
+            main_screen.widgets['trouble_button'].color=(1,1,1,1)
             if 'trouble_details' in troubles_screen.widgets:
                 trouble_display.remove_widget(troubles_screen.widgets['trouble_details'])
                 del troubles_screen.widgets['trouble_details']
         else:#if no troubles detected
-            if 'trouble_button' in widgets:
-                if widgets['trouble_button'].source==trouble_icon:
-                    widgets['trouble_button'].source=trouble_icon_dull
-                    widgets['trouble_button'].color=(1,1,1,.15)
+            if main_screen.widgets['trouble_button'].source==trouble_icon:
+                main_screen.widgets['trouble_button'].source=trouble_icon_dull
+                main_screen.widgets['trouble_button'].color=(1,1,1,.15)
             if 'trouble_details' not in troubles_screen.widgets:
                 trouble_details=trouble_template('-No active troubles detected-')
                 troubles_screen.widgets['trouble_details']=trouble_details
@@ -481,15 +479,13 @@ def listen(app_object,*args):
     #heat trouble
         if trouble_log['heat_override']==1:
             if app_object.current!='alert':
-                if 'fans' in widgets:
-                    widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+                main_screen.widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
                 if 'heat_trouble' not in troubles_screen.widgets:
                     heat_trouble=trouble_template('                        -Heat Sensor-',
                     'Unsafe temps detected in hood; fan override activated',
                     link_text='                                Turn on fans',ref_tag='fans')
 
                     def test(a,b):
-                        print('werk\n'*20)
                         app_object.get_screen('main').widgets['fans'].state = 'down'
                         app_object.get_screen('main').fans_switch(app_object.get_screen('main').widgets['fans'])
 
