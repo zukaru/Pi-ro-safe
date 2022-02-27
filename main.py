@@ -1,4 +1,5 @@
 import os
+import traceback
 import kivy
 from numpy import spacing
 import logic
@@ -501,7 +502,6 @@ def listen(app_object,*args):
 
 class Hood_Control(App):
     def build(self):
-        
         self.context_screen=ScreenManager()
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
@@ -516,6 +516,8 @@ try:
     Hood_Control().run()
 except KeyboardInterrupt:
     print('Keyboard Inturrupt')
+except: 
+    traceback.print_exc()
 finally:
     logic.clean_exit()
     quit()
