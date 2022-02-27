@@ -64,23 +64,9 @@ class trouble_template(Label):
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
-        
-# disabled=True,
-#         background_disabled_normal='',
-#         background_color=(245/250, 216/250, 41/250,.85),
-#         disabled_color = (0,0,0,1),
+
 class EventpassGridLayout(GridLayout):
     pass
-    # def on_touch_down(self, touch):
-    #         super(EventpassGridLayout, self).on_touch_down(touch)
-    # # def on_touch_down(self, touch):
-    # #     for child in self.children:
-    # #         if child.dispatch('on_touch_down', touch):
-    # #             return True
-    #         for i in self.children:
-    #             print(touch)
-    #             i.on_ref_press(touch)
-
 
 class ControlGrid(Screen):
     def quick_start(self,button):
@@ -489,7 +475,7 @@ def listen(app_object,*args):
                     widgets['trouble_button'].source=trouble_icon_dull
                     widgets['trouble_button'].color=(1,1,1,.15)
             if 'trouble_details' not in troubles_screen.widgets:
-                trouble_details=trouble_template('No active troubles detected')
+                trouble_details=trouble_template('-No active troubles detected-')
                 troubles_screen.widgets['trouble_details']=trouble_details
                 trouble_display.add_widget(trouble_details)
     #heat trouble
@@ -510,16 +496,7 @@ def listen(app_object,*args):
                     heat_trouble.bind(on_ref_press=test)
                     troubles_screen.widgets['heat_trouble']=heat_trouble
                     troubles_screen.widgets['heat_trouble'].bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
-                    
-                    
                     trouble_display.add_widget(heat_trouble)
-                    # def print_it(instance, value):
-                    #             print('User click on', value)
-                    #             app_object.get_screen('main').widgets['fans'].state = 'down'
-                    #             app_object.get_screen('main').fans_switch(app_object.get_screen('main').widgets['fans'])
-                    # widget = Label(text='Hello [ref=world]World[/ref]', markup=True)
-                    # widget.bind(on_ref_press=print_it)
-                    # trouble_display.add_widget(widget)
         elif trouble_log['heat_override']==0:
             if 'heat_trouble' in troubles_screen.widgets:
                 trouble_display.remove_widget(troubles_screen.widgets['heat_trouble'])
