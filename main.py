@@ -485,11 +485,11 @@ def listen(app_object,*args):
                     'Unsafe temps detected in hood; fan override activated',
                     link_text='                                Turn on fans',ref_tag='fans')
 
-                    def test(a,b):
+                    def fan_switch(a,b):
                         app_object.get_screen('main').widgets['fans'].state = 'down'
                         app_object.get_screen('main').fans_switch(app_object.get_screen('main').widgets['fans'])
 
-                    heat_trouble.bind(on_ref_press=test)
+                    heat_trouble.bind(on_ref_press=fan_switch)
                     troubles_screen.widgets['heat_trouble']=heat_trouble
                     troubles_screen.widgets['heat_trouble'].bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
                     trouble_display.add_widget(heat_trouble)
