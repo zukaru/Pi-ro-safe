@@ -280,7 +280,7 @@ class SettingsScreen(Screen):
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['logs']=logs
-        logs.bind(on_press=self.device_logs)
+        logs.bind(on_release=self.device_logs)
 
         sys_report=Button(text="[size=40][b][color=#000000]  System Report [/color][/b][/size]",
                         size_hint =(.4, .20),
@@ -289,52 +289,52 @@ class SettingsScreen(Screen):
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['sys_report']=sys_report
-        back.bind(on_press=self.sys_report)
+        sys_report.bind(on_release=self.sys_report)
 
-        temp1=Button(text="[size=40][b][color=#000000]  temp1 [/color][/b][/size]",
+        preferences=Button(text="[size=40][b][color=#000000]  Settings [/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.34},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp1']=temp1
-        temp1.bind(on_press=self.temp1_func)
+        self.widgets['preferences']=preferences
+        preferences.bind(on_release=self.preferences_func)
 
-        temp2=Button(text="[size=40][b][color=#000000]  temp2 [/color][/b][/size]",
+        train=Button(text="[size=40][b][color=#000000]  Training [/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.78},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp2']=temp2
-        temp2.bind(on_press=self.temp2_func)
+        self.widgets['train']=train
+        train.bind(on_release=self.train_func)
 
-        temp3=Button(text="[size=40][b][color=#000000]  temp3 [/color][/b][/size]",
+        qr=Button(text="[size=40][b][color=#000000]  QR Links [/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.56},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp3']=temp3
-        temp3.bind(on_press=self.temp3_func)
+        self.widgets['qr']=qr
+        qr.bind(on_release=self.qr_func)
 
-        temp4=Button(text="[size=40][b][color=#000000]  temp4 [/color][/b][/size]",
+        about=Button(text="[size=40][b][color=#000000]  About [/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.34},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp4']=temp4
-        temp4.bind(on_press=self.temp4_func)
+        self.widgets['about']=about
+        about.bind(on_release=self.about_func)
 
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(logs)
         self.add_widget(sys_report)
-        self.add_widget(temp1)
-        self.add_widget(temp2)
-        self.add_widget(temp3)
-        self.add_widget(temp4)
+        self.add_widget(preferences)
+        self.add_widget(train)
+        self.add_widget(qr)
+        self.add_widget(about)
         
     def settings_back (self,button):
         self.parent.transition = SlideTransition(direction='left')
@@ -345,19 +345,18 @@ class SettingsScreen(Screen):
     def sys_report (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
-    def temp1_func (self,button):
+    def preferences_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
-    def temp2_func (self,button):
+    def train_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
-    def temp3_func (self,button):
+    def qr_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
-    def temp4_func (self,button):
-        self.parent.transition = SlideTransition(direction='down')
+    def about_func (self,button):
+        self.parent.transition = SlideTransition(direction='right')
         #self.manager.current='sys_report'
-        pass
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
