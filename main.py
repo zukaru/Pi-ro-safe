@@ -448,7 +448,11 @@ def listen(app_object,*args):
             pass
     #heat sensor
         if event_log['heat_sensor']==1:
-            pass
+            if main_screen.widgets['fans'].state=='normal':
+                main_screen.widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+        else:
+            if main_screen.widgets['fans'].state=='normal':
+                main_screen.widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
     #dry contact
         if event_log['dry_contact']==1:
             pass
@@ -457,6 +461,7 @@ def listen(app_object,*args):
             if app_object.current!='alert':
                 app_object.transition = SlideTransition(direction='left')
                 app_object.current='alert'
+                App.get_running_app().close_settings()
         elif event_log['micro_switch']==0:
             if app_object.current=='alert':
                 app_object.get_screen('alert').reset_system(widgets['alert'])
@@ -528,14 +533,14 @@ class Hood_Control(App):
         settings.add_json_panel('Settings',self.config,data=preferences.settings)
 
     def on_config_change(self, config, section, key, value):
-        settings_setter(key)
+        settings_setter(value)
 
-def settings_setter(key):
-    if key == '10 Seconds':
+def settings_setter(value):
+    if value == '10 Seconds':
         logic.heat_sensor_timer=10
-    elif key == '5 Minutes':
+    elif value == '5 Minutes':
         logic.heat_sensor_timer=300
-    elif key == '10 Minutes':
+    elif value == '10 Minutes':
         logic.heat_sensor_timer=600
 
 logic_control = Thread(target=logic.logic,daemon=True)
