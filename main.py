@@ -25,6 +25,10 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.graphics import Rectangle, Color
 from kivy.properties import ListProperty
+from kivy.config import ConfigParser
+import preferences
+from kivy.uix.settings import SettingsWithNoMenu
+from kivy.uix.settings import SettingsWithSidebar
 
 kivy.require('2.0.0')
 #Window.fullscreen = 'auto'
@@ -347,6 +351,7 @@ class SettingsScreen(Screen):
         #self.manager.current='sys_report'
     def preferences_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
+        App.get_running_app().open_settings()
         #self.manager.current='sys_report'
     def train_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
@@ -501,6 +506,9 @@ def listen(app_object,*args):
 
 class Hood_Control(App):
     def build(self):
+        self.use_kivy_settings = False
+        self.settings_cls = SettingsWithSidebar
+        settings_setter(self.config.get('preferences', 'heat_timer'))
         self.context_screen=ScreenManager()
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
@@ -508,6 +516,27 @@ class Hood_Control(App):
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen
+
+    def build_config(self, config):
+        config.setdefaults('preferences', {
+            'boolexample': True,
+            'numericexample': 10578,
+            'heat_timer': '10 Seconds',
+            'stringexample': 'some_string'})
+
+    def build_settings(self, settings):
+        settings.add_json_panel('Settings',self.config,data=preferences.settings)
+
+    def on_config_change(self, config, section, key, value):
+        settings_setter(key)
+
+def settings_setter(key):
+    if key == '10 Seconds':
+        logic.heat_sensor_timer=10
+    elif key == '5 Minutes':
+        logic.heat_sensor_timer=300
+    elif key == '10 Minutes':
+        logic.heat_sensor_timer=600
 
 logic_control = Thread(target=logic.logic,daemon=True)
 logic_control.start()

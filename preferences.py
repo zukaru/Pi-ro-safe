@@ -1,0 +1,26 @@
+import json
+
+settings = json.dumps([
+    {'type': 'title',
+     'title': 'Preferences'},
+    {'type': 'bool',
+     'title': 'A boolean setting',
+     'desc': 'Boolean description text',
+     'section': 'preferences',
+     'key': 'boolexample'},
+    {'type': 'numeric',
+     'title': 'A numeric setting',
+     'desc': 'Numeric description text',
+     'section': 'preferences',
+     'key': 'numericexample'},
+    {'type': 'options',
+     'title': 'Heat Sensor',
+     'desc': 'Length of time fans stay on after heat sensor override',
+     'section': 'preferences',
+     'key': 'heat_timer',
+     'options': ['10 Seconds', '5 Minutes', '10 Minutes']},
+    {'type': 'string',
+     'title': 'A string setting',
+     'desc': 'String description text',
+     'section': 'preferences',
+     'key': 'stringexample'}])
