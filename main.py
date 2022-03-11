@@ -1,7 +1,6 @@
 import os
 import traceback
 import kivy
-from numpy import spacing
 import logic
 import RPi.GPIO as GPIO
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -29,6 +28,9 @@ from kivy.config import ConfigParser
 import preferences
 from kivy.uix.settings import SettingsWithNoMenu
 from kivy.uix.settings import SettingsWithSidebar
+from kivy.uix.effectwidget import EffectWidget
+from kivy.uix.effectwidget import HorizontalBlurEffect, VerticalBlurEffect
+from kivy.uix.popup import Popup
 
 kivy.require('2.0.0')
 #Window.fullscreen = 'auto'
@@ -131,7 +133,7 @@ class ControlGrid(Screen):
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
 
-        quick=ToggleButton(text="[size=50][b][color=#000000]  Hood [/color][/b][/size]",
+        quick=ToggleButton(text="[size=50][b][color=#000000]  Fans+Lights [/color][/b][/size]",
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.53},
                     background_down='',
@@ -201,7 +203,7 @@ class ActuationScreen(Screen):
     def acknowledgement(self,button):
         print('actuation acknowledged')
         self.anime.cancel_all(self.widgets['alert'])
-        self.widgets['alert'].background_color=(190/250, 10/250, 10/250,.9)
+        self.widgets['alert'].background_color=(190/255, 10/255, 10/255,.9)
         self.widgets['alert'].text="[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]"
 
 
@@ -239,7 +241,7 @@ class ActuationScreen(Screen):
                     pos_hint = {'x':.03, 'y':.05},
                     background_normal='',
                     background_down='',
-                    background_color=(217/250, 94/250, 10/250,.99),
+                    background_color=(255/255, 121/255, 0/255,.99),
                     markup=True)
         self.widgets['acknowledge']=acknowledge
         acknowledge.bind(on_release=self.acknowledgement)
@@ -250,7 +252,7 @@ class ActuationScreen(Screen):
                     pos_hint = {'x':.52, 'y':.05},
                     background_normal='',
                     background_down='',
-                    background_color=(217/250, 94/250, 1/250,.99),
+                    background_color=(255/255, 121/255, 0/255,.99),
                     markup=True)
         self.widgets['reset']=reset
         reset.bind(on_release=self.reset_system)
@@ -289,8 +291,8 @@ class SettingsScreen(Screen):
         sys_report=Button(text="[size=40][b][color=#000000]  System Report [/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.56},
-                        background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
+                        background_normal='',
+                        background_color=(180/255, 10/255, 10/255,.9),
                         markup=True)
         self.widgets['sys_report']=sys_report
         sys_report.bind(on_release=self.sys_report)
@@ -313,14 +315,14 @@ class SettingsScreen(Screen):
         self.widgets['train']=train
         train.bind(on_release=self.train_func)
 
-        qr=Button(text="[size=40][b][color=#000000]  QR Links [/color][/b][/size]",
+        blank=Button(text="[size=40][b][color=#000000][/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.56},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['qr']=qr
-        qr.bind(on_release=self.qr_func)
+        self.widgets['blank']=blank
+        #qr.bind(on_release=self.qr_func)
 
         about=Button(text="[size=40][b][color=#000000]  About [/color][/b][/size]",
                         size_hint =(.4, .20),
@@ -337,7 +339,7 @@ class SettingsScreen(Screen):
         self.add_widget(sys_report)
         self.add_widget(preferences)
         self.add_widget(train)
-        self.add_widget(qr)
+        self.add_widget(blank)
         self.add_widget(about)
         
     def settings_back (self,button):
@@ -350,18 +352,202 @@ class SettingsScreen(Screen):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
     def preferences_func (self,button):
-        self.parent.transition = SlideTransition(direction='down')
-        App.get_running_app().open_settings()
-        #self.manager.current='sys_report'
+        self.parent.transition = SlideTransition(direction='up')
+        #App.get_running_app().open_settings()
+        self.manager.current='preferences'
     def train_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
-    def qr_func (self,button):
+    def blank_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
     def about_func (self,button):
         self.parent.transition = SlideTransition(direction='right')
         #self.manager.current='sys_report'
+
+class PreferenceScreen(Screen):
+    def __init__(self, **kwargs):
+        super(PreferenceScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+                        size_hint =(.4, .25),
+                        pos_hint = {'x':.02, 'y':.02},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['back']=back
+        back.bind(on_press=self.settings_back)
+
+        back_main=Button(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+                        size_hint =(.48, .25),
+                        pos_hint = {'x':.49, 'y':.02},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.bind(on_press=self.settings_back_main)
+
+        heat_sensor=Button(text="[size=40][b][color=#000000]  Heat Sensor [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.05, 'y':.78},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['heat_sensor']=heat_sensor
+        heat_sensor.bind(on_release=self.heat_sensor_func)
+        heat_sensor.bind(on_release=self.blur_screen)
+
+        temp_1=Button(text="[size=40][b][color=#000000]  temp_1 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.05, 'y':.56},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp_1']=temp_1
+        #temp_1.bind(on_release=self.sys_report_func)
+
+        temp_2=Button(text="[size=40][b][color=#000000]  temp_2 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.05, 'y':.34},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp_2']=temp_2
+        #preferences.bind(on_release=self.preferences_func)
+
+        clean_mode=Button(text="[size=32][b][color=#000000]  Maint. Override [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.54, 'y':.78},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['clean_mode']=clean_mode
+        clean_mode.bind(on_release=self.clean_mode_func)
+
+        temp_3=Button(text="[size=40][b][color=#000000]  temp_3 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.54, 'y':.56},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp_3']=temp_3
+        #qr.bind(on_release=self.qr_func)
+
+        temp_4=Button(text="[size=40][b][color=#000000]  temp_4 [/color][/b][/size]",
+                        size_hint =(.4, .20),
+                        pos_hint = {'x':.54, 'y':.34},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['temp_4']=temp_4
+        #about.bind(on_release=self.about_func)
+
+        self.blur = EffectWidget()
+
+        overlay_menu=Popup(
+            size_hint=(.8, .8),
+            background = 'atlas://data/images/defaulttheme/button',
+            title='Heat-Sensor Override Duration',
+            title_color=[0, 0, 0, 1],
+            title_size='38',
+            title_align='center',
+            separator_color=[255/255, 0/255, 0/255, .5]
+        )
+        self.widgets['overlay_menu']=overlay_menu
+
+        overlay_layout=FloatLayout()
+        self.widgets['overlay_layout']=overlay_layout
+
+
+        overlay_menu.add_widget(overlay_layout)
+        self.blur.add_widget(bg_image)
+        self.blur.add_widget(back)
+        self.blur.add_widget(back_main)
+        self.blur.add_widget(heat_sensor)
+        self.blur.add_widget(temp_1)
+        self.blur.add_widget(temp_2)
+        self.blur.add_widget(clean_mode)
+        self.blur.add_widget(temp_3)
+        self.blur.add_widget(temp_4)
+        self.add_widget(self.blur)
+
+    def blur_screen(self,button):
+        pass
+        #self.blur.effects = [HorizontalBlurEffect(size=5.0),VerticalBlurEffect(size=5.0)]
+    def unblur_screen(self,button):
+        self.blur.effects = [HorizontalBlurEffect(size=0),VerticalBlurEffect(size=0)]
+
+    def heat_overlay(self):
+        self.widgets['overlay_layout'].clear_widgets()
+
+        duration_1=Button(text="[size=30][b][color=#000000]  10 Seconds [/color][/b][/size]",
+                        size_hint =(.3, .50),
+                        pos_hint = {'x':.02, 'y':.3},
+                        background_normal='',
+                        background_color=(0/250, 70/250, 90/250,.9),
+                        markup=True)
+        self.widgets['duration_1']=duration_1
+
+        duration_2=Button(text="[size=30][b][color=#000000]  5 Minutes [/color][/b][/size]",
+                        size_hint =(.3, .50),
+                        pos_hint = {'x':.35, 'y':.3},
+                        background_normal='',
+                        background_color=(0/250, 70/250, 90/250,.9),
+                        markup=True)
+        self.widgets['duration_2']=duration_2
+
+        duration_3=Button(text="[size=30][b][color=#000000]  10 Minutes [/color][/b][/size]",
+                        size_hint =(.3, .50),
+                        pos_hint = {'x':.68, 'y':.3},
+                        background_normal='',
+                        background_color=(0/250, 70/250, 90/250,.9),
+                        markup=True)
+        self.widgets['duration_3']=duration_3
+
+        def duration_1_func(button):
+            logic.heat_sensor_timer=10
+            self.widgets['overlay_menu'].dismiss()
+        duration_1.bind(on_release=duration_1_func)
+
+        def duration_2_func(button):
+            logic.heat_sensor_timer=300
+            self.widgets['overlay_menu'].dismiss()
+        duration_2.bind(on_release=duration_2_func)
+
+        def duration_3_func(button):
+            logic.heat_sensor_timer=600
+            self.widgets['overlay_menu'].dismiss()
+        duration_3.bind(on_release=duration_3_func)
+
+        self.widgets['overlay_layout'].add_widget(duration_1)
+        self.widgets['overlay_layout'].add_widget(duration_2)
+        self.widgets['overlay_layout'].add_widget(duration_3)
+        self.widgets['overlay_menu'].open()
+
+    def settings_back (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        self.manager.current='settings'
+    def settings_back_main (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+        self.manager.current='main'
+    def heat_sensor_func (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+        self.heat_overlay()
+    def sys_report_func (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+    def preferences_func (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+    def clean_mode_func (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+        #self.manager.current='sys_report'
+    def qr_func (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+        #self.manager.current='sys_report'
+    def about_func (self,button):
+        self.parent.transition = SlideTransition(direction='left')
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
@@ -461,7 +647,7 @@ def listen(app_object,*args):
             if app_object.current!='alert':
                 app_object.transition = SlideTransition(direction='left')
                 app_object.current='alert'
-                App.get_running_app().close_settings()
+                app_object.get_screen('preferences').widgets['overlay_menu'].dismiss()
         elif event_log['micro_switch']==0:
             if app_object.current=='alert':
                 app_object.get_screen('alert').reset_system(widgets['alert'])
@@ -511,29 +697,30 @@ def listen(app_object,*args):
 
 class Hood_Control(App):
     def build(self):
-        self.use_kivy_settings = False
-        self.settings_cls = SettingsWithSidebar
-        settings_setter(self.config.get('preferences', 'heat_timer'))
+        # self.use_kivy_settings = False
+        # self.settings_cls = SettingsWithSidebar
+        # settings_setter(self.config.get('preferences', 'heat_timer'))
         self.context_screen=ScreenManager()
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
+        self.context_screen.add_widget(PreferenceScreen(name='preferences'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen
 
-    def build_config(self, config):
-        config.setdefaults('preferences', {
-            'boolexample': True,
-            'numericexample': 10578,
-            'heat_timer': '10 Seconds',
-            'stringexample': 'some_string'})
+    # def build_config(self, config):
+    #     config.setdefaults('preferences', {
+    #         'boolexample': True,
+    #         'numericexample': 10578,
+    #         'heat_timer': '10 Seconds',
+    #         'stringexample': 'some_string'})
 
-    def build_settings(self, settings):
-        settings.add_json_panel('Settings',self.config,data=preferences.settings)
+    # def build_settings(self, settings):
+    #     settings.add_json_panel('Settings',self.config,data=preferences.settings)
 
-    def on_config_change(self, config, section, key, value):
-        settings_setter(value)
+    # def on_config_change(self, config, section, key, value):
+    #     settings_setter(value)
 
 def settings_setter(value):
     if value == '10 Seconds':
