@@ -709,9 +709,6 @@ def listen(app_object,*args):
 
 class Hood_Control(App):
     def build(self):
-        # self.use_kivy_settings = False
-        # self.settings_cls = SettingsWithSidebar
-        # settings_setter(self.config.get('preferences', 'heat_timer'))
         self.config_ = configparser.ConfigParser()
         self.config_.read('hood_control.ini')
         settings_setter(self.config_)
@@ -724,18 +721,6 @@ class Hood_Control(App):
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen
 
-    # def build_config(self, config):
-    #     config.setdefaults('preferences', {
-    #         'boolexample': True,
-    #         'numericexample': 10578,
-    #         'heat_timer': '10 Seconds',
-    #         'stringexample': 'some_string'})
-
-    # def build_settings(self, settings):
-    #     settings.add_json_panel('Settings',self.config,data=preferences.settings)
-
-    # def on_config_change(self, config, section, key, value):
-    #     settings_setter(value)
 
 def settings_setter(config):
     heat_duration=config['preferences']['heat_timer']
