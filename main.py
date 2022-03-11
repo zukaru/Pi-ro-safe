@@ -24,7 +24,7 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.graphics import Rectangle, Color
 from kivy.properties import ListProperty
-from kivy.config import ConfigParser
+import configparser
 import preferences
 from kivy.uix.settings import SettingsWithNoMenu
 from kivy.uix.settings import SettingsWithSidebar
@@ -508,17 +508,29 @@ class PreferenceScreen(Screen):
         self.widgets['duration_3']=duration_3
 
         def duration_1_func(button):
+            config=App.get_running_app().config_
             logic.heat_sensor_timer=10
+            config.set('preferences','heat_timer','10')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
         duration_1.bind(on_release=duration_1_func)
 
         def duration_2_func(button):
+            config=App.get_running_app().config_
             logic.heat_sensor_timer=300
+            config.set('preferences','heat_timer','300')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
         duration_2.bind(on_release=duration_2_func)
 
         def duration_3_func(button):
+            config=App.get_running_app().config_
             logic.heat_sensor_timer=600
+            config.set('preferences','heat_timer','600')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
         duration_3.bind(on_release=duration_3_func)
 
@@ -700,6 +712,9 @@ class Hood_Control(App):
         # self.use_kivy_settings = False
         # self.settings_cls = SettingsWithSidebar
         # settings_setter(self.config.get('preferences', 'heat_timer'))
+        self.config_ = configparser.ConfigParser()
+        self.config_.read('hood_control.ini')
+        settings_setter(self.config_)
         self.context_screen=ScreenManager()
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
@@ -722,12 +737,13 @@ class Hood_Control(App):
     # def on_config_change(self, config, section, key, value):
     #     settings_setter(value)
 
-def settings_setter(value):
-    if value == '10 Seconds':
+def settings_setter(config):
+    heat_duration=config['preferences']['heat_timer']
+    if heat_duration == '10':
         logic.heat_sensor_timer=10
-    elif value == '5 Minutes':
+    elif heat_duration == '300':
         logic.heat_sensor_timer=300
-    elif value == '10 Minutes':
+    elif heat_duration == '600':
         logic.heat_sensor_timer=600
 
 logic_control = Thread(target=logic.logic,daemon=True)
