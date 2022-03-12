@@ -35,7 +35,7 @@ from kivy.uix.popup import Popup
 kivy.require('2.0.0')
 #Window.fullscreen = 'auto'
 if os.name == 'nt':
-    generic_image=r'media\istockphoto-1169326482-640x640.jpg'
+    generic_image=r'media\lit_hood.jpg'
     settings_icon=r'media\tiny gear.png'
     trouble_icon=r'media\trouble icon.png'
     trouble_icon_dull=r'media\trouble icon dull.png'
@@ -364,6 +364,62 @@ class SettingsScreen(Screen):
     def about_func (self,button):
         self.parent.transition = SlideTransition(direction='right')
         #self.manager.current='sys_report'
+
+class ReportScreen(Screen):
+    def __init__(self, **kwargs):
+        super(ReportScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+                    size_hint =(.4, .15),
+                    pos_hint = {'x':.02, 'y':.02},
+                    background_down='',
+                    background_color=(200/250, 200/250, 200/250,.85),
+                    markup=True)
+        self.widgets['back']=back
+        back.bind(on_press=self.trouble_back)
+
+        trouble_details=trouble_template('-No active troubles detected-')
+        self.widgets['trouble_details']=trouble_details
+        # trouble_details.bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
+        # trouble_details.bind(width=lambda instance, value: setattr(instance, 'text_size', (value, None)))
+
+        trouble_layout=EventpassGridLayout(
+            size_hint_y=None,
+            size_hint_x=1,
+            cols=1,
+            padding=10,
+            spacing=(1,5)
+            )
+        self.widgets['trouble_layout']=trouble_layout
+        trouble_layout.bind(minimum_height=trouble_layout.setter('height'))
+
+        trouble_scroll=ScrollView(
+            bar_width=8,
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint_y=None,
+            size_hint_x=1,
+            size_hint =(.9, .80),
+            pos_hint = {'center_x':.5, 'y':.18}
+            )
+        self.widgets['trouble_scroll']=trouble_scroll
+
+        self.add_widget(bg_image)
+        trouble_layout.add_widget(trouble_details)
+        trouble_scroll.add_widget(trouble_layout)
+        
+        
+        self.add_widget(trouble_scroll)
+        self.add_widget(back)
+
+        
+
+    def trouble_back (self,button):
+        self.parent.transition = SlideTransition(direction='up')
+        self.manager.current='main'
 
 class PreferenceScreen(Screen):
     def __init__(self, **kwargs):
