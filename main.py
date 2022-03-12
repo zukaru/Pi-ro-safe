@@ -57,7 +57,7 @@ class trouble_template(Label):
         else:
             link_text='\n'+str(link_text)
         super().__init__(text=f'''[size=24][b]{trouble_tag}[/b][/size]
-        [size=18][i]{trouble_text}[/i][/size][size=20][color=#de2500][i][ref={ref_tag}]{link_text}[/ref][/i][/color][/size]''',
+        [size=18][i]{trouble_text}[/i][/size][size=30][color=#de2500][i][ref={ref_tag}]{link_text}[/ref][/i][/color][/size]''',
         markup=True,
         size_hint_y=None,
         size_hint_x=1,
@@ -481,6 +481,10 @@ class PreferenceScreen(Screen):
         self.blur.effects = [HorizontalBlurEffect(size=0),VerticalBlurEffect(size=0)]
 
     def heat_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.title='Heat-Sensor Override Duration'
+        overlay_menu.separator_height=1
+        overlay_menu.auto_dismiss=True
         self.widgets['overlay_layout'].clear_widgets()
 
         duration_1=Button(text="[size=30][b][color=#000000]  10 Seconds [/color][/b][/size]",
@@ -539,6 +543,106 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_layout'].add_widget(duration_3)
         self.widgets['overlay_menu'].open()
 
+    def maint_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        warning_text=Label(
+            text="""[size=30][color=#000000]Maintenance Override disables heat 
+sensors allowing neccessary maintenance 
+to take place safely.
+You will be locked on this screen untill
+override is canceled.
+
+Disable all fans?
+  [/color][/size]""",
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},
+        )
+        self.widgets['warning_text']=warning_text
+
+        continue_button=Button(text="[size=30][b][color=#000000]  Continue [/color][/b][/size]",
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['continue_button']=continue_button
+
+        cancel_button=Button(text="[size=30][b][color=#000000]  Cancel [/color][/b][/size]",
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['cancel_button']=cancel_button
+
+        def continue_button_func(button):
+            self.override_overlay()
+        continue_button.bind(on_release=continue_button_func)
+
+        def cancel_button_func(button):
+            self.widgets['overlay_menu'].dismiss()
+        cancel_button.bind(on_release=cancel_button_func)
+
+        self.widgets['overlay_layout'].add_widget(warning_text)
+        self.widgets['overlay_layout'].add_widget(continue_button)
+        self.widgets['overlay_layout'].add_widget(cancel_button)
+        self.widgets['overlay_menu'].open()
+
+    def override_overlay(self):
+        logic.fs.moli['maint_override']=1
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=False
+        self.widgets['overlay_layout'].clear_widgets()
+
+        warning_text=Label(
+            text="""[size=30][color=#000000]Maintenance Override active.
+All fans currently disabled.
+Disable override by holding down 
+DISABLE for 3 seconds.
+  [/color][/size]""",
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},
+        )
+        self.widgets['warning_text']=warning_text
+
+        disable_button=Button(text="[size=30][b][color=#000000]  DISABLE [/color][/b][/size]",
+                        size_hint =(.9, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['disable_button']=disable_button
+
+        def disable_button_func(button):
+            logic.fs.moli['maint_override']=0
+            self.widgets['overlay_menu'].dismiss()
+
+        def create_clock(widget, touch, *args):
+            Clock.schedule_once(disable_button_func, 3)
+            touch.ud['event'] = disable_button_func
+
+        def delete_clock(widget, touch, *args):
+            Clock.unschedule(touch.ud['event'])
+
+        disable_button.bind(
+            on_touch_down=create_clock,
+            on_touch_up=delete_clock)
+
+        self.widgets['overlay_layout'].add_widget(warning_text)
+        self.widgets['overlay_layout'].add_widget(disable_button)
+
     def settings_back (self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='settings'
@@ -554,6 +658,7 @@ class PreferenceScreen(Screen):
         self.parent.transition = SlideTransition(direction='left')
     def clean_mode_func (self,button):
         self.parent.transition = SlideTransition(direction='left')
+        self.maint_overlay()
         #self.manager.current='sys_report'
     def qr_func (self,button):
         self.parent.transition = SlideTransition(direction='left')
@@ -691,7 +796,7 @@ def listen(app_object,*args):
                 if 'heat_trouble' not in troubles_screen.widgets:
                     heat_trouble=trouble_template('                        -Heat Sensor-',
                     'Unsafe temps detected in hood; fan override activated',
-                    link_text='                                Turn on fans',ref_tag='fans')
+                    link_text='                    Turn on fans',ref_tag='fans')
 
                     def fan_switch(a,b):
                         app_object.get_screen('main').widgets['fans'].state = 'down'
