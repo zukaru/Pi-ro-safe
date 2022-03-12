@@ -90,6 +90,11 @@ class Logic():
             print('micro_switch')
             self.state='Fire'
             self.milo['micro_switch']=on
+        elif self.moli['maint_override']==1:
+            GPIO.output(dry_contact,on)
+            GPIO.output(lights_pin,on)
+            GPIO.output(exfan1.pin,off)
+            GPIO.output(mau1.pin,off)
         else:
 
             GPIO.output(dry_contact,on)
