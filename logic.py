@@ -71,7 +71,8 @@ class Logic():
             'exhaust':off,
             'mau':off,
             'lights':off,
-            'dry_contact':off
+            'dry_contact':off,
+            'maint_override':off
         }
         self.milo={
             'exhaust':off,
