@@ -7,11 +7,13 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.image import Image
+from kivy.graphics import BorderImage
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.pagelayout import PageLayout
 from kivy.core.window import Window
 from threading import Thread
 from kivy.uix.screenmanager import NoTransition
@@ -46,6 +48,18 @@ if os.name == 'posix':
     trouble_icon=r'media/trouble icon.png'
     trouble_icon_dull=r'media/trouble icon dull.png'
     logo=r'media/qt=q_95.png'
+
+class OutlineScroll(ScrollView):
+    def __init__(self, **kwargs):
+        super(OutlineScroll,self).__init__(**kwargs)
+        self.bind(pos=self.update_rect)
+        self.bind(size=self.update_rect)
+        with self.canvas.before:
+                    Color(0,0,0,.85)
+                    self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = (self.size[0], self.size[1])
 
 class IconButton(ButtonBehavior, Image):
     pass
@@ -350,7 +364,7 @@ class SettingsScreen(Screen):
         #self.manager.current='logs'
     def sys_report (self,button):
         self.parent.transition = SlideTransition(direction='down')
-        #self.manager.current='sys_report'
+        self.manager.current='report'
     def preferences_func (self,button):
         self.parent.transition = SlideTransition(direction='up')
         #App.get_running_app().open_settings()
@@ -374,52 +388,75 @@ class ReportScreen(Screen):
 
         back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
                     size_hint =(.4, .15),
-                    pos_hint = {'x':.02, 'y':.02},
+                    pos_hint = {'x':.06, 'y':.02},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
         self.widgets['back']=back
-        back.bind(on_press=self.trouble_back)
+        back.bind(on_press=self.Report_back)
 
-        trouble_details=trouble_template('-No active troubles detected-')
-        self.widgets['trouble_details']=trouble_details
-        # trouble_details.bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
-        # trouble_details.bind(width=lambda instance, value: setattr(instance, 'text_size', (value, None)))
+        back_main=Button(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.52, 'y':.02},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.bind(on_press=self.Report_back_main)
 
-        trouble_layout=EventpassGridLayout(
-            size_hint_y=None,
-            size_hint_x=1,
-            cols=1,
-            padding=10,
-            spacing=(1,5)
-            )
-        self.widgets['trouble_layout']=trouble_layout
-        trouble_layout.bind(minimum_height=trouble_layout.setter('height'))
-
-        trouble_scroll=ScrollView(
+        report_scroll=ScrollView(
             bar_width=8,
             do_scroll_y=True,
             do_scroll_x=False,
             size_hint_y=None,
-            size_hint_x=1,
-            size_hint =(.9, .80),
-            pos_hint = {'center_x':.5, 'y':.18}
-            )
-        self.widgets['trouble_scroll']=trouble_scroll
+            size_hint_x=1)
+        self.widgets['report_scroll']=report_scroll
+
+        report_image=Image(
+            source=r'media\report.jpg',
+            size_hint_y=2,
+            size_hint_x=.95,
+            pos_hint = {'center_x':.5, 'y':1})
+
+        report_scroll2=OutlineScroll(
+            bar_width=8,
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint_y=None,
+            size_hint_x=1)
+        self.widgets['report_scroll2']=report_scroll2
+
+        report_image2=Image(
+            source=r'media\report.jpg',
+            size_hint_y=2,
+            size_hint_x=.98)
+        report_image2.bind(on_touch_down=self.switch_page)
+
+        report_pages=PageLayout(
+            size_hint =(1, .80),
+            pos_hint = {'center_x':.5, 'y':.18},
+            border=50,
+            swipe_threshold =-1)
+        self.widgets['report_pages']=report_pages
 
         self.add_widget(bg_image)
-        trouble_layout.add_widget(trouble_details)
-        trouble_scroll.add_widget(trouble_layout)
-        
-        
-        self.add_widget(trouble_scroll)
+        report_scroll.add_widget(report_image)
+        report_scroll2.add_widget(report_image2)
+
+        report_pages.add_widget(report_scroll)
+        report_pages.add_widget(report_scroll2)
+        self.add_widget(report_pages)
         self.add_widget(back)
+        self.add_widget(back_main)
 
-        
-
-    def trouble_back (self,button):
+    def Report_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
+        self.manager.current='settings'
+    def Report_back_main (self,button):
+        self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
+    def switch_page(self,*args):
+        self.widgets['report_pages'].page=0
 
 class PreferenceScreen(Screen):
     def __init__(self, **kwargs):
@@ -877,6 +914,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
+        self.context_screen.add_widget(ReportScreen(name='report'))
         self.context_screen.add_widget(PreferenceScreen(name='preferences'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
