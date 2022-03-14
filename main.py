@@ -866,6 +866,7 @@ def listen(app_object,*args):
                 app_object.transition = SlideTransition(direction='left')
                 app_object.current='alert'
                 app_object.get_screen('preferences').widgets['overlay_menu'].dismiss()
+                logic.fs.moli['maint_override']=0
         elif event_log['micro_switch']==0:
             if app_object.current=='alert':
                 app_object.get_screen('alert').reset_system(widgets['alert'])
