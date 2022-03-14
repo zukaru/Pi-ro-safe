@@ -2,7 +2,10 @@ import os
 import traceback
 import kivy
 import logic
-import RPi.GPIO as GPIO
+if os.name == 'nt':
+    import RPi_test.GPIO as GPIO
+else:
+    import RPi.GPIO as GPIO
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.animation import Animation
 from kivy.app import App
@@ -42,12 +45,17 @@ if os.name == 'nt':
     trouble_icon=r'media\trouble icon.png'
     trouble_icon_dull=r'media\trouble icon dull.png'
     logo=r'media\qt=q_95.png'
+    report_current=r'media\report.jpg'
+    report_original=r'media\report.jpg'
+
 if os.name == 'posix':
-    generic_image=r'media/istockphoto-1169326482-640x640.jpg'
+    generic_image=r'media/lit_hood.jpg'
     settings_icon=r'media/tiny gear.png'
     trouble_icon=r'media/trouble icon.png'
     trouble_icon_dull=r'media/trouble icon dull.png'
     logo=r'media/qt=q_95.png'
+    report_current=r'media/report.jpg'
+    report_original=r'media/report.jpg'
 
 class OutlineScroll(ScrollView):
     def __init__(self, **kwargs):
@@ -413,7 +421,7 @@ class ReportScreen(Screen):
         self.widgets['report_scroll']=report_scroll
 
         report_image=Image(
-            source=r'media\report.jpg',
+            source=report_current,
             size_hint_y=2,
             size_hint_x=.95,
             pos_hint = {'center_x':.5, 'y':1})
@@ -427,7 +435,7 @@ class ReportScreen(Screen):
         self.widgets['report_scroll2']=report_scroll2
 
         report_image2=Image(
-            source=r'media\report.jpg',
+            source=report_original,
             size_hint_y=2,
             size_hint_x=.98)
         report_image2.bind(on_touch_down=self.switch_page)

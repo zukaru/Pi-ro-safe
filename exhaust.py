@@ -1,4 +1,8 @@
-import RPi.GPIO as GPIO
+import os
+if os.name == 'nt':
+    import RPi_test.GPIO as GPIO
+else:
+    import RPi.GPIO as GPIO
 
 class Exhaust():
     def __init__(self,pin) -> None:

@@ -1,5 +1,8 @@
 import os,mau,exhaust,time
-import RPi.GPIO as GPIO
+if os.name == 'nt':
+    import RPi_test.GPIO as GPIO
+else:
+    import RPi.GPIO as GPIO
 
 heat_sensor_timer=10
 #inputs: fan switch,light switch,heat sensor, micro switch
