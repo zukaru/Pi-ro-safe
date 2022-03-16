@@ -735,7 +735,8 @@ DISABLE for 3 seconds.
             touch.ud['event'] = disable_button_func
 
         def delete_clock(widget, touch, *args):
-            Clock.unschedule(touch.ud['event'])
+            if touch.ud['event']:
+                Clock.unschedule(touch.ud['event'])
 
         disable_button.bind(
             on_touch_down=create_clock,
