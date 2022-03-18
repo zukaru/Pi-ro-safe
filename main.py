@@ -38,7 +38,8 @@ from kivy.uix.effectwidget import HorizontalBlurEffect, VerticalBlurEffect
 from kivy.uix.popup import Popup
 
 kivy.require('2.0.0')
-#Window.fullscreen = 'auto'
+if os.name == 'posix':
+    Window.fullscreen = 'auto'
 if os.name == 'nt':
     generic_image=r'media\lit_hood.jpg'
     settings_icon=r'media\tiny gear.png'
