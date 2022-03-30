@@ -44,7 +44,10 @@ if os.name == 'posix':
     def light_switch_on():
         return GPIO.input(15)
 def clean_exit():
-    GPIO.cleanup()
+    GPIO.output(25,off)
+    GPIO.output(8,off)
+    GPIO.output(7,off)
+    GPIO.output(12,off)
 
 def clean_list(list,element):
     while True:

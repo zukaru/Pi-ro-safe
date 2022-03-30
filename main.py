@@ -38,9 +38,9 @@ from kivy.uix.effectwidget import HorizontalBlurEffect, VerticalBlurEffect
 from kivy.uix.popup import Popup
 
 kivy.require('2.0.0')
-if os.name == 'posix':
-    Window.fullscreen = 'auto'
+    
 if os.name == 'nt':
+    preferences_path='hood_control.ini'
     generic_image=r'media\lit_hood.jpg'
     settings_icon=r'media\tiny gear.png'
     trouble_icon=r'media\trouble icon.png'
@@ -50,6 +50,8 @@ if os.name == 'nt':
     report_original=r'media\report.jpg'
 
 if os.name == 'posix':
+    preferences_path='home/pi/Desktop/Pi-ro-safe/hood_control.ini'
+    Window.fullscreen = 'auto'
     generic_image=r'media/lit_hood.jpg'
     settings_icon=r'media/tiny gear.png'
     trouble_icon=r'media/trouble icon.png'
@@ -919,7 +921,7 @@ def listen(app_object,*args):
 class Hood_Control(App):
     def build(self):
         self.config_ = configparser.ConfigParser()
-        self.config_.read('hood_control.ini')
+        self.config_.read(preferences_path)
         settings_setter(self.config_)
         self.context_screen=ScreenManager()
         self.context_screen.add_widget(ControlGrid(name='main'))
