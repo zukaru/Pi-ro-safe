@@ -50,7 +50,7 @@ if os.name == 'nt':
     report_original=r'media\report.jpg'
 
 if os.name == 'posix':
-    preferences_path='home/pi/Desktop/Pi-ro-safe/hood_control.ini'
+    preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
     Window.fullscreen = 'auto'
     generic_image=r'media/lit_hood.jpg'
     settings_icon=r'media/tiny gear.png'
