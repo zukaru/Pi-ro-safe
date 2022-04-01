@@ -36,6 +36,7 @@ from kivy.uix.settings import SettingsWithSidebar
 from kivy.uix.effectwidget import EffectWidget
 from kivy.uix.effectwidget import HorizontalBlurEffect, VerticalBlurEffect
 from kivy.uix.popup import Popup
+from kivy.uix.scatter import Scatter
 
 kivy.require('2.0.0')
     
@@ -441,22 +442,25 @@ class ReportScreen(Screen):
             source=report_original,
             size_hint_y=2,
             size_hint_x=.98)
-        report_image2.bind(on_touch_down=self.switch_page)
+        # report_image2.bind(on_touch_down=self.switch_page)
 
-        report_pages=PageLayout(
-            size_hint =(1, .80),
-            pos_hint = {'center_x':.5, 'y':.18},
-            border=50,
-            swipe_threshold =-1)
-        self.widgets['report_pages']=report_pages
+        # report_pages=PageLayout(
+        #     size_hint =(1, .80),
+        #     pos_hint = {'center_x':.5, 'y':.18},
+        #     border=50,
+        #     swipe_threshold =-1)
+        # self.widgets['report_pages']=report_pages
+        report_scatter = Scatter(do_rotation=False, do_scale=False,do_translation_y=False)
+        report_scatter.add_widget(report_image)
 
         self.add_widget(bg_image)
-        report_scroll.add_widget(report_image)
+        report_scroll.add_widget(report_scatter)
         report_scroll2.add_widget(report_image2)
 
-        report_pages.add_widget(report_scroll)
-        report_pages.add_widget(report_scroll2)
-        self.add_widget(report_pages)
+        self.add_widget(report_scroll)
+        # report_pages.add_widget(report_scroll)
+        # report_pages.add_widget(report_scroll2)
+        # self.add_widget(report_pages)
         self.add_widget(back)
         self.add_widget(back_main)
 
