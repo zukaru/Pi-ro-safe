@@ -450,11 +450,19 @@ class ReportScreen(Screen):
         #     border=50,
         #     swipe_threshold =-1)
         # self.widgets['report_pages']=report_pages
+
+        report_scatter_container=FloatLayout(
+            size_hint =(1, .80),
+            pos_hint = {'center_x':.5, 'y':.18}
+            )
+        self.widgets['report_pages']=report_scatter_container
+
         report_scatter = Scatter(do_rotation=False, do_scale=False,do_translation_y=False)
         report_scatter.add_widget(report_image)
 
+        report_scatter_container.add_widget(report_scatter)
         self.add_widget(bg_image)
-        report_scroll.add_widget(report_scatter)
+        report_scroll.add_widget(report_scatter_container)
         report_scroll2.add_widget(report_image2)
 
         self.add_widget(report_scroll)
