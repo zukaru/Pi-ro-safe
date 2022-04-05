@@ -37,6 +37,8 @@ from kivy.uix.effectwidget import EffectWidget
 from kivy.uix.effectwidget import HorizontalBlurEffect, VerticalBlurEffect
 from kivy.uix.popup import Popup
 from kivy.uix.scatter import Scatter
+from kivy.uix.scatterlayout import ScatterLayout
+from kivy.graphics.transformation import Matrix
 
 kivy.require('2.0.0')
     
@@ -60,6 +62,20 @@ if os.name == 'posix':
     logo=r'media/qt=q_95.png'
     report_current=r'media/report.jpg'
     report_original=r'media/report.jpg'
+
+class ScatterImage(Image,Scatter):
+
+    def reset(self):
+        self.transform= Matrix().scale(1, 1, 1)
+
+    def on_transform_with_touch(self,touch):
+        if self.scale<1:
+            pass
+        return super(ScatterImage, self).on_transform_with_touch(touch)
+
+    def on_touch_up(self, touch):
+        self.reset()
+        return super(ScatterImage, self).on_touch_up(touch)
 
 class OutlineScroll(ScrollView):
     def __init__(self, **kwargs):
@@ -416,70 +432,54 @@ class ReportScreen(Screen):
         self.widgets['back_main']=back_main
         back_main.bind(on_press=self.Report_back_main)
 
+        report_image=ScatterImage(
+            source=report_current,
+            size_hint_y=2,
+            size_hint_x=.95,
+            pos_hint = {'center_x':.5, 'y':1},
+            do_rotation=False,
+            do_translation=False,
+            scale_min=.8,
+            scale_max=1.4,
+            auto_bring_to_front=False
+            )
+        self.widgets['report_image']=report_image
+
         report_scroll=ScrollView(
             bar_width=8,
             do_scroll_y=True,
             do_scroll_x=False,
-            size_hint_y=None,
-            size_hint_x=1)
+            size_hint_y=1,
+            size_hint_x=.95,
+            pos_hint = {'center_x':.525, 'center_y':.5}
+            )
         self.widgets['report_scroll']=report_scroll
 
-        report_image=Image(
-            source=report_current,
-            size_hint_y=2,
-            size_hint_x=.95,
-            pos_hint = {'center_x':.5, 'y':1})
-
-        report_scroll2=OutlineScroll(
-            bar_width=8,
-            do_scroll_y=True,
-            do_scroll_x=False,
-            size_hint_y=None,
-            size_hint_x=1)
-        self.widgets['report_scroll2']=report_scroll2
-
-        report_image2=Image(
-            source=report_original,
-            size_hint_y=2,
-            size_hint_x=.98)
-        # report_image2.bind(on_touch_down=self.switch_page)
-
-        # report_pages=PageLayout(
-        #     size_hint =(1, .80),
-        #     pos_hint = {'center_x':.5, 'y':.18},
-        #     border=50,
-        #     swipe_threshold =-1)
-        # self.widgets['report_pages']=report_pages
-
-        report_scatter_container=FloatLayout(
-            size_hint =(1, .80),
-            pos_hint = {'center_x':.5, 'y':.18}
+        report_scatter = Scatter(
+            size_hint=(None, None),
+            size=self.widgets['report_image'].size,
+            pos_hint = {'center_x':.5, 'center_y':.55},
+            do_rotation=False,
+            scale_min=1,
+            scale_max=3,
+            auto_bring_to_front=False
             )
-        self.widgets['report_pages']=report_scatter_container
+        self.widgets['report_scatter']=report_scatter
 
-        report_scatter = Scatter(do_rotation=False, do_scale=False,do_translation_y=False)
-        report_scatter.add_widget(report_image)
-
-        report_scatter_container.add_widget(report_scatter)
         self.add_widget(bg_image)
-        report_scroll.add_widget(report_scatter_container)
-        report_scroll2.add_widget(report_image2)
-
+        report_scroll.add_widget(report_image)
         self.add_widget(report_scroll)
-        # report_pages.add_widget(report_scroll)
-        # report_pages.add_widget(report_scroll2)
-        # self.add_widget(report_pages)
         self.add_widget(back)
         self.add_widget(back_main)
 
     def Report_back (self,button):
+        self.widgets['report_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='settings'
     def Report_back_main (self,button):
+        self.widgets['report_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
-    def switch_page(self,*args):
-        self.widgets['report_pages'].page=0
 
 class PreferenceScreen(Screen):
     def __init__(self, **kwargs):
