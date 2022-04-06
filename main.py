@@ -41,7 +41,7 @@ from kivy.uix.scatterlayout import ScatterLayout
 from kivy.graphics.transformation import Matrix
 
 kivy.require('2.0.0')
-    
+
 if os.name == 'nt':
     preferences_path='hood_control.ini'
     generic_image=r'media\lit_hood.jpg'
@@ -432,23 +432,30 @@ class ReportScreen(Screen):
         self.widgets['back_main']=back_main
         back_main.bind(on_press=self.Report_back_main)
 
-        report_image=ScatterImage(
+        # report_image=ScatterImage(
+        #     source=report_current,
+        #     size_hint_y=2,
+        #     size_hint_x=.95,
+        #     pos_hint = {'center_x':.5, 'y':1},
+        #     do_rotation=False,
+        #     do_translation=False,
+        #     scale_min=.8,
+        #     scale_max=1.4,
+        #     auto_bring_to_front=False
+        #     )
+        # self.widgets['report_image']=report_image
+
+        report_image=Image(
             source=report_current,
             size_hint_y=2,
-            size_hint_x=.95,
-            pos_hint = {'center_x':.5, 'y':1},
-            do_rotation=False,
-            do_translation=False,
-            scale_min=.8,
-            scale_max=1.4,
-            auto_bring_to_front=False
+            size_hint_x=.95
             )
         self.widgets['report_image']=report_image
 
         report_scroll=ScrollView(
             bar_width=8,
             do_scroll_y=True,
-            do_scroll_x=False,
+            do_scroll_x=True,
             size_hint_y=1,
             size_hint_x=.95,
             pos_hint = {'center_x':.525, 'center_y':.5}
