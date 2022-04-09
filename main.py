@@ -1,7 +1,7 @@
 import os
 import traceback
 import kivy
-import logic
+import logic,lang_dict
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -14,6 +14,7 @@ from kivy.graphics import BorderImage
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.pagelayout import PageLayout
@@ -41,10 +42,12 @@ from kivy.uix.scatterlayout import ScatterLayout
 from kivy.graphics.transformation import Matrix
 
 kivy.require('2.0.0')
+current_language=lang_dict.english
 
 if os.name == 'nt':
     preferences_path='hood_control.ini'
-    generic_image=r'media\lit_hood.jpg'
+    generic_image=r'media\drops_crop.jpg'
+    language_image=r'media\language_icon.png'
     settings_icon=r'media\tiny gear.png'
     trouble_icon=r'media\trouble icon.png'
     trouble_icon_dull=r'media\trouble icon dull.png'
@@ -56,12 +59,16 @@ if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
     Window.fullscreen = 'auto'
     generic_image=r'media/lit_hood.jpg'
+    language_image=r'media/language_icon.png'
     settings_icon=r'media/tiny gear.png'
     trouble_icon=r'media/trouble icon.png'
     trouble_icon_dull=r'media/trouble icon dull.png'
     logo=r'media/qt=q_95.png'
     report_current=r'media/report.jpg'
     report_original=r'media/report.jpg'
+
+class LayoutButton(FloatLayout,Button):
+    pass
 
 class ScatterImage(Image,Scatter):
 
@@ -175,31 +182,34 @@ class ControlGrid(Screen):
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
 
-        quick=ToggleButton(text="[size=50][b][color=#000000]  Fans+Lights [/color][/b][/size]",
+        quick=ToggleButton(text=current_language['quick'],
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.53},
                     background_down='',
                     background_color=(47/250, 247/250, 54/250,.85),
                     markup=True)
         self.widgets['quick']=quick
+        quick.ref='quick'
         quick.bind(on_press=self.quick_start)
 
-        fans=ToggleButton(text="[size=32][b][color=#000000] Fans [/color][/b][/size]",
+        fans=ToggleButton(text=current_language['fans'],
                     size_hint =(.45, .35),
                     pos_hint = {'x':.03, 'y':.15},
                     background_down='',
                     background_color=(0/250, 159/250, 232/250,.85),
                     markup=True)
         self.widgets['fans']=fans
+        fans.ref='fans'
         fans.bind(on_press=self.fans_switch)
 
-        lights=ToggleButton(text="[size=32][b][color=#000000] Lights [/color][/b][/size]",
+        lights=ToggleButton(text=current_language['lights'],
                     size_hint =(.45, .35),
                     pos_hint = {'x':.52, 'y':.15},
                     background_down='',
                     background_color=(245/250, 216/250, 41/250,.85),
                     markup=True)
         self.widgets['lights']=lights
+        lights.ref='lights'
         lights.bind(on_press=self.lights_switch)
 
         settings_button=IconButton(source=settings_icon, allow_stretch=True, keep_ratio=True)
@@ -220,9 +230,10 @@ class ControlGrid(Screen):
                 size_hint_y=.25,
                 pos_hint = {'x':.2, 'center_y':.07})
 
-        version_info=Label(text='[size=22][color=#000000][i]-Version 1.0.0-[/i][/color][/size]',
+        version_info=Label(text=current_language['version_info'],
                 markup=True,
                 pos_hint = {'x':.15, 'center_y':.07})
+        version_info.ref='version_info'
 
         self.add_widget(bg_image)
         self.add_widget(quick)
@@ -246,14 +257,14 @@ class ActuationScreen(Screen):
         print('actuation acknowledged')
         self.anime.cancel_all(self.widgets['alert'])
         self.widgets['alert'].background_color=(190/255, 10/255, 10/255,.9)
-        self.widgets['alert'].text="[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]"
+        self.widgets['alert'].text=current_language['alert_acknowledged']
 
 
     def reset_system(self,button):
             print('system reset')
             GPIO.heatsensor=0
             GPIO.micro=0
-            self.widgets['alert'].text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]"
+            self.widgets['alert'].text=current_language['alert']
             self.anime.cancel_all(self.widgets['alert'])
             self.pulse()
             self.parent.transition = SlideTransition(direction='right')
@@ -269,7 +280,7 @@ class ActuationScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        alert=Button(text="[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
+        alert=Button(text=current_language['alert'],
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.5},
                     background_normal='',
@@ -277,8 +288,9 @@ class ActuationScreen(Screen):
                     background_color=(190/250, 10/250, 10/250,.9),
                     markup=True)
         self.widgets['alert']=alert
+        alert.ref='alert'
 
-        acknowledge=Button(text="[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
+        acknowledge=Button(text=current_language['acknowledge'],
                     size_hint =(.45, .40),
                     pos_hint = {'x':.03, 'y':.05},
                     background_normal='',
@@ -286,10 +298,11 @@ class ActuationScreen(Screen):
                     background_color=(255/255, 121/255, 0/255,.99),
                     markup=True)
         self.widgets['acknowledge']=acknowledge
+        acknowledge.ref='acknowledge'
         acknowledge.bind(on_release=self.acknowledgement)
 
 
-        reset=Button(text="[size=32][b][color=#000000] Reset [/color][/b][/size]",
+        reset=Button(text=current_language['reset'],
                     size_hint =(.45, .40),
                     pos_hint = {'x':.52, 'y':.05},
                     background_normal='',
@@ -297,6 +310,7 @@ class ActuationScreen(Screen):
                     background_color=(255/255, 121/255, 0/255,.99),
                     markup=True)
         self.widgets['reset']=reset
+        reset.ref='reset'
         reset.bind(on_release=self.reset_system)
         self.pulse()
 
@@ -312,78 +326,155 @@ class SettingsScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+        back=Button(text=current_language['settings_back'],
                         size_hint =(.4, .25),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['back']=back
+        back.ref='settings_back'
         back.bind(on_press=self.settings_back)
 
-        logs=Button(text="[size=40][b][color=#000000]  Device Logs [/color][/b][/size]",
+        logs=Button(text=current_language['logs'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.78},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['logs']=logs
+        logs.ref='logs'
         logs.bind(on_release=self.device_logs)
 
-        sys_report=Button(text="[size=40][b][color=#000000]  System Report [/color][/b][/size]",
+        sys_report=Button(text=current_language['sys_report'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.56},
                         background_normal='',
                         background_color=(180/255, 10/255, 10/255,.9),
                         markup=True)
         self.widgets['sys_report']=sys_report
+        sys_report.ref='sys_report'
         sys_report.bind(on_release=self.sys_report)
 
-        preferences=Button(text="[size=40][b][color=#000000]  Settings [/color][/b][/size]",
+        preferences=Button(text=current_language['preferences'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.34},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['preferences']=preferences
+        preferences.ref='preferences'
         preferences.bind(on_release=self.preferences_func)
 
-        train=Button(text="[size=40][b][color=#000000]  Training [/color][/b][/size]",
+        train=Button(text=current_language['train'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.78},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['train']=train
+        train.ref='train'
         train.bind(on_release=self.train_func)
 
-        blank=Button(text="[size=40][b][color=#000000][/color][/b][/size]",
+        language_icon=Image(
+            source=language_image,
+            pos_hint = {'center_x':.5, 'center_y':.53},
+            size_hint =(1, 1))
+
+        language=LayoutButton(text='',
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.56},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['blank']=blank
-        #qr.bind(on_release=self.qr_func)
+        self.widgets['language']=language
+        language.bind(on_release=self.language_func)
 
-        about=Button(text="[size=40][b][color=#000000]  About [/color][/b][/size]",
+
+        about=Button(text=current_language['about'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.34},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['about']=about
+        about.ref='about'
         about.bind(on_release=self.about_func)
 
+        overlay_menu=Popup(
+            size_hint=(.8, .8),
+            background = 'atlas://data/images/defaulttheme/button',
+            title_color=[0, 0, 0, 1],
+            title_size='38',
+            title_align='center',
+            separator_color=[255/255, 0/255, 0/255, .5]
+        )
+        self.widgets['overlay_menu']=overlay_menu
+
+        overlay_layout=FloatLayout()
+        self.widgets['overlay_layout']=overlay_layout
+
+        overlay_menu.add_widget(overlay_layout)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(logs)
         self.add_widget(sys_report)
         self.add_widget(preferences)
         self.add_widget(train)
-        self.add_widget(blank)
+        language.add_widget(language_icon)
+        self.add_widget(language)
         self.add_widget(about)
         
+    def language_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.auto_dismiss=True
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        self.widgets['overlay_layout'].clear_widgets()
+
+        english=Button(text="[size=30][b][color=#000000]  English [/color][/b][/size]",
+                        size_hint =(.96, .125),
+                        pos_hint = {'x':.02, 'y':.9},
+                        background_normal='',
+                        background_color=(0/250, 70/250, 90/250,.9),
+                        markup=True)
+        self.widgets['english']=english
+        
+
+        spanish=Button(text="[size=30][b][color=#000000]  Español [/color][/b][/size]",
+                        size_hint =(.96, .125),
+                        pos_hint = {'x':.02, 'y':.7},
+                        background_normal='',
+                        background_color=(0/250, 70/250, 90/250,.9),
+                        markup=True)
+        self.widgets['spanish']=spanish
+
+        def english_func(button):
+            global current_language
+            config=App.get_running_app().config_
+            current_language=lang_dict.english
+            config.set('preferences','language','english')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+            language_setter()
+            self.widgets['overlay_menu'].dismiss()
+        english.bind(on_release=english_func)
+
+        def spanish_func(button):
+            global current_language
+            config=App.get_running_app().config_
+            current_language=lang_dict.spanish
+            config.set('preferences','language','spanish')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+            language_setter()
+            self.widgets['overlay_menu'].dismiss()
+        spanish.bind(on_release=spanish_func)
+
+        self.widgets['overlay_layout'].add_widget(english)
+        self.widgets['overlay_layout'].add_widget(spanish)
+        self.widgets['overlay_menu'].open()
+
     def settings_back (self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
@@ -400,9 +491,9 @@ class SettingsScreen(Screen):
     def train_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         #self.manager.current='sys_report'
-    def blank_func (self,button):
+    def language_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
-        #self.manager.current='sys_report'
+        self.language_overlay()
     def about_func (self,button):
         self.parent.transition = SlideTransition(direction='right')
         #self.manager.current='sys_report'
@@ -414,22 +505,24 @@ class ReportScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+        back=Button(text=current_language['report_back'],
                     size_hint =(.4, .15),
                     pos_hint = {'x':.06, 'y':.02},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
         self.widgets['back']=back
+        back.ref='report_back'
         back.bind(on_press=self.Report_back)
 
-        back_main=Button(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+        back_main=Button(text=current_language['report_back_main'],
                         size_hint =(.4, .15),
                         pos_hint = {'x':.52, 'y':.02},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
+        back_main.ref='report_back_main'
         back_main.bind(on_press=self.Report_back_main)
 
         # report_image=ScatterImage(
@@ -455,7 +548,7 @@ class ReportScreen(Screen):
         report_scroll=ScrollView(
             bar_width=8,
             do_scroll_y=True,
-            do_scroll_x=True,
+            do_scroll_x=False,
             size_hint_y=1,
             size_hint_x=.95,
             pos_hint = {'center_x':.525, 'center_y':.5}
@@ -495,31 +588,34 @@ class PreferenceScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+        back=Button(text=current_language['preferences_back'],
                         size_hint =(.4, .25),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['back']=back
+        back.ref='preferences_back'
         back.bind(on_press=self.settings_back)
 
-        back_main=Button(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+        back_main=Button(text=current_language['preferences_back_main'],
                         size_hint =(.48, .25),
                         pos_hint = {'x':.49, 'y':.02},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
+        back_main.ref='preferences_back_main'
         back_main.bind(on_press=self.settings_back_main)
 
-        heat_sensor=Button(text="[size=40][b][color=#000000]  Heat Sensor [/color][/b][/size]",
+        heat_sensor=Button(text=current_language['heat_sensor'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.78},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['heat_sensor']=heat_sensor
+        heat_sensor.ref='heat_sensor'
         heat_sensor.bind(on_release=self.heat_sensor_func)
         heat_sensor.bind(on_release=self.blur_screen)
 
@@ -548,6 +644,7 @@ class PreferenceScreen(Screen):
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['clean_mode']=clean_mode
+        clean_mode.ref='clean_mode'
         clean_mode.bind(on_release=self.clean_mode_func)
 
         temp_3=Button(text="[size=40][b][color=#000000]  temp_3 [/color][/b][/size]",
@@ -610,29 +707,32 @@ class PreferenceScreen(Screen):
         overlay_menu.auto_dismiss=True
         self.widgets['overlay_layout'].clear_widgets()
 
-        duration_1=Button(text="[size=30][b][color=#000000]  10 Seconds [/color][/b][/size]",
+        duration_1=Button(text=current_language['duration_1'],
                         size_hint =(.3, .50),
                         pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
                         background_color=(0/250, 70/250, 90/250,.9),
                         markup=True)
         self.widgets['duration_1']=duration_1
+        duration_1.ref='duration_1'
 
-        duration_2=Button(text="[size=30][b][color=#000000]  5 Minutes [/color][/b][/size]",
+        duration_2=Button(text=current_language['duration_2'],
                         size_hint =(.3, .50),
                         pos_hint = {'x':.35, 'y':.3},
                         background_normal='',
                         background_color=(0/250, 70/250, 90/250,.9),
                         markup=True)
         self.widgets['duration_2']=duration_2
+        duration_1.ref='duration_2'
 
-        duration_3=Button(text="[size=30][b][color=#000000]  10 Minutes [/color][/b][/size]",
+        duration_3=Button(text=current_language['duration_3'],
                         size_hint =(.3, .50),
                         pos_hint = {'x':.68, 'y':.3},
                         background_normal='',
                         background_color=(0/250, 70/250, 90/250,.9),
                         markup=True)
         self.widgets['duration_3']=duration_3
+        duration_1.ref='duration_3'
 
         def duration_1_func(button):
             config=App.get_running_app().config_
@@ -674,21 +774,15 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_layout'].clear_widgets()
 
         warning_text=Label(
-            text="""[size=30][color=#000000]Maintenance Override disables heat 
-sensors allowing neccessary maintenance 
-to take place safely.
-You will be locked on this screen untill
-override is canceled.
-
-Disable all fans?
-  [/color][/size]""",
+            text=current_language['maint_overlay_warning_text'],
             markup=True,
             size_hint =(1,.6),
             pos_hint = {'x':0, 'y':.4},
         )
         self.widgets['warning_text']=warning_text
+        warning_text.ref='maint_overlay_warning_text'
 
-        continue_button=Button(text="[size=30][b][color=#000000]  Continue [/color][/b][/size]",
+        continue_button=Button(text=current_language['continue_button'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -696,8 +790,9 @@ Disable all fans?
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
         self.widgets['continue_button']=continue_button
+        continue_button.ref='continue_button'
 
-        cancel_button=Button(text="[size=30][b][color=#000000]  Cancel [/color][/b][/size]",
+        cancel_button=Button(text=current_language['cancel_button'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
@@ -705,6 +800,7 @@ Disable all fans?
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
         self.widgets['cancel_button']=cancel_button
+        cancel_button.ref='cancel_button'
 
         def continue_button_func(button):
             self.override_overlay()
@@ -728,18 +824,15 @@ Disable all fans?
         self.widgets['overlay_layout'].clear_widgets()
 
         warning_text=Label(
-            text="""[size=30][color=#000000]Maintenance Override active.
-All fans currently disabled.
-Disable override by holding down 
-DISABLE for 3 seconds.
-  [/color][/size]""",
+            text=current_language['override_overlay_warning_text'],
             markup=True,
             size_hint =(1,.6),
             pos_hint = {'x':0, 'y':.4},
         )
         self.widgets['warning_text']=warning_text
+        warning_text.ref='override_overlay_warning_text'
 
-        disable_button=Button(text="[size=30][b][color=#000000]  DISABLE [/color][/b][/size]",
+        disable_button=Button(text=current_language['disable_button'],
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -747,6 +840,7 @@ DISABLE for 3 seconds.
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
         self.widgets['disable_button']=disable_button
+        disable_button.ref='disable_button'
 
         def disable_button_func(button):
             logic.fs.moli['maint_override']=0
@@ -797,17 +891,19 @@ class TroubleScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+        back=Button(text=current_language['trouble_back'],
                     size_hint =(.4, .15),
                     pos_hint = {'x':.02, 'y':.02},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
         self.widgets['back']=back
+        back.ref='trouble_back'
         back.bind(on_press=self.trouble_back)
 
-        trouble_details=trouble_template('-No active troubles detected-')
+        trouble_details=trouble_template(current_language['no_trouble'])
         self.widgets['trouble_details']=trouble_details
+        trouble_details.ref='no_trouble'
         # trouble_details.bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
         # trouble_details.bind(width=lambda instance, value: setattr(instance, 'text_size', (value, None)))
 
@@ -863,10 +959,10 @@ def listen(app_object,*args):
     #exhaust
         if event_log['exhaust']==1:
             if main_screen.widgets['fans'].state=='down':
-                main_screen.widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+                main_screen.widgets['fans'].text=current_language['fans']
         elif event_log['exhaust']==0:
             if main_screen.widgets['fans'].state=='down':
-                main_screen.widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+                main_screen.widgets['fans'].text=current_language['fans']
     #mau
         if event_log['mau']==1:
             pass
@@ -876,10 +972,10 @@ def listen(app_object,*args):
     #heat sensor
         if event_log['heat_sensor']==1:
             if main_screen.widgets['fans'].state=='normal':
-                main_screen.widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+                main_screen.widgets['fans'].text = current_language['fans_heat']
         else:
             if main_screen.widgets['fans'].state=='normal':
-                main_screen.widgets['fans'].text='[size=32][b][color=#000000] Fans [/color][/b][/size]'
+                main_screen.widgets['fans'].text=current_language['fans']
     #dry contact
         if event_log['dry_contact']==1:
             pass
@@ -911,17 +1007,18 @@ def listen(app_object,*args):
                 main_screen.widgets['trouble_button'].source=trouble_icon_dull
                 main_screen.widgets['trouble_button'].color=(1,1,1,.15)
             if 'trouble_details' not in troubles_screen.widgets:
-                trouble_details=trouble_template('-No active troubles detected-')
+                trouble_details=trouble_template(current_language['no_trouble'])
                 troubles_screen.widgets['trouble_details']=trouble_details
                 trouble_display.add_widget(trouble_details)
     #heat trouble
         if trouble_log['heat_override']==1:
             if app_object.current!='alert':
-                main_screen.widgets['fans'].text = '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]'
+                main_screen.widgets['fans'].text =current_language['fans_heat']
                 if 'heat_trouble' not in troubles_screen.widgets:
-                    heat_trouble=trouble_template('                        -Heat Sensor-',
-                    'Unsafe temps detected in hood; fan override activated',
-                    link_text='                    Turn on fans',ref_tag='fans')
+                    heat_trouble=trouble_template(current_language['heat_trouble_title'],
+                    current_language['heat_trouble_body'],
+                    link_text=current_language['heat_trouble_link'],ref_tag='fans')
+                    heat_trouble.ref='heat_trouble'
 
                     def fan_switch(a,b):
                         app_object.get_screen('main').widgets['fans'].state = 'down'
@@ -942,6 +1039,7 @@ class Hood_Control(App):
         self.config_ = configparser.ConfigParser()
         self.config_.read(preferences_path)
         settings_setter(self.config_)
+        Clock.schedule_once(partial(language_setter,config=self.config_))
         self.context_screen=ScreenManager()
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
@@ -961,6 +1059,32 @@ def settings_setter(config):
         logic.heat_sensor_timer=300
     elif heat_duration == '600':
         logic.heat_sensor_timer=600
+
+def language_setter(*args,config=None):
+    if config:
+        print('here')
+        global current_language
+        lang_pref=config['preferences']['language']
+        current_language=eval(f'lang_dict.{lang_pref}')
+    for screen in App.get_running_app().root.screens:
+        for i in screen.children:
+            for ii in i.children:
+                for iii in ii.children:
+                    if hasattr(iii,'text') and hasattr(iii,'ref'):
+                        if iii.text!='':
+                            iii.text=current_language[str(iii.ref)]
+                if hasattr(ii,'text') and hasattr(ii,'ref'):
+                    if ii.text!='':
+                        ii.text=current_language[str(ii.ref)]
+            if hasattr(i,'text') and hasattr(i,'ref'):
+                if i.text!='':
+                    i.text=current_language[str(i.ref)]
+            # else:
+            #     if i.text!='':
+            #         i.text='test'
+
+
+
 
 logic_control = Thread(target=logic.logic,daemon=True)
 logic_control.start()
