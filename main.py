@@ -637,7 +637,7 @@ class PreferenceScreen(Screen):
         self.widgets['temp_2']=temp_2
         #preferences.bind(on_release=self.preferences_func)
 
-        clean_mode=Button(text="[size=32][b][color=#000000]  Maint. Override [/color][/b][/size]",
+        clean_mode=Button(text=current_language['clean_mode'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.78},
                         background_down='',
@@ -670,13 +670,14 @@ class PreferenceScreen(Screen):
         overlay_menu=Popup(
             size_hint=(.8, .8),
             background = 'atlas://data/images/defaulttheme/button',
-            title='Heat-Sensor Override Duration',
+            title=current_language['heat_overlay'],
             title_color=[0, 0, 0, 1],
             title_size='38',
             title_align='center',
             separator_color=[255/255, 0/255, 0/255, .5]
         )
         self.widgets['overlay_menu']=overlay_menu
+        overlay_menu.ref='heat_overlay'
 
         overlay_layout=FloatLayout()
         self.widgets['overlay_layout']=overlay_layout
@@ -702,7 +703,7 @@ class PreferenceScreen(Screen):
 
     def heat_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
-        overlay_menu.title='Heat-Sensor Override Duration'
+        overlay_menu.title=current_language['heat_overlay']
         overlay_menu.separator_height=1
         overlay_menu.auto_dismiss=True
         self.widgets['overlay_layout'].clear_widgets()
