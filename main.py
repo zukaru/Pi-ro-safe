@@ -1063,7 +1063,6 @@ def settings_setter(config):
 
 def language_setter(*args,config=None):
     if config:
-        print('here')
         global current_language
         lang_pref=config['preferences']['language']
         current_language=eval(f'lang_dict.{lang_pref}')
