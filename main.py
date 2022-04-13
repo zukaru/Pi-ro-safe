@@ -475,6 +475,40 @@ class SettingsScreen(Screen):
         self.widgets['overlay_layout'].add_widget(spanish)
         self.widgets['overlay_menu'].open()
 
+    def about_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        about_text=Label(
+            text=current_language['about_overlay_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},
+        )
+        self.widgets['about_text']=about_text
+        about_text.ref='about_overlay_text'
+
+        about_back_button=Button(text=current_language['about_back'],
+                        size_hint =(.9, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['about_back_button']=about_back_button
+        about_back_button.ref='about_back'
+
+        def about_overlay_close(button):
+            self.widgets['overlay_menu'].dismiss()
+        about_back_button.bind(on_press=about_overlay_close)
+
+        self.widgets['overlay_layout'].add_widget(about_text)
+        self.widgets['overlay_layout'].add_widget(about_back_button)
+        self.widgets['overlay_menu'].open()
+
     def settings_back (self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
@@ -497,6 +531,7 @@ class SettingsScreen(Screen):
     def about_func (self,button):
         self.parent.transition = SlideTransition(direction='right')
         #self.manager.current='sys_report'
+        self.about_overlay()
 
 class ReportScreen(Screen):
     def __init__(self, **kwargs):
@@ -540,7 +575,7 @@ class ReportScreen(Screen):
 
         report_image=Image(
             source=report_current,
-            size_hint_y=2,
+            size_hint_y=2.5,
             size_hint_x=.95
             )
         self.widgets['report_image']=report_image
@@ -696,8 +731,9 @@ class PreferenceScreen(Screen):
         self.add_widget(self.blur)
 
     def blur_screen(self,button):
-        pass
         #self.blur.effects = [HorizontalBlurEffect(size=5.0),VerticalBlurEffect(size=5.0)]
+        pass
+
     def unblur_screen(self,button):
         self.blur.effects = [HorizontalBlurEffect(size=0),VerticalBlurEffect(size=0)]
 
@@ -712,7 +748,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.3, .50),
                         pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
-                        background_color=(0/250, 70/250, 90/250,.9),
+                        background_color=(0/250, 159/250, 232/250,.9),
                         markup=True)
         self.widgets['duration_1']=duration_1
         duration_1.ref='duration_1'
@@ -721,7 +757,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.3, .50),
                         pos_hint = {'x':.35, 'y':.3},
                         background_normal='',
-                        background_color=(0/250, 70/250, 90/250,.9),
+                        background_color=(0/250, 159/250, 232/250,.9),
                         markup=True)
         self.widgets['duration_2']=duration_2
         duration_1.ref='duration_2'
@@ -730,7 +766,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.3, .50),
                         pos_hint = {'x':.68, 'y':.3},
                         background_normal='',
-                        background_color=(0/250, 70/250, 90/250,.9),
+                        background_color=(0/250, 159/250, 232/250,.9),
                         markup=True)
         self.widgets['duration_3']=duration_3
         duration_1.ref='duration_3'
@@ -1079,12 +1115,6 @@ def language_setter(*args,config=None):
             if hasattr(i,'text') and hasattr(i,'ref'):
                 if i.text!='':
                     i.text=current_language[str(i.ref)]
-            # else:
-            #     if i.text!='':
-            #         i.text='test'
-
-
-
 
 logic_control = Thread(target=logic.logic,daemon=True)
 logic_control.start()

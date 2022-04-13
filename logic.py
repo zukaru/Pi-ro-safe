@@ -88,7 +88,6 @@ class Logic():
             'dry_contact':off,
             'micro_switch':off,
             'troubles':self.troubles
-
         }
 
     def normal(self):
