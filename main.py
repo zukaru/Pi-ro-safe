@@ -47,7 +47,7 @@ current_language=lang_dict.english
 if os.name == 'nt':
     preferences_path='hood_control.ini'
     generic_image=r'media\drops_crop.jpg'
-    language_image=r'media\language_icon.png'
+    language_image=r'media\language_icon-1.png'
     settings_icon=r'media\tiny gear.png'
     trouble_icon=r'media\trouble icon.png'
     trouble_icon_dull=r'media\trouble icon dull.png'
@@ -59,7 +59,7 @@ if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
     Window.fullscreen = 'auto'
     generic_image=r'media/lit_hood.jpg'
-    language_image=r'media/language_icon.png'
+    language_image=r'media/language_icon-1.png'
     settings_icon=r'media/tiny gear.png'
     trouble_icon=r'media/trouble icon.png'
     trouble_icon_dull=r'media/trouble icon dull.png'
@@ -682,23 +682,25 @@ class PreferenceScreen(Screen):
         clean_mode.ref='clean_mode'
         clean_mode.bind(on_release=self.clean_mode_func)
 
-        temp_3=Button(text="[size=40][b][color=#000000]  temp_3 [/color][/b][/size]",
+        commission=Button(text=current_language['commission'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.56},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp_3']=temp_3
-        #qr.bind(on_release=self.qr_func)
+        self.widgets['commission']=commission
+        commission.ref='commission'
+        commission.bind(on_release=self.commission_func)
 
-        temp_4=Button(text="[size=40][b][color=#000000]  temp_4 [/color][/b][/size]",
+        pins=Button(text=current_language['pins'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.34},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp_4']=temp_4
-        #about.bind(on_release=self.about_func)
+        self.widgets['pins']=pins
+        pins.ref='pins'
+        pins.bind(on_release=self.pins_func)
 
         self.blur = EffectWidget()
 
@@ -726,8 +728,8 @@ class PreferenceScreen(Screen):
         self.blur.add_widget(temp_1)
         self.blur.add_widget(temp_2)
         self.blur.add_widget(clean_mode)
-        self.blur.add_widget(temp_3)
-        self.blur.add_widget(temp_4)
+        self.blur.add_widget(commission)
+        self.blur.add_widget(pins)
         self.add_widget(self.blur)
 
     def blur_screen(self,button):
@@ -898,27 +900,27 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_layout'].add_widget(warning_text)
         self.widgets['overlay_layout'].add_widget(disable_button)
 
-    def settings_back (self,button):
+    def settings_back(self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='settings'
-    def settings_back_main (self,button):
+    def settings_back_main(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
-    def heat_sensor_func (self,button):
+    def heat_sensor_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.heat_overlay()
     def sys_report_func (self,button):
         self.parent.transition = SlideTransition(direction='left')
-    def preferences_func (self,button):
+    def preferences_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
-    def clean_mode_func (self,button):
+    def clean_mode_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.maint_overlay()
         #self.manager.current='sys_report'
-    def qr_func (self,button):
+    def commission_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         #self.manager.current='sys_report'
-    def about_func (self,button):
+    def pins_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
 
 class TroubleScreen(Screen):
@@ -978,7 +980,6 @@ class TroubleScreen(Screen):
     def trouble_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='main'
-
 
 def listen(app_object,*args):
     event_log=logic.fs.milo
@@ -1070,7 +1071,6 @@ def listen(app_object,*args):
                 trouble_display.remove_widget(troubles_screen.widgets['heat_trouble'])
                 del troubles_screen.widgets['heat_trouble']
 
-
 class Hood_Control(App):
     def build(self):
         self.config_ = configparser.ConfigParser()
@@ -1086,7 +1086,6 @@ class Hood_Control(App):
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen
-
 
 def settings_setter(config):
     heat_duration=config['preferences']['heat_timer']
@@ -1122,7 +1121,7 @@ try:
     Hood_Control().run()
 except KeyboardInterrupt:
     print('Keyboard Inturrupt')
-except: 
+except:
     traceback.print_exc()
 finally:
     logic.clean_exit()
