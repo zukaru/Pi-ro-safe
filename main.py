@@ -919,9 +919,47 @@ class PreferenceScreen(Screen):
         #self.manager.current='sys_report'
     def commission_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
-        #self.manager.current='sys_report'
     def pins_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
+        self.manager.current='pin'
+
+class PinScreen(Screen):
+    def __init__(self, **kwargs):
+        super(PinScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=Button(text=current_language['pin_back'],
+                    size_hint =(.4, .15),
+                    pos_hint = {'x':.06, 'y':.02},
+                    background_down='',
+                    background_color=(200/250, 200/250, 200/250,.85),
+                    markup=True)
+        self.widgets['back']=back
+        back.ref='pin_back'
+        back.bind(on_press=self.Pin_back)
+
+        back_main=Button(text=current_language['pin_back_main'],
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.52, 'y':.02},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.ref='pin_back_main'
+        back_main.bind(on_press=self.Pin_back_main)
+
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        self.add_widget(back_main)
+
+    def Pin_back (self,button):
+        self.parent.transition = SlideTransition(direction='right')
+        self.manager.current='preferences'
+    def Pin_back_main (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        self.manager.current='main'
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
@@ -1083,6 +1121,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(SettingsScreen(name='settings'))
         self.context_screen.add_widget(ReportScreen(name='report'))
         self.context_screen.add_widget(PreferenceScreen(name='preferences'))
+        self.context_screen.add_widget(PinScreen(name='pin'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen

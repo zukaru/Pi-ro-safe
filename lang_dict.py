@@ -48,7 +48,9 @@ DISABLE for 3 seconds.
     'no_trouble' : '-No active troubles detected-',
     'heat_trouble_title' : '                        -Heat Sensor-',
     'heat_trouble_body' : 'Unsafe temps detected in hood; fan override activated',
-    'heat_trouble_link' : '                    Turn on fans'
+    'heat_trouble_link' : '                    Turn on fans',
+    'pin_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
+    'pin_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]"
 
 }
 
@@ -103,5 +105,7 @@ para 3 segundos.
     'no_trouble' : '-No hay problemas para identificar-',
     'heat_trouble_title' : '                      -Sensor de Calor-',
     'heat_trouble_body' : 'La campana se activada por la temperatura en la campana',
-    'heat_trouble_link' : '         Enciende los ventiladores'
+    'heat_trouble_link' : '         Enciende los ventiladores',
+    'pin_back' : "[size=50][b][color=#000000]  Regresa [/color][/b][/size]",
+    'pin_back_main' : "[size=50][b][color=#000000]  Cerrar Menú [/color][/b][/size]",
 }
