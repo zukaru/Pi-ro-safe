@@ -950,16 +950,167 @@ class PinScreen(Screen):
         back_main.ref='pin_back_main'
         back_main.bind(on_press=self.Pin_back_main)
 
+        num_pad=RelativeLayout(size_hint =(.9, .65),
+            pos_hint = {'center_x':.6, 'center_y':.4})
+        self.widgets['num_pad']=num_pad
+
+        one=Button(text="[size=35][b][color=#000000] 1 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.85},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['one']=one
+        one.bind(on_press=self.one_func)
+
+        two=Button(text="[size=35][b][color=#000000] 2 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.2, 'y':.85},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['two']=two
+        two.bind(on_press=self.two_func)
+
+        three=Button(text="[size=35][b][color=#000000] 3 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.4, 'y':.85},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['three']=three
+        three.bind(on_press=self.three_func)
+
+        four=Button(text="[size=35][b][color=#000000] 4 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.65},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['four']=four
+        four.bind(on_press=self.four_func)
+
+        five=Button(text="[size=35][b][color=#000000] 5 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.2, 'y':.65},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['five']=five
+        five.bind(on_press=self.five_func)
+
+        six=Button(text="[size=35][b][color=#000000] 6 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.4, 'y':.65},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['six']=six
+        six.bind(on_press=self.six_func)
+
+        seven=Button(text="[size=35][b][color=#000000] 7 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.45},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['seven']=seven
+        seven.bind(on_press=self.seven_func)
+
+        eight=Button(text="[size=35][b][color=#000000] 8 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.2, 'y':.45},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['eight']=eight
+        eight.bind(on_press=self.eight_func)
+
+        nine=Button(text="[size=35][b][color=#000000] 9 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.4, 'y':.45},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['nine']=nine
+        nine.bind(on_press=self.nine_func)
+
+        zero=Button(text="[size=35][b][color=#000000] 0 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.25},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['zero']=zero
+        zero.bind(on_press=self.zero_func)
+
+        backspace=Button(text="[size=35][b][color=#000000] <- [/color][/b][/size]",
+            size_hint =(.35, .15),
+            pos_hint = {'x':.2, 'y':.25},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['backspace']=backspace
+        backspace.bind(on_press=self.backspace_func)
+
+        enter=Button(text="[size=35][b][color=#000000] -> [/color][/b][/size]",
+            size_hint =(.15, .75),
+            pos_hint = {'x':.6, 'y':.25},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['enter']=enter
+        enter.bind(on_press=self.enter_func)
+
+        # display=Label()
+
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
+        num_pad.add_widget(one)
+        num_pad.add_widget(two)
+        num_pad.add_widget(three)
+        num_pad.add_widget(four)
+        num_pad.add_widget(five)
+        num_pad.add_widget(six)
+        num_pad.add_widget(seven)
+        num_pad.add_widget(eight)
+        num_pad.add_widget(nine)
+        num_pad.add_widget(zero)
+        num_pad.add_widget(backspace)
+        num_pad.add_widget(enter)
+        self.add_widget(num_pad)
 
-    def Pin_back (self,button):
+    def Pin_back(self,button):
         self.parent.transition = SlideTransition(direction='right')
         self.manager.current='preferences'
-    def Pin_back_main (self,button):
+    def Pin_back_main(self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
+    def one_func(self,button):
+        pass
+    def two_func(self,button):
+        pass
+    def three_func(self,button):
+        pass
+    def four_func(self,button):
+        pass
+    def five_func(self,button):
+        pass
+    def six_func(self,button):
+        pass
+    def seven_func(self,button):
+        pass
+    def eight_func(self,button):
+        pass
+    def nine_func(self,button):
+        pass
+    def zero_func(self,button):
+        pass
+    def backspace_func(self,button):
+        pass
+    def enter_func(self,button):
+        pass
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
