@@ -976,7 +976,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['one']=one
-        one.bind(on_press=self.one_func)
+        one.bind(on_release=self.one_func)
 
         two=Button(text="[size=35][b][color=#000000] 2 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -985,7 +985,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['two']=two
-        two.bind(on_press=self.two_func)
+        two.bind(on_release=self.two_func)
 
         three=Button(text="[size=35][b][color=#000000] 3 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -994,7 +994,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['three']=three
-        three.bind(on_press=self.three_func)
+        three.bind(on_release=self.three_func)
 
         four=Button(text="[size=35][b][color=#000000] 4 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -1003,7 +1003,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['four']=four
-        four.bind(on_press=self.four_func)
+        four.bind(on_release=self.four_func)
 
         five=Button(text="[size=35][b][color=#000000] 5 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -1012,7 +1012,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['five']=five
-        five.bind(on_press=self.five_func)
+        five.bind(on_release=self.five_func)
 
         six=Button(text="[size=35][b][color=#000000] 6 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -1021,7 +1021,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['six']=six
-        six.bind(on_press=self.six_func)
+        six.bind(on_release=self.six_func)
 
         seven=Button(text="[size=35][b][color=#000000] 7 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -1030,7 +1030,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['seven']=seven
-        seven.bind(on_press=self.seven_func)
+        seven.bind(on_release=self.seven_func)
 
         eight=Button(text="[size=35][b][color=#000000] 8 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -1039,7 +1039,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['eight']=eight
-        eight.bind(on_press=self.eight_func)
+        eight.bind(on_release=self.eight_func)
 
         nine=Button(text="[size=35][b][color=#000000] 9 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -1048,7 +1048,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['nine']=nine
-        nine.bind(on_press=self.nine_func)
+        nine.bind(on_release=self.nine_func)
 
         zero=Button(text="[size=35][b][color=#000000] 0 [/color][/b][/size]",
             size_hint =(.15, .15),
@@ -1057,7 +1057,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['zero']=zero
-        zero.bind(on_press=self.zero_func)
+        zero.bind(on_release=self.zero_func)
 
         backspace=Button(text="[size=35][b][color=#000000] <- [/color][/b][/size]",
             size_hint =(.35, .15),
@@ -1066,7 +1066,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['backspace']=backspace
-        backspace.bind(on_press=self.backspace_func)
+        backspace.bind(on_release=self.backspace_func)
 
         enter=Button(text="[size=35][b][color=#000000] -> [/color][/b][/size]",
             size_hint =(.15, .75),
@@ -1075,7 +1075,7 @@ class PinScreen(Screen):
             background_color=(200/250, 200/250, 200/250,.85),
             markup=True)
         self.widgets['enter']=enter
-        enter.bind(on_press=self.enter_func)
+        enter.bind(on_release=self.enter_func)
 
         display=DisplayLabel(text=f'[size=25][color=#000000]{self.pin}[/color][/size]',
         size_hint =(.67, .10),
