@@ -1105,9 +1105,13 @@ class PinScreen(Screen):
         self.add_widget(display)
 
     def Pin_back(self,button):
+        self.pin=''
+        self.widgets['display'].update_text(self.pin)
         self.parent.transition = SlideTransition(direction='right')
         self.manager.current='preferences'
     def Pin_back_main(self,button):
+        self.pin=''
+        self.widgets['display'].update_text(self.pin)
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
     def one_func(self,button):
