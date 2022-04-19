@@ -50,7 +50,8 @@ DISABLE for 3 seconds.
     'heat_trouble_body' : 'Unsafe temps detected in hood; fan override activated',
     'heat_trouble_link' : '                    Turn on fans',
     'pin_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
-    'pin_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]"
+    'pin_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+    'system_reset_overlay' : 'System Reset'
 
 }
 

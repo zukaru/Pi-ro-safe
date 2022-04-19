@@ -68,6 +68,20 @@ if os.name == 'posix':
     report_current=r'media/report.jpg'
     report_original=r'media/report.jpg'
 
+class PinPop(Popup):
+    def __init__(self,name, **kwargs):
+        super().__init__(size_hint=(.8, .8),
+        background = 'atlas://data/images/defaulttheme/button',
+        title=current_language[f'{name}_overlay'],
+        title_color=[0, 0, 0, 1],
+        title_size='38',
+        title_align='center',
+        separator_color=[255/255, 0/255, 0/255, .5],
+        **kwargs)
+        self.widgets={}
+        self.overlay_layout=FloatLayout()
+        self.add_widget(self.overlay_layout)
+
 class LayoutButton(FloatLayout,Button):
     pass
 
@@ -1086,6 +1100,11 @@ class PinScreen(Screen):
         markup=True)
         self.widgets['display']=display
 
+        reset_overlay=PinPop('system_reset')
+        self.widgets['reset_overlay']=reset_overlay
+        reset_overlay.ref='reset_overlay'
+        reset_overlay.widgets['overlay_layout']=reset_overlay.overlay_layout
+
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
@@ -1160,7 +1179,7 @@ class PinScreen(Screen):
         self.widgets['display'].update_text(self.pin)
     def enter_func(self,button):
         if hasattr(pindex.Pindex,f'p{self.pin}'):
-            eval(f'pindex.Pindex.p{self.pin}()')
+            eval(f'pindex.Pindex.p{self.pin}(self)')
         self.pin=''
         self.widgets['display'].update_text(self.pin)
 
