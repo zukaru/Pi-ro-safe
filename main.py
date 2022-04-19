@@ -1,7 +1,7 @@
 import os
 import traceback
 import kivy
-import logic,lang_dict
+import logic,lang_dict,pindex
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -120,6 +120,20 @@ class trouble_template(Label):
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
+
+class DisplayLabel(Label):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.bind(pos=self.update_rect)
+        self.bind(size=self.update_rect)
+        with self.canvas.before:
+                    Color(255/255, 255/255, 255/255,.95)
+                    self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = (self.size[0], self.size[1])
+    def update_text(self,text,*args):
+        self.text=f'[size=25][color=#000000]{text}[/color][/size]'
 
 class EventpassGridLayout(GridLayout):
     pass
@@ -928,6 +942,7 @@ class PinScreen(Screen):
         super(PinScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
+        self.pin=''
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=Button(text=current_language['pin_back'],
@@ -1062,7 +1077,14 @@ class PinScreen(Screen):
         self.widgets['enter']=enter
         enter.bind(on_press=self.enter_func)
 
-        # display=Label()
+        
+        display=DisplayLabel(text=f'[size=25][color=#000000]{self.pin}[/color][/size]',
+        size_hint =(.67, .10),
+        pos_hint = {'x':.152, 'y':.77},
+        valign='middle',
+        halign='center',
+        markup=True)
+        self.widgets['display']=display
 
         self.add_widget(bg_image)
         self.add_widget(back)
@@ -1080,6 +1102,7 @@ class PinScreen(Screen):
         num_pad.add_widget(backspace)
         num_pad.add_widget(enter)
         self.add_widget(num_pad)
+        self.add_widget(display)
 
     def Pin_back(self,button):
         self.parent.transition = SlideTransition(direction='right')
@@ -1088,29 +1111,52 @@ class PinScreen(Screen):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
     def one_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='1'
+        self.widgets['display'].update_text(self.pin)
     def two_func(self,button):
-        pass
+        if len(self.pin)<11:   
+            self.pin+='2'
+        self.widgets['display'].update_text(self.pin)
     def three_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='3'
+        self.widgets['display'].update_text(self.pin)
     def four_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='4'
+        self.widgets['display'].update_text(self.pin)
     def five_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='5'
+        self.widgets['display'].update_text(self.pin)
     def six_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='6'
+        self.widgets['display'].update_text(self.pin)
     def seven_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='7'
+        self.widgets['display'].update_text(self.pin)
     def eight_func(self,button):
-        pass
+        self.pin+='8'
+        self.widgets['display'].update_text(self.pin)
     def nine_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='9'
+        self.widgets['display'].update_text(self.pin)
     def zero_func(self,button):
-        pass
+        if len(self.pin)<11:
+            self.pin+='0'
+        self.widgets['display'].update_text(self.pin)
     def backspace_func(self,button):
-        pass
+        self.pin=self.pin[0:-1]
+        self.widgets['display'].update_text(self.pin)
     def enter_func(self,button):
-        pass
+        if hasattr(pindex.Pindex,f'p{self.pin}'):
+            eval(f'pindex.Pindex.p{self.pin}()')
+        self.pin=''
+        self.widgets['display'].update_text(self.pin)
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
