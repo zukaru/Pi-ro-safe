@@ -40,6 +40,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.scatter import Scatter
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.graphics.transformation import Matrix
+from kivy.input.providers.mouse import MouseMotionEvent
 
 kivy.require('2.0.0')
 current_language=lang_dict.english
@@ -1110,46 +1111,48 @@ class PinScreen(Screen):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
     def one_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='1'
         self.widgets['display'].update_text(self.pin)
     def two_func(self,button):
-        if len(self.pin)<11:   
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):   
             self.pin+='2'
         self.widgets['display'].update_text(self.pin)
     def three_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='3'
         self.widgets['display'].update_text(self.pin)
     def four_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='4'
         self.widgets['display'].update_text(self.pin)
     def five_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='5'
         self.widgets['display'].update_text(self.pin)
     def six_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='6'
         self.widgets['display'].update_text(self.pin)
     def seven_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='7'
         self.widgets['display'].update_text(self.pin)
     def eight_func(self,button):
-        self.pin+='8'
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='8'
         self.widgets['display'].update_text(self.pin)
     def nine_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='9'
         self.widgets['display'].update_text(self.pin)
     def zero_func(self,button):
-        if len(self.pin)<11:
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='0'
         self.widgets['display'].update_text(self.pin)
     def backspace_func(self,button):
-        self.pin=self.pin[0:-1]
+        if isinstance(button.last_touch,MouseMotionEvent):
+            self.pin=self.pin[0:-1]
         self.widgets['display'].update_text(self.pin)
     def enter_func(self,button):
         if hasattr(pindex.Pindex,f'p{self.pin}'):
