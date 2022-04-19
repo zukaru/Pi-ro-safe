@@ -1077,7 +1077,6 @@ class PinScreen(Screen):
         self.widgets['enter']=enter
         enter.bind(on_press=self.enter_func)
 
-        
         display=DisplayLabel(text=f'[size=25][color=#000000]{self.pin}[/color][/size]',
         size_hint =(.67, .10),
         pos_hint = {'x':.152, 'y':.77},
