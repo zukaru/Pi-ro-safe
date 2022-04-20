@@ -2,16 +2,11 @@ import os
 
 class Pindex:
 
-    def p123456(self):
+    def p123456(pin_screen):
         print("that's the password on my luggage!")
 
-    def p2022(self):
+    def p2022(pin_screen):
         print('updating report date')
 
-    def p4321(self):
-        if os.name == 'posix':
-            self.widgets['reset_overlay'].open()
-            os.system("sudo reboot")
-        else:
-            print(self.widgets['reset_overlay'].open())
-            print('System reset')
+    def p4321(pin_screen):
+        pin_screen.widgets['reset_overlay'].open()

@@ -51,8 +51,16 @@ DISABLE for 3 seconds.
     'heat_trouble_link' : '                    Turn on fans',
     'pin_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'pin_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
-    'system_reset_overlay' : 'System Reset'
+    'system_reset_overlay' : 'System Reset',
+    'reset_text' : """[size=30][color=#000000]    Rebooting will take a few moments.
 
+    During this time the hood will power down.
+    Normally closed relays will be open.
+    E.g. Shunts will need to be reset.
+
+    Do you want to continue?[/color][/size]""",
+    'reset_confirm' : '[size=30][b][color=#000000] Reset [/color][/b][/size]',
+    'reset_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]'
 }
 
 spanish={
@@ -109,4 +117,14 @@ para 3 segundos.
     'heat_trouble_link' : '         Enciende los ventiladores',
     'pin_back' : "[size=50][b][color=#000000]  Regresa [/color][/b][/size]",
     'pin_back_main' : "[size=50][b][color=#000000]  Cerrar Menú [/color][/b][/size]",
+    'system_reset_overlay' : 'Reiniciar la Sistema',
+    'reset_text' : """[size=30][color=#000000]    Reiniciando vas a tomará unos minutos.
+
+    El campana se apagará durante la reiniciando.
+    Los relés normalmente cerrados se abrirán.
+    Por ejemplo será necesario restablecer las disparo en derivación.
+
+    ¿Quieres continuar?[/color][/size]""",
+    'reset_confirm' : '[size=30][b][color=#000000] Reiniciar [/color][/b][/size]',
+    'reset_cancel' : '[size=30][b][color=#000000] Regresa [/color][/b][/size]'
 }

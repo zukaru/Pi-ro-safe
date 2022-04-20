@@ -1093,11 +1093,11 @@ class PinScreen(Screen):
         enter.bind(on_release=self.enter_func)
 
         display=DisplayLabel(text=f'[size=25][color=#000000]{self.pin}[/color][/size]',
-        size_hint =(.67, .10),
-        pos_hint = {'x':.152, 'y':.77},
-        valign='middle',
-        halign='center',
-        markup=True)
+            size_hint =(.67, .10),
+            pos_hint = {'x':.152, 'y':.77},
+            valign='middle',
+            halign='center',
+            markup=True)
         self.widgets['display']=display
 
         reset_overlay=PinPop('system_reset')
@@ -1105,6 +1105,48 @@ class PinScreen(Screen):
         reset_overlay.ref='reset_overlay'
         reset_overlay.widgets['overlay_layout']=reset_overlay.overlay_layout
 
+        reset_text=Label(
+            text=current_language['reset_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},
+        )
+        self.widgets['reset_text']=reset_text
+        reset_text.ref='reset_text'
+
+        reset_confirm=Button(text=current_language['reset_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['reset_confirm']=reset_confirm
+        reset_confirm.ref='reset_confirm'
+
+        reset_cancel=Button(text=current_language['reset_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['reset_cancel']=reset_cancel
+        reset_cancel.ref='reset_cancel'
+
+        def reset_confirm_func(button):
+            print(self.widgets['reset_overlay'].widgets['overlay_layout'].children )
+            if os.name=='posix':
+                os.system("sudo reboot")
+        reset_confirm.bind(on_release=reset_confirm_func)
+
+        def reset_cancel_func(button):
+            self.widgets['reset_overlay'].dismiss()
+        reset_cancel.bind(on_release=reset_cancel_func)
+
+        self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
+        self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
+        self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
@@ -1366,6 +1408,14 @@ def language_setter(*args,config=None):
         for i in screen.children:
             for ii in i.children:
                 for iii in ii.children:
+                    for iiii in iii.children:
+                        for iiiii in iiii.children:
+                            if hasattr(iiiii,'text') and hasattr(iiiii,'ref'):
+                                if iiiii.text!='':
+                                    iiiii.text=current_language[str(iiiii.ref)]
+                        if hasattr(iiii,'text') and hasattr(iiii,'ref'):
+                            if iiii.text!='':
+                                iiii.text=current_language[str(iiii.ref)]
                     if hasattr(iii,'text') and hasattr(iii,'ref'):
                         if iii.text!='':
                             iii.text=current_language[str(iii.ref)]
