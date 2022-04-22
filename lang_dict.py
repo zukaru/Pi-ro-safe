@@ -21,7 +21,7 @@ english={
     'preferences_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'heat_sensor' : "[size=40][b][color=#000000]  Heat Sensor [/color][/b][/size]",
     'clean_mode' : "[size=32][b][color=#000000]  Maint. Override [/color][/b][/size]",
-    'commission' : "[size=35][b][color=#000000]  Commissioning\n  Documentation [/color][/b][/size]",
+    'commission' : "[size=35][b][color=#000000]  Documents [/color][/b][/size]",
     'pins' : "[size=40][b][color=#000000]  Enter Pin [/color][/b][/size]",
     'heat_overlay' : 'Heat-Sensor Override Duration',
     'duration_1' : "[size=30][b][color=#000000]  10 Seconds [/color][/b][/size]",

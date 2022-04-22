@@ -948,6 +948,7 @@ class PreferenceScreen(Screen):
         #self.manager.current='sys_report'
     def commission_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
+        self.manager.current='documents'
     def pins_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='pin'
@@ -1225,6 +1226,87 @@ class PinScreen(Screen):
         self.pin=''
         self.widgets['display'].update_text(self.pin)
 
+class DocumentScreen(Screen):
+    def __init__(self, **kwargs):
+        super(DocumentScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+                    size_hint =(.4, .15),
+                    pos_hint = {'x':.06, 'y':.02},
+                    background_down='',
+                    background_color=(200/250, 200/250, 200/250,.85),
+                    markup=True)
+        self.widgets['back']=back
+        back.bind(on_press=self.Report_back)
+
+        back_main=Button(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.52, 'y':.02},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.bind(on_press=self.Report_back_main)
+
+        report_scroll=ScrollView(
+            bar_width=8,
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint_y=None,
+            size_hint_x=1)
+        self.widgets['report_scroll']=report_scroll
+
+        report_image=IconButton(
+            source=r'media\report.jpg',
+            size_hint_y=2,
+            size_hint_x=.95,
+            pos_hint = {'center_x':.5, 'y':1})
+
+        report_scroll2=OutlineScroll(
+            bar_width=8,
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint_y=None,
+            size_hint_x=1)
+        self.widgets['report_scroll2']=report_scroll2
+
+        report_image2=IconButton(
+            source=r'media\report.jpg',
+            size_hint_y=2,
+            size_hint_x=.98)
+        report_image2.bind(on_touch_down=self.switch_page)
+
+        report_pages=PageLayout(
+            size_hint =(1, .80),
+            pos_hint = {'center_x':.5, 'y':.18},
+            border=50,
+            swipe_threshold =-1)
+        self.widgets['report_pages']=report_pages
+
+        self.add_widget(bg_image)
+        report_scroll.add_widget(report_image)
+        report_scroll2.add_widget(report_image2)
+
+        report_pages.add_widget(report_scroll)
+        report_pages.add_widget(report_scroll2)
+        self.add_widget(report_pages)
+        self.add_widget(back)
+        self.add_widget(back_main)
+
+    def Report_back (self,button):
+        self.parent.transition = SlideTransition(direction='up')
+        self.manager.current='settings'
+    def Report_back_main (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+        self.manager.current='main'
+    def switch_page(self,image,*args):
+        if isinstance(image.last_touch,MouseMotionEvent):
+            self.widgets['report_pages'].page=0
+
+
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
         super(TroubleScreen,self).__init__(**kwargs)
@@ -1386,6 +1468,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(ReportScreen(name='report'))
         self.context_screen.add_widget(PreferenceScreen(name='preferences'))
         self.context_screen.add_widget(PinScreen(name='pin'))
+        self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         return self.context_screen
