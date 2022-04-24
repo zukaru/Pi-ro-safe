@@ -1483,31 +1483,19 @@ def settings_setter(config):
         logic.heat_sensor_timer=600
 
 def language_setter(*args,config=None):
+    def widget_walker(widget,current_language):
+        if hasattr(widget,'children'):
+            for i in widget.children:
+                widget_walker(i,current_language)
+        if hasattr(widget,'text') and hasattr(widget,'ref'):
+            if widget.text!='':
+                widget.text=current_language[str(widget.ref)]
     if config:
         global current_language
         lang_pref=config['preferences']['language']
         current_language=eval(f'lang_dict.{lang_pref}')
-    for screen in App.get_running_app().root.screens:
-        for i in screen.children:
-            for ii in i.children:
-                for iii in ii.children:
-                    for iiii in iii.children:
-                        for iiiii in iiii.children:
-                            if hasattr(iiiii,'text') and hasattr(iiiii,'ref'):
-                                if iiiii.text!='':
-                                    iiiii.text=current_language[str(iiiii.ref)]
-                        if hasattr(iiii,'text') and hasattr(iiii,'ref'):
-                            if iiii.text!='':
-                                iiii.text=current_language[str(iiii.ref)]
-                    if hasattr(iii,'text') and hasattr(iii,'ref'):
-                        if iii.text!='':
-                            iii.text=current_language[str(iii.ref)]
-                if hasattr(ii,'text') and hasattr(ii,'ref'):
-                    if ii.text!='':
-                        ii.text=current_language[str(ii.ref)]
-            if hasattr(i,'text') and hasattr(i,'ref'):
-                if i.text!='':
-                    i.text=current_language[str(i.ref)]
+    for i in App.get_running_app().root.screens:
+        widget_walker(i,current_language)
 
 logic_control = Thread(target=logic.logic,daemon=True)
 logic_control.start()
