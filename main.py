@@ -1304,7 +1304,8 @@ class DocumentScreen(Screen):
         self.manager.current='main'
     def switch_page(self,image,*args):
         if isinstance(image.last_touch,MouseMotionEvent):
-            self.widgets['report_pages'].page=0
+            if not self.widgets['report_pages'].page==0:
+                self.widgets['report_pages'].page-=1
 
 
 class TroubleScreen(Screen):
