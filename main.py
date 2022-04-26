@@ -1,6 +1,7 @@
 import os
 import traceback
 import kivy
+from numpy import source
 import logic,lang_dict,pindex
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
@@ -41,6 +42,7 @@ from kivy.uix.scatter import Scatter
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.graphics.transformation import Matrix
 from kivy.input.providers.mouse import MouseMotionEvent
+from kivy.uix.carousel import Carousel
 
 kivy.require('2.0.0')
 current_language=lang_dict.english
@@ -55,6 +57,9 @@ if os.name == 'nt':
     logo=r'media\qt=q_95.png'
     report_current=r'media\report.jpg'
     report_original=r'media\report.jpg'
+    left_arrow_image=r'media\left_arrow.png'
+    right_arrow_image=r'media\right_arrow.png'
+    stock_photo_test=r'media\download.jpeg'
 
 if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
@@ -67,6 +72,9 @@ if os.name == 'posix':
     logo=r'media/qt=q_95.png'
     report_current=r'media/report.jpg'
     report_original=r'media/report.jpg'
+    left_arrow_image=r'media/left_arrow.png'
+    right_arrow_image=r'media/right_arrow.png'
+    stock_photo_test=r'media/download.jpeg'
 
 class PinPop(Popup):
     def __init__(self,name, **kwargs):
@@ -1251,40 +1259,54 @@ class DocumentScreen(Screen):
         self.widgets['back_main']=back_main
         back_main.bind(on_press=self.Report_back_main)
 
+        left_arrow=IconButton(source=left_arrow_image,
+                        size_hint =(.4, .25),
+                        pos_hint = {'x':-.1, 'center_y':.55})
+        self.widgets['left_arrow']=left_arrow
+        left_arrow.bind(on_press=self.left_arrow_func)
+
+        right_arrow=IconButton(source=right_arrow_image,
+                        size_hint =(.4, .25),
+                        pos_hint = {'x':.7, 'center_y':.55})
+        self.widgets['right_arrow']=right_arrow
+        right_arrow.bind(on_press=self.right_arrow_func)
+
         report_scroll=ScrollView(
             bar_width=8,
+            bar_margin=20,
             do_scroll_y=True,
             do_scroll_x=False,
-            size_hint_y=None,
+            size_hint_y=1,
             size_hint_x=1)
         self.widgets['report_scroll']=report_scroll
 
         report_image=IconButton(
-            source=r'media\report.jpg',
+            source=report_current,
             size_hint_y=2,
             size_hint_x=.95,
             pos_hint = {'center_x':.5, 'y':1})
 
-        report_scroll2=OutlineScroll(
+        report_scroll2=ScrollView(
             bar_width=8,
+            bar_margin=20,
             do_scroll_y=True,
             do_scroll_x=False,
-            size_hint_y=None,
+            size_hint_y=1,
             size_hint_x=1)
         self.widgets['report_scroll2']=report_scroll2
 
         report_image2=IconButton(
-            source=r'media\report.jpg',
+            source=report_original,
             size_hint_y=2,
             size_hint_x=.98)
-        report_image2.bind(on_touch_down=self.switch_page)
 
-        report_pages=PageLayout(
-            size_hint =(1, .80),
-            pos_hint = {'center_x':.5, 'y':.18},
-            border=50,
-            swipe_threshold =-1)
+        report_pages=Carousel(loop=True,
+        size_hint =(1, .75),
+        pos_hint = {'center_x':.5, 'center_y':.60}
+        )
         self.widgets['report_pages']=report_pages
+
+        stock_photo=Image(source=stock_photo_test)
 
         self.add_widget(bg_image)
         report_scroll.add_widget(report_image)
@@ -1292,9 +1314,12 @@ class DocumentScreen(Screen):
 
         report_pages.add_widget(report_scroll)
         report_pages.add_widget(report_scroll2)
+        report_pages.add_widget(stock_photo)
         self.add_widget(report_pages)
         self.add_widget(back)
         self.add_widget(back_main)
+        self.add_widget(left_arrow)
+        self.add_widget(right_arrow)
 
     def Report_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
@@ -1302,10 +1327,10 @@ class DocumentScreen(Screen):
     def Report_back_main (self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
-    def switch_page(self,image,*args):
-        if isinstance(image.last_touch,MouseMotionEvent):
-            if not self.widgets['report_pages'].page==0:
-                self.widgets['report_pages'].page-=1
+    def left_arrow_func(self,*args):
+            self.widgets['report_pages'].load_previous()
+    def right_arrow_func(self,*args):
+            self.widgets['report_pages'].load_next()
 
 
 class TroubleScreen(Screen):
