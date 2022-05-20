@@ -600,8 +600,8 @@ class ReportScreen(Screen):
         date_label=DisplayLabel(
             text='',
             markup=True,
-            size_hint =(.14, .05),
-            pos_hint = {'center_x':.88, 'center_y':.79})
+            size_hint =(.135, .045),
+            pos_hint = {'center_x':.88, 'center_y':.865})
         self.widgets['date_label']=date_label
 
         report_image=Image(
@@ -1160,7 +1160,7 @@ class PinScreen(Screen):
         def reset_cancel_func(button):
             self.widgets['reset_overlay'].dismiss()
         reset_cancel.bind(on_release=reset_cancel_func)
-#
+
         date_overlay=PinPop('date')
         self.widgets['date_overlay']=date_overlay
         date_overlay.ref='date_overlay'
@@ -1203,7 +1203,7 @@ class PinScreen(Screen):
         def date_cancel_func(button):
             self.widgets['date_overlay'].dismiss()
         date_cancel.bind(on_release=date_cancel_func)
-#
+
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
