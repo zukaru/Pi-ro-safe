@@ -10,3 +10,6 @@ class Pindex:
 
     def p4321(pin_screen):
         pin_screen.widgets['reset_overlay'].open()
+
+    def p1337(pin_screen):
+        pin_screen.widgets['date_overlay'].open()

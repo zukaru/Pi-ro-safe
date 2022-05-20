@@ -150,7 +150,7 @@ class DisplayLabel(Label):
         self.bind(pos=self.update_rect)
         self.bind(size=self.update_rect)
         with self.canvas.before:
-                    Color(255/255, 255/255, 255/255,.95)
+                    Color(255/255, 255/255, 255/255,1)
                     self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
     def update_rect(self, *args):
         self.rect.pos = self.pos
@@ -597,25 +597,22 @@ class ReportScreen(Screen):
         back_main.ref='report_back_main'
         back_main.bind(on_press=self.Report_back_main)
 
-        # report_image=ScatterImage(
-        #     source=report_current,
-        #     size_hint_y=2,
-        #     size_hint_x=.95,
-        #     pos_hint = {'center_x':.5, 'y':1},
-        #     do_rotation=False,
-        #     do_translation=False,
-        #     scale_min=.8,
-        #     scale_max=1.4,
-        #     auto_bring_to_front=False
-        #     )
-        # self.widgets['report_image']=report_image
+        date_label=DisplayLabel(
+            text='',
+            markup=True,
+            size_hint =(.14, .05),
+            pos_hint = {'center_x':.88, 'center_y':.79})
+        self.widgets['date_label']=date_label
 
         report_image=Image(
-            source=report_current,
-            size_hint_y=2.5,
-            size_hint_x=.95
+            source=report_current
             )
         self.widgets['report_image']=report_image
+
+        scroll_layout=RelativeLayout(
+            size_hint_y=2.5,
+            size_hint_x=.95
+        )
 
         report_scroll=ScrollView(
             bar_width=8,
@@ -639,11 +636,15 @@ class ReportScreen(Screen):
         self.widgets['report_scatter']=report_scatter
 
         self.add_widget(bg_image)
-        report_scroll.add_widget(report_image)
+        scroll_layout.add_widget(report_image)
+        scroll_layout.add_widget(date_label)
+        report_scroll.add_widget(scroll_layout)
         self.add_widget(report_scroll)
         self.add_widget(back)
         self.add_widget(back_main)
 
+    def on_pre_enter(self):
+        self.date_setter()
     def Report_back (self,button):
         self.widgets['report_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='up')
@@ -652,6 +653,11 @@ class ReportScreen(Screen):
         self.widgets['report_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
+    def date_setter(self):
+        report_date=self.widgets['date_label']
+        config=App.get_running_app().config_
+        saved_date=config["documents"]["inspection_date"]
+        report_date.text=f'[color=#000000]{saved_date}[/color]'
 
 class PreferenceScreen(Screen):
     def __init__(self, **kwargs):
@@ -964,6 +970,8 @@ class PreferenceScreen(Screen):
 class PinScreen(Screen):
     def __init__(self, **kwargs):
         super(PinScreen,self).__init__(**kwargs)
+        self.root=App.get_running_app()
+        self.date_flag=0
         self.cols = 2
         self.widgets={}
         self.pin=''
@@ -1152,10 +1160,56 @@ class PinScreen(Screen):
         def reset_cancel_func(button):
             self.widgets['reset_overlay'].dismiss()
         reset_cancel.bind(on_release=reset_cancel_func)
+#
+        date_overlay=PinPop('date')
+        self.widgets['date_overlay']=date_overlay
+        date_overlay.ref='date_overlay'
+        date_overlay.widgets['overlay_layout']=date_overlay.overlay_layout
 
+        date_text=Label(
+            text=current_language['date_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},
+        )
+        self.widgets['date_text']=date_text
+        date_text.ref='date_text'
+
+        date_confirm=Button(text=current_language['date_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['date_confirm']=date_confirm
+        date_confirm.ref='date_confirm'
+
+        date_cancel=Button(text=current_language['date_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['date_cancel']=date_cancel
+        date_cancel.ref='date_cancel'
+
+        def date_confirm_func(button):
+            self.date_flag=1
+            self.widgets['date_overlay'].dismiss()
+        date_confirm.bind(on_release=date_confirm_func)
+
+        def date_cancel_func(button):
+            self.widgets['date_overlay'].dismiss()
+        date_cancel.bind(on_release=date_cancel_func)
+#
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
+        self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_text)
+        self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_confirm)
+        self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_cancel)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
@@ -1184,6 +1238,9 @@ class PinScreen(Screen):
         self.widgets['display'].update_text(self.pin)
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
+    def on_leave(self):
+        self.pin=''
+        self.date_flag=0
     def one_func(self,button):
         if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
             self.pin+='1'
@@ -1229,7 +1286,16 @@ class PinScreen(Screen):
             self.pin=self.pin[0:-1]
         self.widgets['display'].update_text(self.pin)
     def enter_func(self,button):
-        if hasattr(pindex.Pindex,f'p{self.pin}'):
+        if self.date_flag:
+            self.date_flag=0
+            config=self.root.config_
+            month=self.pin[0:2]
+            day=self.pin[2:4]
+            year=self.pin[4:8]
+            config.set('documents','inspection_date',f'{month}-{day}-{year}')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+        elif hasattr(pindex.Pindex,f'p{self.pin}'):
             eval(f'pindex.Pindex.p{self.pin}(self)')
         self.pin=''
         self.widgets['display'].update_text(self.pin)
@@ -1248,6 +1314,7 @@ class DocumentScreen(Screen):
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
         self.widgets['back']=back
+        back.ref='report_back'
         back.bind(on_press=self.Report_back)
 
         back_main=Button(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
@@ -1257,6 +1324,7 @@ class DocumentScreen(Screen):
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
+        back_main.ref='report_back_main'
         back_main.bind(on_press=self.Report_back_main)
 
         left_arrow=IconButton(source=left_arrow_image,
@@ -1322,16 +1390,15 @@ class DocumentScreen(Screen):
         self.add_widget(right_arrow)
 
     def Report_back (self,button):
-        self.parent.transition = SlideTransition(direction='up')
-        self.manager.current='settings'
+        self.parent.transition = SlideTransition(direction='right')
+        self.manager.current='preferences'
     def Report_back_main (self,button):
-        self.parent.transition = SlideTransition(direction='left')
+        self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
     def left_arrow_func(self,*args):
             self.widgets['report_pages'].load_previous()
     def right_arrow_func(self,*args):
             self.widgets['report_pages'].load_next()
-
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):

@@ -60,7 +60,17 @@ DISABLE for 3 seconds.
 
     Do you want to continue?[/color][/size]""",
     'reset_confirm' : '[size=30][b][color=#000000] Reset [/color][/b][/size]',
-    'reset_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]'
+    'reset_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'date_overlay' : 'Set Report Date ',
+    'date_text' : """[size=30][color=#000000]    Change date on current report?
+    
+    You will be returned to the pin menu; 
+    Enter the new date in mmddyy format
+    and press enter.
+    Do not use spaces, dashes,
+    or any delineators.[/color][/size]""",
+    'date_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'date_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
 }
 
 spanish={
