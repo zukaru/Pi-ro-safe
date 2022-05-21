@@ -1369,6 +1369,8 @@ class DocumentScreen(Screen):
             size_hint_x=.98)
 
         report_pages=Carousel(loop=True,
+        scroll_distance=5000,
+        scroll_timeout=0,
         size_hint =(1, .75),
         pos_hint = {'center_x':.5, 'center_y':.60}
         )
