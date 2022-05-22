@@ -924,6 +924,18 @@ class PreferenceScreen(Screen):
         self.widgets['disable_button']=disable_button
         disable_button.ref='disable_button'
 
+        light_button=IconButton(source=r'media\tall_bulb.png',
+                        size_hint =(.9, .25),
+                        pos_hint = {'x':.40, 'y':.05})
+        self.widgets['light_button']=light_button
+
+        def light_button_func(button):
+            if logic.fs.moli['maint_override_light']==1:
+                logic.fs.moli['maint_override_light']=0
+            else:
+                logic.fs.moli['maint_override_light']=1
+        light_button.bind(on_press=light_button_func)
+
         def disable_button_func(button):
             logic.fs.moli['maint_override']=0
             self.widgets['overlay_menu'].dismiss()
@@ -942,6 +954,7 @@ class PreferenceScreen(Screen):
 
         self.widgets['overlay_layout'].add_widget(warning_text)
         self.widgets['overlay_layout'].add_widget(disable_button)
+        self.widgets['overlay_layout'].add_widget(light_button)
 
     def settings_back(self,button):
         self.parent.transition = SlideTransition(direction='down')

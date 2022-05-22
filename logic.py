@@ -78,7 +78,8 @@ class Logic():
             'mau':off,
             'lights':off,
             'dry_contact':off,
-            'maint_override':off
+            'maint_override':off,
+            'maint_override_light':off
         }
         self.milo={
             'exhaust':off,
@@ -97,9 +98,12 @@ class Logic():
             self.milo['micro_switch']=on
         elif self.moli['maint_override']==1:
             GPIO.output(dry_contact,on)
-            GPIO.output(lights_pin,on)
             GPIO.output(exfan1.pin,off)
             GPIO.output(mau1.pin,off)
+            if self.moli['maint_override_light']==1:
+                GPIO.output(lights_pin,on)
+            elif self.moli['maint_override_light']==0:
+                GPIO.output(lights_pin,off)
         else:
 
             GPIO.output(dry_contact,on)

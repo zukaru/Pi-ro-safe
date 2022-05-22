@@ -65,8 +65,8 @@ DISABLE for 3 seconds.
     'date_text' : """[size=30][color=#000000]    Change date on current report?
     
     You will be returned to the pin menu; 
-    Enter the new date in mmddyy format
-    and press enter.
+    Enter the new date in: mmddyyyy 
+    format and press enter.
     Do not use spaces, dashes,
     or any delineators.[/color][/size]""",
     'date_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
