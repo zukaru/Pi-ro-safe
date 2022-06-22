@@ -551,7 +551,7 @@ class SettingsScreen(Screen):
         self.manager.current='main'
     def device_logs (self,button):
         self.parent.transition = SlideTransition(direction='down')
-        #self.manager.current='logs'
+        self.manager.current='devices'
     def sys_report (self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='report'
@@ -658,6 +658,43 @@ class ReportScreen(Screen):
         config=App.get_running_app().config_
         saved_date=config["documents"]["inspection_date"]
         report_date.text=f'[color=#000000]{saved_date}[/color]'
+
+class DevicesScreen(Screen):
+    def __init__(self, **kw):
+        super(DevicesScreen,self).__init__(**kw)
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        self.widgets={}
+
+        back=Button(text=current_language['report_back'],
+                    size_hint =(.4, .15),
+                    pos_hint = {'x':.06, 'y':.02},
+                    background_down='',
+                    background_color=(200/250, 200/250, 200/250,.85),
+                    markup=True)
+        self.widgets['back']=back
+        back.ref='report_back'
+        back.bind(on_press=self.devices_back)
+
+        back_main=Button(text=current_language['report_back_main'],
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.52, 'y':.02},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.ref='report_back_main'
+        back_main.bind(on_press=self.devices_back_main)
+
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        self.add_widget(back_main)
+
+    def devices_back (self,button):
+        self.parent.transition = SlideTransition(direction='up')
+        self.manager.current='settings'
+    def devices_back_main (self,button):
+            self.parent.transition = SlideTransition(direction='left')
+            self.manager.current='main'
 
 class PreferenceScreen(Screen):
     def __init__(self, **kwargs):
@@ -1574,6 +1611,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
         self.context_screen.add_widget(ReportScreen(name='report'))
+        self.context_screen.add_widget(DevicesScreen(name='devices'))
         self.context_screen.add_widget(PreferenceScreen(name='preferences'))
         self.context_screen.add_widget(PinScreen(name='pin'))
         self.context_screen.add_widget(DocumentScreen(name='documents'))
