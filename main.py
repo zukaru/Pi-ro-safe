@@ -1,7 +1,6 @@
 import os
 import traceback
 import kivy
-from numpy import source
 import logic,lang_dict,pindex
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
@@ -1253,6 +1252,54 @@ class PinScreen(Screen):
         def date_cancel_func(button):
             self.widgets['date_overlay'].dismiss()
         date_cancel.bind(on_release=date_cancel_func)
+        
+        heat_override_overlay=PinPop('heat_override_overlay')
+        self.widgets['heat_override_overlay']=heat_override_overlay
+        heat_override_overlay.ref='heat_overlay'
+        heat_override_overlay.widgets['overlay_layout']=heat_override_overlay.overlay_layout
+
+        heat_override_text=Label(
+            text=current_language['heat_override_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},
+        )
+        self.widgets['heat_override_text']=heat_override_text
+        heat_override_text.ref='heat_override_text'
+
+        heat_override_confirm=Button(text=current_language['heat_override_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['heat_override_confirm']=heat_override_confirm
+        heat_override_confirm.ref='heat_override_confirm'
+
+        heat_override_cancel=Button(text=current_language['heat_override_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['heat_override_cancel']=heat_override_cancel
+        heat_override_cancel.ref='heat_override_cancel'
+
+        def heat_override_confirm_func(button):
+            logic.heat_sensor_timer=10
+            config=self.root.config_
+            config.set('preferences','heat_timer','10')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+            print(self.widgets['heat_override_overlay'].widgets['overlay_layout'].children )
+            self.widgets['heat_override_overlay'].dismiss()
+        heat_override_confirm.bind(on_release=heat_override_confirm_func)
+
+        def heat_override_cancel_func(button):
+            self.widgets['heat_override_overlay'].dismiss()
+        heat_override_cancel.bind(on_release=heat_override_cancel_func)
 
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
@@ -1260,6 +1307,9 @@ class PinScreen(Screen):
         self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_text)
         self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_confirm)
         self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_cancel)
+        self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_text)
+        self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_confirm)
+        self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_cancel)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)

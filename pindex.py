@@ -13,3 +13,6 @@ class Pindex:
 
     def p1337(pin_screen):
         pin_screen.widgets['date_overlay'].open()
+
+    def p1438(pin_screen):
+        pin_screen.widgets['heat_override_overlay'].open()
