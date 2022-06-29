@@ -1253,7 +1253,7 @@ class PinScreen(Screen):
             self.widgets['date_overlay'].dismiss()
         date_cancel.bind(on_release=date_cancel_func)
         
-        heat_override_overlay=PinPop('heat_override_overlay')
+        heat_override_overlay=PinPop('heat_override')
         self.widgets['heat_override_overlay']=heat_override_overlay
         heat_override_overlay.ref='heat_overlay'
         heat_override_overlay.widgets['overlay_layout']=heat_override_overlay.overlay_layout
