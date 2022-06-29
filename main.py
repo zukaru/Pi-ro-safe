@@ -960,7 +960,7 @@ class PreferenceScreen(Screen):
         self.widgets['disable_button']=disable_button
         disable_button.ref='disable_button'
 
-        light_button=IconButton(source=r'media\tall_bulb.png',
+        light_button=IconButton(source=r'media/tall_bulb.png',
                         size_hint =(.9, .25),
                         pos_hint = {'x':.40, 'y':.05})
         self.widgets['light_button']=light_button
