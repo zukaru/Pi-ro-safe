@@ -71,6 +71,7 @@ DISABLE for 3 seconds.
     or any delineators.[/color][/size]""",
     'date_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'date_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'heat_override_overlay' : '[size=30][b][color=#000000] Set heat overrid duration to 10 seconds? [/color][/b][/size]',
     'heat_override_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]'
 }
