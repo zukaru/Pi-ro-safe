@@ -960,10 +960,14 @@ class PreferenceScreen(Screen):
         self.widgets['disable_button']=disable_button
         disable_button.ref='disable_button'
 
-        light_button=IconButton(source=r'media/tall_bulb.png',
-                        size_hint =(.9, .25),
-                        pos_hint = {'x':.40, 'y':.05})
+        light_button=ToggleButton(text=current_language['lights'],
+                        size_hint =(.2, .25),
+                        pos_hint = {'x':.75, 'y':.05},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
         self.widgets['light_button']=light_button
+        light_button.ref='lights'
 
         def light_button_func(button):
             if logic.fs.moli['maint_override_light']==1:
