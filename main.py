@@ -145,6 +145,28 @@ class trouble_template(Label):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
 
+class ScrollItemTemplate(Label):
+    def __init__(self,Item_tag,Item_text='',link_text=None,ref_tag=None,color=(245/250, 216/250, 41/250,.85),**kwargs):
+        if link_text == None:
+            link_text=''
+        else:
+            link_text='\n'+str(link_text)
+        super().__init__(text=f'''[size=24][b]{Item_tag}[/b][/size]
+        [size=18][i]{Item_text}[/i][/size][size=30][color=#de2500][i][ref={ref_tag}]{link_text}[/ref][/i][/color][/size]''',
+        markup=True,
+        size_hint_y=None,
+        size_hint_x=1,
+        color = (0,0,0,1),
+        **kwargs)
+        self.bind(pos=self.update_rect)
+        self.bind(size=self.update_rect)
+        with self.canvas.before:
+            Color(color[0],color[1],color[2],color[3])
+            self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = (self.size[0], self.size[1])
+
 class DisplayLabel(Label):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -569,7 +591,7 @@ class SettingsScreen(Screen):
         self.manager.current='preferences'
     def train_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
-        #self.manager.current='sys_report'
+        self.manager.current='train'
     def language_func (self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.language_overlay()
@@ -693,14 +715,107 @@ class DevicesScreen(Screen):
         back_main.ref='report_back_main'
         back_main.bind(on_press=self.devices_back_main)
 
+        device_details=ScrollItemTemplate(current_language['no_device'],color=(120/255, 120/255, 120/255,.85))
+        self.widgets['device_details']=device_details
+        device_details.ref='no_device'
+
+        device_layout=EventpassGridLayout(
+            size_hint_y=None,
+            size_hint_x=1,
+            cols=1,
+            padding=10,
+            spacing=(1,5)
+            )
+        self.widgets['device_layout']=device_layout
+        device_layout.bind(minimum_height=device_layout.setter('height'))
+
+        device_scroll=ScrollView(
+            bar_width=8,
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint_y=None,
+            size_hint_x=1,
+            size_hint =(.9, .80),
+            pos_hint = {'center_x':.5, 'y':.18}
+            )
+        self.widgets['device_scroll']=device_scroll
+
+        device_layout.add_widget(device_details)
+        device_scroll.add_widget(device_layout)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
+        self.add_widget(device_scroll)
 
     def devices_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='settings'
     def devices_back_main (self,button):
+            self.parent.transition = SlideTransition(direction='left')
+            self.manager.current='main'
+
+class TrainScreen(Screen):
+    def __init__(self, **kw):
+        super(TrainScreen,self).__init__(**kw)
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        self.widgets={}
+
+        back=Button(text=current_language['report_back'],
+                    size_hint =(.4, .15),
+                    pos_hint = {'x':.06, 'y':.02},
+                    background_down='',
+                    background_color=(200/250, 200/250, 200/250,.85),
+                    markup=True)
+        self.widgets['back']=back
+        back.ref='report_back'
+        back.bind(on_press=self.train_back)
+
+        back_main=Button(text=current_language['report_back_main'],
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.52, 'y':.02},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.ref='report_back_main'
+        back_main.bind(on_press=self.train_back_main)
+
+        train_details=ScrollItemTemplate(current_language['no_train'],color=(120/255, 120/255, 120/255,.85))
+        self.widgets['train_details']=train_details
+        train_details.ref='no_train'
+
+        train_layout=EventpassGridLayout(
+            size_hint_y=None,
+            size_hint_x=1,
+            cols=1,
+            padding=10,
+            spacing=(1,5)
+            )
+        self.widgets['train_layout']=train_layout
+        train_layout.bind(minimum_height=train_layout.setter('height'))
+
+        train_scroll=ScrollView(
+            bar_width=8,
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint_y=None,
+            size_hint_x=1,
+            size_hint =(.9, .80),
+            pos_hint = {'center_x':.5, 'y':.18}
+            )
+        self.widgets['train_scroll']=train_scroll
+
+        train_layout.add_widget(train_details)
+        train_scroll.add_widget(train_layout)
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        self.add_widget(back_main)
+        self.add_widget(train_scroll)
+
+    def train_back (self,button):
+        self.parent.transition = SlideTransition(direction='up')
+        self.manager.current='settings'
+    def train_back_main (self,button):
             self.parent.transition = SlideTransition(direction='left')
             self.manager.current='main'
 
@@ -1566,12 +1681,9 @@ class TroubleScreen(Screen):
         self.add_widget(bg_image)
         trouble_layout.add_widget(trouble_details)
         trouble_scroll.add_widget(trouble_layout)
-        
-        
+
         self.add_widget(trouble_scroll)
         self.add_widget(back)
-
-        
 
     def trouble_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
@@ -1703,6 +1815,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(SettingsScreen(name='settings'))
         self.context_screen.add_widget(ReportScreen(name='report'))
         self.context_screen.add_widget(DevicesScreen(name='devices'))
+        self.context_screen.add_widget(TrainScreen(name='train'))
         self.context_screen.add_widget(PreferenceScreen(name='preferences'))
         self.context_screen.add_widget(PinScreen(name='pin'))
         self.context_screen.add_widget(DocumentScreen(name='documents'))

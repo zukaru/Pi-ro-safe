@@ -2,18 +2,18 @@ english={
     'quick' : "[size=50][b][color=#000000]  Fans+Lights [/color][/b][/size]",
     'fans' : "[size=32][b][color=#000000] Fans [/color][/b][/size]",
     'lights' : "[size=32][b][color=#000000] Lights [/color][/b][/size]",
-    'version_info' : '''[size=18][color=#000000]    Hood Control[/size]
+    'version_info' : '''[size=16][color=#000000]      Hood Control[/size]
 [size=22][i]-Version 1.0.0-[/i][/color][/size]''',
     'alert' : "[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
     'alert_acknowledged' : "[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]",
     'acknowledge' : "[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
     'reset' : "[size=32][b][color=#000000] Reset [/color][/b][/size]",
     'settings_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
-    'logs' : "[size=40][b][color=#000000]  Device Logs [/color][/b][/size]",
-    'sys_report' : "[size=40][b][color=#000000]  System Report [/color][/b][/size]",
-    'preferences' : "[size=40][b][color=#000000]  Settings [/color][/b][/size]",
-    'train' : "[size=40][b][color=#000000]  Training [/color][/b][/size]",
-    'about' : "[size=40][b][color=#000000]  About [/color][/b][/size]",
+    'logs' : "[size=32][b][color=#000000]  Device Logs [/color][/b][/size]",
+    'sys_report' : "[size=32][b][color=#000000]  System Report [/color][/b][/size]",
+    'preferences' : "[size=32][b][color=#000000]  Settings [/color][/b][/size]",
+    'train' : "[size=32][b][color=#000000]  Training [/color][/b][/size]",
+    'about' : "[size=32][b][color=#000000]  About [/color][/b][/size]",
     'about_overlay_text' : """[size=20][color=#000000]Hood Control™ developed
 by Fire Safe Extinguisher Service.
 PO Box 1071, Murray, Kentucky
@@ -29,10 +29,10 @@ Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""
     'report_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'preferences_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'preferences_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
-    'heat_sensor' : "[size=40][b][color=#000000]  Heat Sensor [/color][/b][/size]",
+    'heat_sensor' : "[size=32][b][color=#000000]  Heat Sensor [/color][/b][/size]",
     'clean_mode' : "[size=32][b][color=#000000]  Maint. Override [/color][/b][/size]",
-    'commission' : "[size=35][b][color=#000000]  Documents [/color][/b][/size]",
-    'pins' : "[size=40][b][color=#000000]  Enter Pin [/color][/b][/size]",
+    'commission' : "[size=32][b][color=#000000]  Documents [/color][/b][/size]",
+    'pins' : "[size=32][b][color=#000000]  Enter Pin [/color][/b][/size]",
     'heat_overlay' : 'Heat-Sensor Override Duration',
     'duration_1' : "[size=30][b][color=#000000]  5 Minutes [/color][/b][/size]",
     'duration_2' : "[size=30][b][color=#000000]  15 Minutes [/color][/b][/size]",
@@ -87,7 +87,9 @@ DISABLE for 3 seconds.
     'heat_override_overlay' : 'Heat Override Duration',
     'heat_override_text' : '[size=30][color=#000000] Set heat override duration to 10 seconds? [/color][/size]',
     'heat_override_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
-    'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]'
+    'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'no_device':'-No active devices detected-',
+    'no_train':'-No training items found-'
 }
 
 spanish={
