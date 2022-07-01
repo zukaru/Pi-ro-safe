@@ -710,6 +710,7 @@ class PreferenceScreen(Screen):
         self.cols = 2
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        self.duration_flag=0
 
         back=Button(text=current_language['preferences_back'],
                         size_hint =(.4, .25),
@@ -1028,6 +1029,9 @@ class PreferenceScreen(Screen):
     def pins_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='pin'
+    def on_enter(self):
+        if self.duration_flag:
+            self.heat_overlay()
 
 class PinScreen(Screen):
     def __init__(self, **kwargs):
@@ -1662,6 +1666,30 @@ def listen(app_object,*args):
             if 'heat_trouble' in troubles_screen.widgets:
                 trouble_display.remove_widget(troubles_screen.widgets['heat_trouble'])
                 del troubles_screen.widgets['heat_trouble']
+    #short duration trouble
+        if trouble_log['short_duration']==1:
+            if app_object.current!='alert':
+                if 'duration_trouble' not in troubles_screen.widgets:
+                    duration_trouble=trouble_template(current_language['duration_trouble_title'],
+                    current_language['duration_trouble_body'],
+                    link_text=current_language['duration_trouble_link'],ref_tag='duration_trouble')
+                    duration_trouble.ref='duration_trouble'
+
+                    def duration_overlay(a,b):
+                        app_object.get_screen('preferences').duration_flag=1
+                        app_object.transition = SlideTransition(direction='up')
+                        app_object.current='preferences'
+
+
+                    duration_trouble.bind(on_ref_press=duration_overlay)
+                    troubles_screen.widgets['duration_trouble']=duration_trouble
+                    troubles_screen.widgets['duration_trouble'].bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
+                    trouble_display.add_widget(duration_trouble)
+        elif trouble_log['short_duration']==0:
+            if 'duration_trouble' in troubles_screen.widgets:
+                trouble_display.remove_widget(troubles_screen.widgets['duration_trouble'])
+                del troubles_screen.widgets['duration_trouble']
+
 
 class Hood_Control(App):
     def build(self):
@@ -1684,12 +1712,12 @@ class Hood_Control(App):
 
 def settings_setter(config):
     heat_duration=config['preferences']['heat_timer']
-    if heat_duration == '10':
-        logic.heat_sensor_timer=10
-    elif heat_duration == '300':
+    if heat_duration == '300':
         logic.heat_sensor_timer=300
-    elif heat_duration == '600':
-        logic.heat_sensor_timer=600
+    elif heat_duration == '900':
+        logic.heat_sensor_timer=900
+    elif heat_duration == '1800':
+        logic.heat_sensor_timer=1800
 
 def language_setter(*args,config=None):
     def widget_walker(widget,current_language):

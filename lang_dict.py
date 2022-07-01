@@ -16,9 +16,13 @@ english={
     'about' : "[size=40][b][color=#000000]  About [/color][/b][/size]",
     'about_overlay_text' : """[size=20][color=#000000]Hood Control™ developed
 by Fire Safe Extinguisher Service.
+PO Box 1071, Murray, Kentucky
+42071, United States
+(270) 761-0637
 
 
-\n\n\n\n\n\n\n
+
+\n\n\n
 Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""",
     'about_back' : "[size=30][b][color=#000000]  Back [/color][/b][/size]",
     'report_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
@@ -55,6 +59,9 @@ DISABLE for 3 seconds.
     'heat_trouble_title' : '                        -Heat Sensor-',
     'heat_trouble_body' : 'Unsafe temps detected in hood; fan override activated',
     'heat_trouble_link' : '                    Turn on fans',
+    'duration_trouble_title' : '               -Short Duration-',
+    'duration_trouble_body' : 'Heat override duration set to test mode',
+    'duration_trouble_link' : '              Set Duration',
     'pin_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'pin_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'system_reset_overlay' : 'System Reset',

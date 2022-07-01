@@ -4,7 +4,7 @@ if os.name == 'nt':
 else:
     import RPi.GPIO as GPIO
 
-heat_sensor_timer=10
+heat_sensor_timer=300
 #inputs: fan switch,light switch,heat sensor, micro switch
 channels_in = [14,15,18,23]
 
@@ -70,7 +70,8 @@ class Logic():
         milo: main in logic out, is written too in logic and read in main.
         '''
         self.troubles={
-            'heat_override':0
+            'heat_override':0,
+            'short_duration':0
         }
 
         self.moli={
@@ -170,6 +171,11 @@ class Logic():
             self.milo['troubles']['heat_override']=1
         else:
             self.milo['troubles']['heat_override']=0
+
+        if heat_sensor_timer==10:
+            self.milo['troubles']['short_duration']=1
+        else:
+            self.milo['troubles']['short_duration']=0
 
     def fire(self):
         if not self.fired:
