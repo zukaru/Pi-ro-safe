@@ -2,7 +2,8 @@ english={
     'quick' : "[size=50][b][color=#000000]  Fans+Lights [/color][/b][/size]",
     'fans' : "[size=32][b][color=#000000] Fans [/color][/b][/size]",
     'lights' : "[size=32][b][color=#000000] Lights [/color][/b][/size]",
-    'version_info' : '[size=22][color=#000000][i]-Version 1.0.0-[/i][/color][/size]',
+    'version_info' : '''[size=18][color=#000000]    Hood Control[/size]
+[size=22][i]-Version 1.0.0-[/i][/color][/size]''',
     'alert' : "[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
     'alert_acknowledged' : "[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]",
     'acknowledge' : "[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
@@ -13,7 +14,12 @@ english={
     'preferences' : "[size=40][b][color=#000000]  Settings [/color][/b][/size]",
     'train' : "[size=40][b][color=#000000]  Training [/color][/b][/size]",
     'about' : "[size=40][b][color=#000000]  About [/color][/b][/size]",
-    'about_overlay_text' : """[size=30][color=#000000]test[/color][/size]""",
+    'about_overlay_text' : """[size=20][color=#000000]Hood Control™ developed
+by Fire Safe Extinguisher Service.
+
+
+\n\n\n\n\n\n\n
+Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""",
     'about_back' : "[size=30][b][color=#000000]  Back [/color][/b][/size]",
     'report_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'report_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
@@ -24,9 +30,9 @@ english={
     'commission' : "[size=35][b][color=#000000]  Documents [/color][/b][/size]",
     'pins' : "[size=40][b][color=#000000]  Enter Pin [/color][/b][/size]",
     'heat_overlay' : 'Heat-Sensor Override Duration',
-    'duration_1' : "[size=30][b][color=#000000]  10 Seconds [/color][/b][/size]",
-    'duration_2' : "[size=30][b][color=#000000]  5 Minutes [/color][/b][/size]",
-    'duration_3' : "[size=30][b][color=#000000]  10 Minutes [/color][/b][/size]",
+    'duration_1' : "[size=30][b][color=#000000]  5 Minutes [/color][/b][/size]",
+    'duration_2' : "[size=30][b][color=#000000]  15 Minutes [/color][/b][/size]",
+    'duration_3' : "[size=30][b][color=#000000]  30 Minutes [/color][/b][/size]",
     'maint_overlay_warning_text' : """[size=30][color=#000000]Maintenance Override disables heat 
 sensors allowing neccessary maintenance 
 to take place safely.
@@ -72,7 +78,7 @@ DISABLE for 3 seconds.
     'date_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'date_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
     'heat_override_overlay' : 'Heat Override Duration',
-    'heat_override_text' : '[size=30][b][color=#000000] Set heat override duration to 10 seconds? [/color][/b][/size]',
+    'heat_override_text' : '[size=30][color=#000000] Set heat override duration to 10 seconds? [/color][/size]',
     'heat_override_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]'
 }
@@ -103,9 +109,9 @@ spanish={
     'commission' : "[size=40][b][color=#000000]  Documentación [/color][/b][/size]",
     'pins' : "[size=40][b][color=#000000]  Opciones \n   de Pines [/color][/b][/size]",
     'heat_overlay' : 'La duración del Sensor de Calor',
-    'duration_1' : "[size=30][b][color=#000000]  10 Segundos [/color][/b][/size]",
-    'duration_2' : "[size=30][b][color=#000000]  5 Minutos [/color][/b][/size]",
-    'duration_3' : "[size=30][b][color=#000000]  10 Minutos [/color][/b][/size]",
+    'duration_1' : "[size=30][b][color=#000000]  5 Minutos [/color][/b][/size]",
+    'duration_2' : "[size=30][b][color=#000000]  15 Minutos [/color][/b][/size]",
+    'duration_3' : "[size=30][b][color=#000000]  30 Minutos [/color][/b][/size]",
     'maint_overlay_warning_text' : """[size=30][color=#000000]El Modo de Mantenimiento
 deshabilita los Sensores de Calor.
 Por eso puedes trabajar sin peligro.

@@ -59,6 +59,7 @@ if os.name == 'nt':
     left_arrow_image=r'media\left_arrow.png'
     right_arrow_image=r'media\right_arrow.png'
     stock_photo_test=r'media\download.jpeg'
+    qr_link =r'media\qr link.png'
 
 if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
@@ -74,6 +75,7 @@ if os.name == 'posix':
     left_arrow_image=r'media/left_arrow.png'
     right_arrow_image=r'media/right_arrow.png'
     stock_photo_test=r'media/download.jpeg'
+    qr_link =r'media/qr link.png'
 
 class PinPop(Popup):
     def __init__(self,name, **kwargs):
@@ -527,6 +529,12 @@ class SettingsScreen(Screen):
         self.widgets['about_text']=about_text
         about_text.ref='about_overlay_text'
 
+        about_qr=Image(source=qr_link,
+            allow_stretch=False,
+            keep_ratio=True,
+            size_hint =(.5,.5),
+            pos_hint = {'x':.6, 'y':.53})
+
         about_back_button=Button(text=current_language['about_back'],
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
@@ -542,6 +550,7 @@ class SettingsScreen(Screen):
         about_back_button.bind(on_press=about_overlay_close)
 
         self.widgets['overlay_layout'].add_widget(about_text)
+        self.widgets['overlay_layout'].add_widget(about_qr)
         self.widgets['overlay_layout'].add_widget(about_back_button)
         self.widgets['overlay_menu'].open()
 
@@ -854,8 +863,8 @@ class PreferenceScreen(Screen):
 
         def duration_1_func(button):
             config=App.get_running_app().config_
-            logic.heat_sensor_timer=10
-            config.set('preferences','heat_timer','10')
+            logic.heat_sensor_timer=300
+            config.set('preferences','heat_timer','300')
             with open('hood_control.ini','w') as configfile:
                 config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
@@ -863,8 +872,8 @@ class PreferenceScreen(Screen):
 
         def duration_2_func(button):
             config=App.get_running_app().config_
-            logic.heat_sensor_timer=300
-            config.set('preferences','heat_timer','300')
+            logic.heat_sensor_timer=900
+            config.set('preferences','heat_timer','900')
             with open('hood_control.ini','w') as configfile:
                 config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
@@ -872,8 +881,8 @@ class PreferenceScreen(Screen):
 
         def duration_3_func(button):
             config=App.get_running_app().config_
-            logic.heat_sensor_timer=600
-            config.set('preferences','heat_timer','600')
+            logic.heat_sensor_timer=1800
+            config.set('preferences','heat_timer','1800')
             with open('hood_control.ini','w') as configfile:
                 config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
