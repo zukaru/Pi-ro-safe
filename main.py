@@ -1146,6 +1146,7 @@ class PreferenceScreen(Screen):
         self.manager.current='pin'
     def on_enter(self):
         if self.duration_flag:
+            self.duration_flag=0
             self.heat_overlay()
 
 class PinScreen(Screen):
