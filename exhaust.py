@@ -1,4 +1,5 @@
 import os,time,json
+import os.path
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -12,7 +13,8 @@ class Exhaust():
         self.unsafe_state_trigger=0
         self.state=0
         self.run_time=0
-        self.last_state_change=0
+        self.last_state_change=time.time()
+        self.initialize()
 
     def write(self):
         data={
@@ -39,4 +41,8 @@ class Exhaust():
             self.last_state_change=time.time()
 
     def update(self):
-        pass
+        now=time.time()
+        self.run_time+=now-self.last_state_change
+
+    def initialize(self):
+        data=self.read(self)
