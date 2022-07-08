@@ -20,7 +20,8 @@ off=0
 on=1
 #hmi=GPIO.input(14)
 
-exfan1=exhaust.Exhaust(25)
+exfan1=exhaust.Exhaust("exfan1",25)
+exfan1.write()
 mau1=mau.Mau(8)
 dry_contact=12
 #lights=GPIO.input(7)
