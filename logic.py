@@ -21,7 +21,8 @@ on=1
 #hmi=GPIO.input(14)
 
 exfan1=exhaust.Exhaust("exfan1",25)
-exfan1.write()
+devices=[exfan1]
+
 mau1=mau.Mau(8)
 dry_contact=12
 #lights=GPIO.input(7)
@@ -101,6 +102,7 @@ class Logic():
         elif self.moli['maint_override']==1:
             GPIO.output(dry_contact,on)
             GPIO.output(exfan1.pin,off)
+            exfan1.off()
             GPIO.output(mau1.pin,off)
             if self.moli['maint_override_light']==1:
                 GPIO.output(lights_pin,on)
@@ -112,9 +114,11 @@ class Logic():
 
             if self.moli['exhaust']==on or fan_switch_on():
                 GPIO.output(exfan1.pin,on)
+                exfan1.on()
                 self.milo['exhaust']=on
             elif self.moli['exhaust']==off or not fan_switch_on():
                 GPIO.output(exfan1.pin,off)
+                exfan1.off()
                 self.milo['exhaust']=off
             if self.moli['mau']==on or fan_switch_on():
                 GPIO.output(mau1.pin,on)
@@ -152,6 +156,7 @@ class Logic():
     def heat_sensor(self):
             if self.sensor_target>=time.time():
                 GPIO.output(exfan1.pin,on)
+                exfan1.on()
                 GPIO.output(mau1.pin,on)
                 self.milo['exhaust']=on
                 self.milo['mau']=on
@@ -160,6 +165,7 @@ class Logic():
             else:
                 if self.moli['exhaust']==off and self.moli['mau']==off:
                     GPIO.output(exfan1.pin,off)
+                    exfan1.off()
                     GPIO.output(mau1.pin,off)
                 self.milo['exhaust']=off
                 self.milo['mau']=off
@@ -181,6 +187,7 @@ class Logic():
     def fire(self):
         if not self.fired:
             GPIO.output(exfan1.pin,on)
+            exfan1.on()
             GPIO.output(mau1.pin,off)
             GPIO.output(lights_pin,off)
             GPIO.output(dry_contact,off)

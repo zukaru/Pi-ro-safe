@@ -6,9 +6,10 @@ else:
     import RPi.GPIO as GPIO
 
 class Exhaust():
-    def __init__(self,name,pin) -> None:
+    def __init__(self,name,pin,color=(120/255, 120/255, 120/255,.85)) -> None:
         self.name=name
         self.pin=pin
+        self.color=color
         self.log={}
         self.unsafe_state_trigger=0
         self.state=0
@@ -24,11 +25,20 @@ class Exhaust():
         with open(rf"logs\devices\{self.name}.json","w") as write_file:
             json.dump(data, write_file)
 
+    def initialize(self):
+        data=self.read()
+        if data:
+            self.name=data["device_name"]
+            self.pin=data["gpio_pin"]
+            self.run_time=float(data["run_time"])
 
     def read(self):
-        with open(rf"logs\devices\{self.name}.json","r") as read_file:
-            data = json.load(read_file)
-        return data
+        try:
+            with open(rf"logs\devices\{self.name}.json","r") as read_file:
+                data = json.load(read_file)
+            return data
+        except FileNotFoundError:
+            return None
 
     def on(self):
         if self.state==0:
@@ -40,9 +50,8 @@ class Exhaust():
             self.state=0
             self.last_state_change=time.time()
 
-    def update(self):
+    def update(self,*args):
         now=time.time()
-        self.run_time+=now-self.last_state_change
-
-    def initialize(self):
-        data=self.read(self)
+        if self.state==1:
+            self.run_time+=now-self.last_state_change
+            self.last_state_change=now

@@ -754,6 +754,19 @@ class DevicesScreen(Screen):
             self.parent.transition = SlideTransition(direction='left')
             self.manager.current='main'
 
+    def aggregate_devices(self):
+        if logic.devices:
+            self.widgets['device_layout'].clear_widgets()
+            for i in logic.devices:
+                device=ScrollItemTemplate(i.name,color=i.color)
+                self.widgets['device_layout'].add_widget(device)
+        else:
+            self.widgets['device_layout'].clear_widgets()
+            self.widgets['device_layout'].add_widget(self.widgets['device_details'])
+
+    def on_pre_enter(self):
+        self.aggregate_devices()
+
 class TrainScreen(Screen):
     def __init__(self, **kw):
         super(TrainScreen,self).__init__(**kw)
@@ -1822,6 +1835,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
+        device_update_event=Clock.schedule_interval(partial(logic.exfan1.update, logic.exfan1),.75)
         return self.context_screen
 
 def settings_setter(config):
@@ -1854,8 +1868,10 @@ try:
     Hood_Control().run()
 except KeyboardInterrupt:
     print('Keyboard Inturrupt')
+    traceback.print_exc()
 except:
     traceback.print_exc()
 finally:
     logic.clean_exit()
+    logic.exfan1.write()
     quit()
