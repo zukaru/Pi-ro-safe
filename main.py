@@ -145,7 +145,7 @@ class trouble_template(Label):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
 
-class ScrollItemTemplate(Label):
+class ScrollItemTemplate(Button):
     def __init__(self,Item_tag,Item_text='',link_text=None,ref_tag=None,color=(245/250, 216/250, 41/250,.85),**kwargs):
         if link_text == None:
             link_text=''
@@ -740,6 +740,21 @@ class DevicesScreen(Screen):
             )
         self.widgets['device_scroll']=device_scroll
 
+        overlay_menu=Popup(
+            size_hint=(.95, .95),
+            background = 'atlas://data/images/defaulttheme/button',
+            title_color=[0, 0, 0, 1],
+            title_size='30',
+            title_align='center',
+            separator_color=[255/255, 0/255, 0/255, .5]
+        )
+        self.widgets['overlay_menu']=overlay_menu
+
+        overlay_layout=FloatLayout()
+        self.widgets['overlay_layout']=overlay_layout
+
+        overlay_menu.add_widget(overlay_layout)
+
         device_layout.add_widget(device_details)
         device_scroll.add_widget(device_layout)
         self.add_widget(bg_image)
@@ -747,12 +762,48 @@ class DevicesScreen(Screen):
         self.add_widget(back_main)
         self.add_widget(device_scroll)
 
+    def info_overlay(self,device):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.title=f'[u]{device.name} Details[/u]'
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        # info_text=Label(
+        #     text=current_language['info_overlay_text'],
+        #     markup=True,
+        #     size_hint =(1,.6),
+        #     pos_hint = {'x':0, 'y':.4},
+        # )
+        # self.widgets['info_text']=info_text
+        # info_text.ref='info_overlay_text'
+
+        info_back_button=Button(text=current_language['about_back'],
+                        size_hint =(.9, .15),
+                        pos_hint = {'x':.05, 'y':.025},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['info_back_button']=info_back_button
+        info_back_button.ref='info_back'
+
+        def info_overlay_close(button):
+            self.widgets['overlay_menu'].dismiss()
+        info_back_button.bind(on_press=info_overlay_close)
+
+        # self.widgets['overlay_layout'].add_widget(info_text)
+        self.widgets['overlay_layout'].add_widget(info_back_button)
+        self.widgets['overlay_menu'].open()
+
     def devices_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='settings'
     def devices_back_main (self,button):
             self.parent.transition = SlideTransition(direction='left')
             self.manager.current='main'
+    def info_func (self,device,button):
+        self.info_overlay(device)
 
     def aggregate_devices(self):
         if logic.devices:
@@ -760,6 +811,7 @@ class DevicesScreen(Screen):
             for i in logic.devices:
                 device=ScrollItemTemplate(i.name,color=i.color)
                 self.widgets['device_layout'].add_widget(device)
+                device.bind(on_release=partial(self.info_func,i))
         else:
             self.widgets['device_layout'].clear_widgets()
             self.widgets['device_layout'].add_widget(self.widgets['device_details'])

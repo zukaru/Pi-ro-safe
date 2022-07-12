@@ -21,7 +21,8 @@ on=1
 #hmi=GPIO.input(14)
 
 exfan1=exhaust.Exhaust("exfan1",25)
-devices=[exfan1]
+exfan2=exhaust.Exhaust("exfan2",25)
+devices=[exfan1,exfan2]
 
 mau1=mau.Mau(8)
 dry_contact=12
