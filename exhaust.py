@@ -6,7 +6,7 @@ else:
     import RPi.GPIO as GPIO
 
 class Exhaust():
-    def __init__(self,name,pin,color=(120/255, 120/255, 120/255,.85)) -> None:
+    def __init__(self,name="default",pin=0,color=(170/255, 0/255, 0/255,.85)) -> None:
         self.name=name
         self.pin=pin
         self.color=color
@@ -21,9 +21,10 @@ class Exhaust():
         data={
             "device_name":self.name,
             "gpio_pin":self.pin,
-            "run_time":self.run_time}
-        with open(rf"logs\devices\{self.name}.json","w") as write_file:
-            json.dump(data, write_file)
+            "run_time":self.run_time,
+            "color":self.color}
+        with open(rf"logs/devices/{self.name}.json","w") as write_file:
+            json.dump(data, write_file,indent=0)
 
     def initialize(self):
         data=self.read()
@@ -31,10 +32,11 @@ class Exhaust():
             self.name=data["device_name"]
             self.pin=data["gpio_pin"]
             self.run_time=float(data["run_time"])
+            self.color=data["color"]
 
     def read(self):
         try:
-            with open(rf"logs\devices\{self.name}.json","r") as read_file:
+            with open(rf"logs/devices/{self.name}.json","r") as read_file:
                 data = json.load(read_file)
             return data
         except FileNotFoundError:

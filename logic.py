@@ -1,4 +1,4 @@
-import os,mau,exhaust,time
+import os,mau,exhaust,time,json
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -19,10 +19,42 @@ GPIO.setup(channels_out, GPIO.OUT)
 off=0
 on=1
 #hmi=GPIO.input(14)
+devices=[]
+def get_devices():
+    def load_devices():
+        try:
+            with open(rf"logs/devices/device_list.json","r") as read_file:
+                data = json.loads(read_file.read())
+            return data
+        except FileNotFoundError:
+            return None
 
-exfan1=exhaust.Exhaust("exfan1",25)
-exfan2=exhaust.Exhaust("exfan2",25)
-devices=[exfan1,exfan2]
+    loaded_devices=load_devices()
+    for d in loaded_devices:
+        i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
+        #i.name=d
+        devices.append(i)
+
+def exfans_on():
+    for i in (i for i in devices if isinstance(i,exhaust.Exhaust)):
+        GPIO.output(i.pin,on)
+        i.on()
+
+def exfans_off():
+    for i in (i for i in devices if isinstance(i,exhaust.Exhaust)):
+        GPIO.output(i.pin,off)
+        i.off()
+
+def save_devices():
+    for i in devices:
+        i.write()
+
+def update_devices(*args):
+    for i in devices:
+        i.update()
+
+
+
 
 mau1=mau.Mau(8)
 dry_contact=12
@@ -51,6 +83,8 @@ def clean_exit():
     GPIO.output(8,off)
     GPIO.output(7,off)
     GPIO.output(12,off)
+    # for i in devices:
+    #     i.off()
 
 def clean_list(list,element):
     while True:
@@ -102,8 +136,7 @@ class Logic():
             self.milo['micro_switch']=on
         elif self.moli['maint_override']==1:
             GPIO.output(dry_contact,on)
-            GPIO.output(exfan1.pin,off)
-            exfan1.off()
+            exfans_off()
             GPIO.output(mau1.pin,off)
             if self.moli['maint_override_light']==1:
                 GPIO.output(lights_pin,on)
@@ -114,12 +147,10 @@ class Logic():
             GPIO.output(dry_contact,on)
 
             if self.moli['exhaust']==on or fan_switch_on():
-                GPIO.output(exfan1.pin,on)
-                exfan1.on()
+                exfans_on()
                 self.milo['exhaust']=on
             elif self.moli['exhaust']==off or not fan_switch_on():
-                GPIO.output(exfan1.pin,off)
-                exfan1.off()
+                exfans_off()
                 self.milo['exhaust']=off
             if self.moli['mau']==on or fan_switch_on():
                 GPIO.output(mau1.pin,on)
@@ -156,8 +187,7 @@ class Logic():
 
     def heat_sensor(self):
             if self.sensor_target>=time.time():
-                GPIO.output(exfan1.pin,on)
-                exfan1.on()
+                exfans_on()
                 GPIO.output(mau1.pin,on)
                 self.milo['exhaust']=on
                 self.milo['mau']=on
@@ -165,8 +195,7 @@ class Logic():
                 print('heat timer active')
             else:
                 if self.moli['exhaust']==off and self.moli['mau']==off:
-                    GPIO.output(exfan1.pin,off)
-                    exfan1.off()
+                    exfans_off()
                     GPIO.output(mau1.pin,off)
                 self.milo['exhaust']=off
                 self.milo['mau']=off
@@ -187,8 +216,7 @@ class Logic():
 
     def fire(self):
         if not self.fired:
-            GPIO.output(exfan1.pin,on)
-            exfan1.on()
+            exfans_on()
             GPIO.output(mau1.pin,off)
             GPIO.output(lights_pin,off)
             GPIO.output(dry_contact,off)
@@ -214,7 +242,7 @@ class Logic():
     def update(self):
         self.state_manager()
         self.auxillary()
-
+get_devices()
 fs=Logic()
 def logic():
     while True:

@@ -1,7 +1,7 @@
 {
-"device_name": "exfan1",
+"device_name": "test",
 "gpio_pin": 0,
-"run_time": 31.597047328948975,
+"run_time": 27.600582361221313,
 "color": [
 0.6666666666666666,
 0.0,

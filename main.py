@@ -1,5 +1,6 @@
 import os
 import traceback
+from turtle import onclick
 import kivy
 import logic,lang_dict,pindex
 if os.name == 'nt':
@@ -42,6 +43,8 @@ from kivy.uix.scatterlayout import ScatterLayout
 from kivy.graphics.transformation import Matrix
 from kivy.input.providers.mouse import MouseMotionEvent
 from kivy.uix.carousel import Carousel
+from kivy.uix.textinput import TextInput
+from kivy.uix.vkeyboard import VKeyboard
 
 kivy.require('2.0.0')
 current_language=lang_dict.english
@@ -60,6 +63,8 @@ if os.name == 'nt':
     right_arrow_image=r'media\right_arrow.png'
     stock_photo_test=r'media\download.jpeg'
     qr_link =r'media\qr link.png'
+    add_device_icon=r'media\icons8-edit-64.png'
+    add_device_down=r'media\icons8-edit-64_down.png'
 
 if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
@@ -76,6 +81,8 @@ if os.name == 'posix':
     right_arrow_image=r'media/right_arrow.png'
     stock_photo_test=r'media/download.jpeg'
     qr_link =r'media/qr link.png'
+    add_device_icon=r'media/icons8-edit-64.png'
+    add_device_down=r'media/icons8-edit-64_down.png'
 
 class PinPop(Popup):
     def __init__(self,name, **kwargs):
@@ -180,6 +187,21 @@ class DisplayLabel(Label):
         self.rect.size = (self.size[0], self.size[1])
     def update_text(self,text,*args):
         self.text=f'[size=25][color=#000000]{text}[/color][/size]'
+
+class ExactLabel(Label):
+    def __init__(self,label_color=(0,0,0,0), **kwargs):
+        super().__init__(**kwargs)
+        self.size_hint=(None,None)
+        with self.canvas.before:
+                    Color(label_color[0],label_color[1],label_color[2],label_color[3])
+                    self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
+        self.bind(pos=self.update_rect)
+        self.bind(size=self.update_rect)
+
+    def update_rect(self, *args):
+        self.size=self.texture_size
+        self.rect.pos = self.pos
+        self.rect.size = (self.texture_size[0], self.texture_size[1])
 
 class EventpassGridLayout(GridLayout):
     pass
@@ -741,7 +763,7 @@ class DevicesScreen(Screen):
         self.widgets['device_scroll']=device_scroll
 
         overlay_menu=Popup(
-            size_hint=(.95, .95),
+            size_hint=(.98, .98),
             background = 'atlas://data/images/defaulttheme/button',
             title_color=[0, 0, 0, 1],
             title_size='30',
@@ -764,19 +786,18 @@ class DevicesScreen(Screen):
 
     def info_overlay(self,device):
         overlay_menu=self.widgets['overlay_menu']
-        overlay_menu.title=f'[u]{device.name} Details[/u]'
+        overlay_menu.title=f'{device.name} Details'
         overlay_menu.separator_height=0
         overlay_menu.auto_dismiss=True
         self.widgets['overlay_layout'].clear_widgets()
 
-        # info_text=Label(
-        #     text=current_language['info_overlay_text'],
-        #     markup=True,
-        #     size_hint =(1,.6),
-        #     pos_hint = {'x':0, 'y':.4},
-        # )
-        # self.widgets['info_text']=info_text
-        # info_text.ref='info_overlay_text'
+        info_add_icon=IconButton(source=add_device_icon,
+                        size_hint =(.15, .15),
+                        pos_hint = {'x':.85, 'y':.95})
+        self.widgets['info_add_icon']=info_add_icon
+        info_add_icon.color=(1,1,1,.5)
+        info_add_icon.bind(on_release=self.info_add_icon_func)
+        info_add_icon.bind(state=self.icon_change)
 
         info_back_button=Button(text=current_language['about_back'],
                         size_hint =(.9, .15),
@@ -786,22 +807,74 @@ class DevicesScreen(Screen):
                         background_color=(0/250, 159/250, 232/250,.9),
                         markup=True)
         self.widgets['info_back_button']=info_back_button
-        info_back_button.ref='info_back'
-
-        def info_overlay_close(button):
-            self.widgets['overlay_menu'].dismiss()
-        info_back_button.bind(on_press=info_overlay_close)
+        info_back_button.ref='about_back'
+        info_back_button.bind(on_press=self.info_overlay_close)
 
         # self.widgets['overlay_layout'].add_widget(info_text)
+        self.widgets['overlay_layout'].add_widget(info_add_icon)
         self.widgets['overlay_layout'].add_widget(info_back_button)
         self.widgets['overlay_menu'].open()
+
+    def info_overlay_close(self,button):
+        self.widgets['overlay_menu'].dismiss()
+
+    def info_add_icon_func(self,button):
+        pass
+
+    def icon_change(self,button,state):
+        if state=='down':
+            button.source=add_device_down
+        else:
+            button.source=add_device_icon
+
+    def new_device_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        lay_out=self.widgets['overlay_layout']
+        overlay_menu.title='Configure New Device'
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        new_device_back_button=Button(text=current_language['about_back'],
+                        size_hint =(.9, .15),
+                        pos_hint = {'x':.05, 'y':.025},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['new_device_back_button']=new_device_back_button
+        new_device_back_button.ref='about_back'
+        new_device_back_button.bind(on_press=self.new_device_overlay_close)
+
+        get_name_label=ExactLabel(text="[size=18]Device Name:[/size]",
+                        pos_hint = {'x':.05, 'y':.9},
+                        color = (0,0,0,1),
+                        markup=True)
+
+        get_name=TextInput(multiline=False,
+                        focus=True,
+                        size_hint =(.5, .05),
+                        pos_hint = {'x':.40, 'y':.9})
+        get_name.bind(on_text_validate=self.get_name_func)
+
+        lay_out.add_widget(get_name_label)
+        lay_out.add_widget(get_name)
+        lay_out.add_widget(new_device_back_button)
+        overlay_menu.open()
+
+    def new_device_overlay_close(self,button):
+        self.widgets['overlay_menu'].dismiss()
+    def get_name_func(self,button):
+        pass
+
+
 
     def devices_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='settings'
     def devices_back_main (self,button):
-            self.parent.transition = SlideTransition(direction='left')
-            self.manager.current='main'
+        self.parent.transition = SlideTransition(direction='left')
+        self.manager.current='main'
     def info_func (self,device,button):
         self.info_overlay(device)
 
@@ -813,11 +886,402 @@ class DevicesScreen(Screen):
                 self.widgets['device_layout'].add_widget(device)
                 device.bind(on_release=partial(self.info_func,i))
         else:
+            print("main.py aggregate_devices(): no devices")
             self.widgets['device_layout'].clear_widgets()
             self.widgets['device_layout'].add_widget(self.widgets['device_details'])
+        new_device=ScrollItemTemplate('Add Device +')
+        self.widgets['device_layout'].add_widget(new_device)
+        new_device.bind(on_release=self.new_device_func)
+
+    def new_device_func(self,button):
+        self.new_device_overlay()
 
     def on_pre_enter(self):
         self.aggregate_devices()
+
+class DeviceConfigureScreen(Screen):
+    def __init__(self, **kwargs):
+        super(PinScreen,self).__init__(**kwargs)
+        self.root=App.get_running_app()
+        self.date_flag=0
+        self.cols = 2
+        self.widgets={}
+        self.pin=''
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=Button(text=current_language['pin_back'],
+                    size_hint =(.4, .15),
+                    pos_hint = {'x':.06, 'y':.02},
+                    background_down='',
+                    background_color=(200/250, 200/250, 200/250,.85),
+                    markup=True)
+        self.widgets['back']=back
+        back.ref='pin_back'
+        back.bind(on_press=self.Pin_back)
+
+        back_main=Button(text=current_language['pin_back_main'],
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.52, 'y':.02},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.ref='pin_back_main'
+        back_main.bind(on_press=self.Pin_back_main)
+
+        num_pad=RelativeLayout(size_hint =(.9, .65),
+            pos_hint = {'center_x':.6, 'center_y':.4})
+        self.widgets['num_pad']=num_pad
+
+        one=Button(text="[size=35][b][color=#000000] 1 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.85},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['one']=one
+        one.bind(on_release=self.one_func)
+
+        two=Button(text="[size=35][b][color=#000000] 2 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.2, 'y':.85},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['two']=two
+        two.bind(on_release=self.two_func)
+
+        three=Button(text="[size=35][b][color=#000000] 3 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.4, 'y':.85},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['three']=three
+        three.bind(on_release=self.three_func)
+
+        four=Button(text="[size=35][b][color=#000000] 4 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.65},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['four']=four
+        four.bind(on_release=self.four_func)
+
+        five=Button(text="[size=35][b][color=#000000] 5 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.2, 'y':.65},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['five']=five
+        five.bind(on_release=self.five_func)
+
+        six=Button(text="[size=35][b][color=#000000] 6 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.4, 'y':.65},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['six']=six
+        six.bind(on_release=self.six_func)
+
+        seven=Button(text="[size=35][b][color=#000000] 7 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.45},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['seven']=seven
+        seven.bind(on_release=self.seven_func)
+
+        eight=Button(text="[size=35][b][color=#000000] 8 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.2, 'y':.45},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['eight']=eight
+        eight.bind(on_release=self.eight_func)
+
+        nine=Button(text="[size=35][b][color=#000000] 9 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':.4, 'y':.45},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['nine']=nine
+        nine.bind(on_release=self.nine_func)
+
+        zero=Button(text="[size=35][b][color=#000000] 0 [/color][/b][/size]",
+            size_hint =(.15, .15),
+            pos_hint = {'x':0, 'y':.25},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['zero']=zero
+        zero.bind(on_release=self.zero_func)
+
+        backspace=Button(text="[size=35][b][color=#000000] <- [/color][/b][/size]",
+            size_hint =(.35, .15),
+            pos_hint = {'x':.2, 'y':.25},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['backspace']=backspace
+        backspace.bind(on_release=self.backspace_func)
+
+        enter=Button(text="[size=35][b][color=#000000] -> [/color][/b][/size]",
+            size_hint =(.15, .75),
+            pos_hint = {'x':.6, 'y':.25},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.85),
+            markup=True)
+        self.widgets['enter']=enter
+        enter.bind(on_release=self.enter_func)
+
+        display=DisplayLabel(text=f'[size=25][color=#000000]{self.pin}[/color][/size]',
+            size_hint =(.67, .10),
+            pos_hint = {'x':.152, 'y':.77},
+            valign='middle',
+            halign='center',
+            markup=True)
+        self.widgets['display']=display
+
+        reset_overlay=PinPop('system_reset')
+        self.widgets['reset_overlay']=reset_overlay
+        reset_overlay.ref='reset_overlay'
+        reset_overlay.widgets['overlay_layout']=reset_overlay.overlay_layout
+
+        reset_text=Label(
+            text=current_language['reset_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},
+        )
+        self.widgets['reset_text']=reset_text
+        reset_text.ref='reset_text'
+
+        reset_confirm=Button(text=current_language['reset_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['reset_confirm']=reset_confirm
+        reset_confirm.ref='reset_confirm'
+
+        reset_cancel=Button(text=current_language['reset_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['reset_cancel']=reset_cancel
+        reset_cancel.ref='reset_cancel'
+
+        def reset_confirm_func(button):
+            print(self.widgets['reset_overlay'].widgets['overlay_layout'].children )
+            if os.name=='posix':
+                os.system("sudo reboot")
+        reset_confirm.bind(on_release=reset_confirm_func)
+
+        def reset_cancel_func(button):
+            self.widgets['reset_overlay'].dismiss()
+        reset_cancel.bind(on_release=reset_cancel_func)
+
+        date_overlay=PinPop('date')
+        self.widgets['date_overlay']=date_overlay
+        date_overlay.ref='date_overlay'
+        date_overlay.widgets['overlay_layout']=date_overlay.overlay_layout
+
+        date_text=Label(
+            text=current_language['date_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},
+        )
+        self.widgets['date_text']=date_text
+        date_text.ref='date_text'
+
+        date_confirm=Button(text=current_language['date_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['date_confirm']=date_confirm
+        date_confirm.ref='date_confirm'
+
+        date_cancel=Button(text=current_language['date_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['date_cancel']=date_cancel
+        date_cancel.ref='date_cancel'
+
+        def date_confirm_func(button):
+            self.date_flag=1
+            self.widgets['date_overlay'].dismiss()
+        date_confirm.bind(on_release=date_confirm_func)
+
+        def date_cancel_func(button):
+            self.widgets['date_overlay'].dismiss()
+        date_cancel.bind(on_release=date_cancel_func)
+        
+        heat_override_overlay=PinPop('heat_override')
+        self.widgets['heat_override_overlay']=heat_override_overlay
+        heat_override_overlay.ref='heat_overlay'
+        heat_override_overlay.widgets['overlay_layout']=heat_override_overlay.overlay_layout
+
+        heat_override_text=Label(
+            text=current_language['heat_override_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},
+        )
+        self.widgets['heat_override_text']=heat_override_text
+        heat_override_text.ref='heat_override_text'
+
+        heat_override_confirm=Button(text=current_language['heat_override_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['heat_override_confirm']=heat_override_confirm
+        heat_override_confirm.ref='heat_override_confirm'
+
+        heat_override_cancel=Button(text=current_language['heat_override_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['heat_override_cancel']=heat_override_cancel
+        heat_override_cancel.ref='heat_override_cancel'
+
+        def heat_override_confirm_func(button):
+            logic.heat_sensor_timer=10
+            config=self.root.config_
+            config.set('preferences','heat_timer','10')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+            print(self.widgets['heat_override_overlay'].widgets['overlay_layout'].children )
+            self.widgets['heat_override_overlay'].dismiss()
+        heat_override_confirm.bind(on_release=heat_override_confirm_func)
+
+        def heat_override_cancel_func(button):
+            self.widgets['heat_override_overlay'].dismiss()
+        heat_override_cancel.bind(on_release=heat_override_cancel_func)
+
+        self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
+        self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
+        self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
+        self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_text)
+        self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_confirm)
+        self.widgets['date_overlay'].widgets['overlay_layout'].add_widget(date_cancel)
+        self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_text)
+        self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_confirm)
+        self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_cancel)
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        self.add_widget(back_main)
+        num_pad.add_widget(one)
+        num_pad.add_widget(two)
+        num_pad.add_widget(three)
+        num_pad.add_widget(four)
+        num_pad.add_widget(five)
+        num_pad.add_widget(six)
+        num_pad.add_widget(seven)
+        num_pad.add_widget(eight)
+        num_pad.add_widget(nine)
+        num_pad.add_widget(zero)
+        num_pad.add_widget(backspace)
+        num_pad.add_widget(enter)
+        self.add_widget(num_pad)
+        self.add_widget(display)
+
+    def Pin_back(self,button):
+        self.pin=''
+        self.widgets['display'].update_text(self.pin)
+        self.parent.transition = SlideTransition(direction='right')
+        self.manager.current='preferences'
+    def Pin_back_main(self,button):
+        self.pin=''
+        self.widgets['display'].update_text(self.pin)
+        self.parent.transition = SlideTransition(direction='down')
+        self.manager.current='main'
+    def on_leave(self):
+        self.pin=''
+        self.date_flag=0
+    def one_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='1'
+        self.widgets['display'].update_text(self.pin)
+    def two_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):   
+            self.pin+='2'
+        self.widgets['display'].update_text(self.pin)
+    def three_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='3'
+        self.widgets['display'].update_text(self.pin)
+    def four_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='4'
+        self.widgets['display'].update_text(self.pin)
+    def five_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='5'
+        self.widgets['display'].update_text(self.pin)
+    def six_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='6'
+        self.widgets['display'].update_text(self.pin)
+    def seven_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='7'
+        self.widgets['display'].update_text(self.pin)
+    def eight_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='8'
+        self.widgets['display'].update_text(self.pin)
+    def nine_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='9'
+        self.widgets['display'].update_text(self.pin)
+    def zero_func(self,button):
+        if len(self.pin)<11 and isinstance(button.last_touch,MouseMotionEvent):
+            self.pin+='0'
+        self.widgets['display'].update_text(self.pin)
+    def backspace_func(self,button):
+        if isinstance(button.last_touch,MouseMotionEvent):
+            self.pin=self.pin[0:-1]
+        self.widgets['display'].update_text(self.pin)
+    def enter_func(self,button):
+        if self.date_flag:
+            self.date_flag=0
+            config=self.root.config_
+            month=self.pin[0:2]
+            day=self.pin[2:4]
+            year=self.pin[4:8]
+            config.set('documents','inspection_date',f'{month}-{day}-{year}')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+        elif hasattr(pindex.Pindex,f'p{self.pin}'):
+            eval(f'pindex.Pindex.p{self.pin}(self)')
+        self.pin=''
+        self.widgets['display'].update_text(self.pin)
 
 class TrainScreen(Screen):
     def __init__(self, **kw):
@@ -1887,7 +2351,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
-        device_update_event=Clock.schedule_interval(partial(logic.exfan1.update, logic.exfan1),.75)
+        device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         return self.context_screen
 
 def settings_setter(config):
@@ -1924,6 +2388,8 @@ except KeyboardInterrupt:
 except:
     traceback.print_exc()
 finally:
+    logic.save_devices()
+    print("devices saved")
     logic.clean_exit()
-    logic.exfan1.write()
+    print("pins set as inputs")
     quit()
