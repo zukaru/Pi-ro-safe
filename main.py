@@ -1,4 +1,4 @@
-import os
+import os,json
 import traceback
 from turtle import onclick
 import kivy
@@ -45,6 +45,7 @@ from kivy.input.providers.mouse import MouseMotionEvent
 from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 from kivy.uix.vkeyboard import VKeyboard
+from kivy.uix.spinner import Spinner
 
 kivy.require('2.0.0')
 current_language=lang_dict.english
@@ -828,6 +829,16 @@ class DevicesScreen(Screen):
             button.source=add_device_icon
 
     def new_device_overlay(self):
+        class InfoShelf():
+            def __init__(self) -> None:
+                self.name='default'
+                self.type='Exfan'
+                self.pin=''
+                self.color=(0,0,0,0)
+                self.run_time='0'
+                self.device_types={"Exfan":"exhaust.Exhaust",}
+        current_device=InfoShelf()
+
         overlay_menu=self.widgets['overlay_menu']
         lay_out=self.widgets['overlay_layout']
         overlay_menu.title='Configure New Device'
@@ -836,7 +847,7 @@ class DevicesScreen(Screen):
         self.widgets['overlay_layout'].clear_widgets()
 
         new_device_back_button=Button(text=current_language['about_back'],
-                        size_hint =(.9, .15),
+                        size_hint =(.4, .15),
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
@@ -845,6 +856,17 @@ class DevicesScreen(Screen):
         self.widgets['new_device_back_button']=new_device_back_button
         new_device_back_button.ref='about_back'
         new_device_back_button.bind(on_press=self.new_device_overlay_close)
+
+        new_device_save_button=Button(text=current_language['save'],
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.55, 'y':.025},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['new_device_save_button']=new_device_save_button
+        new_device_save_button.ref='save'
+        new_device_save_button.bind(on_press=partial(self.new_device_save,current_device))
 
         get_name_label=ExactLabel(text="[size=18]Device Name:[/size]",
                         pos_hint = {'x':.05, 'y':.9},
@@ -855,17 +877,67 @@ class DevicesScreen(Screen):
                         focus=True,
                         size_hint =(.5, .05),
                         pos_hint = {'x':.40, 'y':.9})
-        get_name.bind(on_text_validate=self.get_name_func)
+        get_name.bind(on_text_validate=partial(self.get_name_func,current_device))
+
+        get_device_label=ExactLabel(text="[size=18]Device Type:[/size]",
+                        pos_hint = {'x':.05, 'y':.8},
+                        color = (0,0,0,1),
+                        markup=True)
+
+        get_device_type=Spinner(
+                        text="Exfan",
+                        values=("Exfan","MUA","Heat","Dry"),
+                        size_hint =(.5, .05),
+                        pos_hint = {'x':.40, 'y':.8})
+        get_device_type.bind(text=partial(self.get_device_type_func,current_device))
+
+        get_device_pin_label=ExactLabel(text="[size=18]Device I/O Pin:[/size]",
+                        pos_hint = {'x':.05, 'y':.7},
+                        color = (0,0,0,1),
+                        markup=True)
+
+        get_device_pin=Spinner(
+                        text="1",
+                        values=("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17"),
+                        size_hint =(.5, .05),
+                        pos_hint = {'x':.40, 'y':.7})
+        get_device_pin.bind(text=partial(self.get_device_pin_func,current_device))
 
         lay_out.add_widget(get_name_label)
         lay_out.add_widget(get_name)
+        lay_out.add_widget(get_device_label)
+        lay_out.add_widget(get_device_type)
+        lay_out.add_widget(get_device_pin_label)
+        lay_out.add_widget(get_device_pin)
         lay_out.add_widget(new_device_back_button)
+        lay_out.add_widget(new_device_save_button)
         overlay_menu.open()
 
     def new_device_overlay_close(self,button):
         self.widgets['overlay_menu'].dismiss()
-    def get_name_func(self,button):
-        pass
+
+    def new_device_save(self,current_device,button):
+        data={
+            "device_name":current_device.name,
+            "gpio_pin":current_device.pin,
+            "run_time":current_device.run_time,
+            "color":current_device.color}
+        with open(rf"logs/devices/{current_device.name}.json","w") as write_file:
+            json.dump(data, write_file,indent=0)
+        with open(rf"logs/devices/device_list.json","r+") as read_file:
+            d_list=json.load(read_file)
+            d_list[current_device.name]=current_device.device_types[current_device.type]
+            read_file.seek(0)
+            json.dump(d_list,read_file,indent=0)
+            read_file.truncate()
+        self.widgets['overlay_menu'].dismiss()
+
+    def get_name_func(self,current_device,button,value):
+        current_device.name=value
+    def get_device_type_func(self,current_device,button,value):
+        current_device.type=value
+    def get_device_pin_func(self,current_device,button,value):
+        current_device.pin=value
 
 
 

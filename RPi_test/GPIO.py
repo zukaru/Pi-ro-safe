@@ -11,6 +11,7 @@ def setmode(a):
 def setup(a, b,pull_up_down=1):
    pass
 def output(a, b):
+   # print(a,b)
    pass
    if b == 1:
       pass

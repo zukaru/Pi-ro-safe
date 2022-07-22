@@ -31,9 +31,10 @@ def get_devices():
 
     loaded_devices=load_devices()
     for d in loaded_devices:
-        i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
-        #i.name=d
-        devices.append(i)
+        if d != "default":
+            i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
+            #i.name=d
+            devices.append(i)
 
 def exfans_on():
     for i in (i for i in devices if isinstance(i,exhaust.Exhaust)):

@@ -1,1 +1,4 @@
-{"exfan1":"exhaust.Exhaust","test":"exhaust.Exhaust"}
+{
+"exfan1": "exhaust.Exhaust",
+"default": "exhaust.Exhaust"
+}

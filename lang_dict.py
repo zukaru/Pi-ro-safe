@@ -89,7 +89,8 @@ DISABLE for 3 seconds.
     'heat_override_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
     'no_device':'-No active devices detected-',
-    'no_train':'-No training items found-'
+    'no_train':'-No training items found-',
+    'save':"[size=30][b][color=#000000]  Save [/color][/b][/size]"
 }
 
 spanish={
