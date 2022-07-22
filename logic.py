@@ -5,6 +5,7 @@ else:
     import RPi.GPIO as GPIO
 
 heat_sensor_timer=300
+available_pins=[str(i) for i in range(1,41)]
 #inputs: fan switch,light switch,heat sensor, micro switch
 channels_in = [14,15,18,23]
 
@@ -31,22 +32,23 @@ def get_devices():
 
     loaded_devices=load_devices()
     for d in loaded_devices:
-        if d != "default":
+        if d != "default": 
             i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
             #i.name=d
             devices.append(i)
 
 def exfans_on():
     for i in (i for i in devices if isinstance(i,exhaust.Exhaust)):
-        GPIO.output(i.pin,on)
-        i.on()
+        if i.pin!='':
+            GPIO.output(i.pin,on)
+            i.on()
 
 def exfans_off():
     for i in (i for i in devices if isinstance(i,exhaust.Exhaust)):
         GPIO.output(i.pin,off)
         i.off()
 
-def save_devices():
+def save_devices(*args):
     for i in devices:
         i.write()
 
