@@ -198,7 +198,10 @@ class ExactLabel(Label):
                     self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
         self.bind(pos=self.update_rect)
         self.bind(size=self.update_rect)
+        Clock.schedule_once(self.align_to_parent)
 
+    def align_to_parent(self,*args):
+        self.size=self.parent.size
     def update_rect(self, *args):
         self.size=self.texture_size
         self.rect.pos = self.pos
@@ -747,8 +750,7 @@ class DevicesScreen(Screen):
             size_hint_x=1,
             cols=1,
             padding=10,
-            spacing=(1,5)
-            )
+            spacing=(1,5))
         self.widgets['device_layout']=device_layout
         device_layout.bind(minimum_height=device_layout.setter('height'))
 
@@ -759,8 +761,7 @@ class DevicesScreen(Screen):
             size_hint_y=None,
             size_hint_x=1,
             size_hint =(.9, .80),
-            pos_hint = {'center_x':.5, 'y':.18}
-            )
+            pos_hint = {'center_x':.5, 'y':.18})
         self.widgets['device_scroll']=device_scroll
 
         overlay_menu=Popup(
@@ -769,8 +770,8 @@ class DevicesScreen(Screen):
             title_color=[0, 0, 0, 1],
             title_size='30',
             title_align='center',
-            separator_color=[255/255, 0/255, 0/255, .5]
-        )
+            separator_color=[255/255, 0/255, 0/255, .5])
+        overlay_menu.bind(on_open=self.resize)
         self.widgets['overlay_menu']=overlay_menu
 
         overlay_layout=FloatLayout()
@@ -784,6 +785,9 @@ class DevicesScreen(Screen):
         self.add_widget(back)
         self.add_widget(back_main)
         self.add_widget(device_scroll)
+
+    def resize(self,popup,*args):
+        pass
 
     def info_overlay(self,device):
         overlay_menu=self.widgets['overlay_menu']
@@ -800,6 +804,22 @@ class DevicesScreen(Screen):
         info_add_icon.bind(on_release=self.info_add_icon_func)
         info_add_icon.bind(state=self.icon_change)
 
+
+        info_type=ExactLabel(text=f"[size=18]Device Type:                    {device.type}[/size]",
+                        color=(0,0,0,1),
+                        pos_hint = {'x':.05, 'y':.9},
+                        markup=True)
+
+        info_pin=ExactLabel(text=f"[size=18]Device GPIO Pin:             {device.pin}[/size]",
+                        color=(0,0,0,1),
+                        pos_hint = {'x':.05, 'y':.8},
+                        markup=True)
+
+        info_run_time=ExactLabel(text=f"[size=18]Device Run Time:           {device.run_time}[/size]",
+                color=(0,0,0,1),
+                pos_hint = {'x':.05, 'y':.7},
+                markup=True)
+
         info_back_button=Button(text=current_language['about_back'],
                         size_hint =(.9, .15),
                         pos_hint = {'x':.05, 'y':.025},
@@ -813,8 +833,12 @@ class DevicesScreen(Screen):
 
         # self.widgets['overlay_layout'].add_widget(info_text)
         self.widgets['overlay_layout'].add_widget(info_add_icon)
+        self.widgets['overlay_layout'].add_widget(info_type)
+        self.widgets['overlay_layout'].add_widget(info_pin)
+        self.widgets['overlay_layout'].add_widget(info_run_time)
         self.widgets['overlay_layout'].add_widget(info_back_button)
         self.widgets['overlay_menu'].open()
+
 
     def info_overlay_close(self,button):
         self.widgets['overlay_menu'].dismiss()

@@ -8,6 +8,7 @@ else:
 class Exhaust():
     def __init__(self,name="default",pin=0,color=(170/255, 0/255, 0/255,.85)) -> None:
         self.name=name
+        self.type='Exhaust Fan'
         self.pin=pin
         self.color=color
         self.log={}
