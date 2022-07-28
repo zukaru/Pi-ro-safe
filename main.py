@@ -201,7 +201,8 @@ class ExactLabel(Label):
         Clock.schedule_once(self.align_to_parent)
 
     def align_to_parent(self,*args):
-        self.size=self.parent.size
+        if self.parent:
+            self.size=self.parent.size
     def update_rect(self, *args):
         self.size=self.texture_size
         self.rect.pos = self.pos
