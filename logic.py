@@ -5,7 +5,7 @@ else:
     import RPi.GPIO as GPIO
 
 heat_sensor_timer=300
-available_pins=[str(i) for i in range(1,41)]
+available_pins=[i for i in range(2,28)]
 #inputs: fan switch,light switch,heat sensor, micro switch
 channels_in = [14,15,18,23]
 
@@ -28,18 +28,21 @@ def get_devices():
                 data = json.loads(read_file.read())
             return data
         except FileNotFoundError:
+            print("logic.get_devices().load_devices(): FileNotFoundError")
             return None
 
     loaded_devices=load_devices()
     for d in loaded_devices:
-        if d != "default": 
+        if d != "default" and not any(j for j in devices if j.name == d):
             i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
-            #i.name=d
+            if i.pin in available_pins:
+                available_pins.remove(i.pin)
+                print(f"removed {i.pin} from available_pins[]")
             devices.append(i)
 
 def exfans_on():
     for i in (i for i in devices if isinstance(i,exhaust.Exhaust)):
-        if i.pin!='':
+        if i.pin!=0:
             GPIO.output(i.pin,on)
             i.on()
 

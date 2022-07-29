@@ -1,6 +1,8 @@
 import os,json
 import traceback
 from turtle import onclick
+from kivy.config import Config
+Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
 import logic,lang_dict,pindex
 if os.name == 'nt':
@@ -46,6 +48,7 @@ from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 from kivy.uix.vkeyboard import VKeyboard
 from kivy.uix.spinner import Spinner
+
 
 kivy.require('2.0.0')
 current_language=lang_dict.english
@@ -858,9 +861,9 @@ class DevicesScreen(Screen):
             def __init__(self) -> None:
                 self.name='default'
                 self.type='Exfan'
-                self.pin=''
+                self.pin=0
                 self.color=(0,0,0,0)
-                self.run_time='0'
+                self.run_time=0
                 self.device_types={"Exfan":"exhaust.Exhaust",}
         current_device=InfoShelf()
 
@@ -899,10 +902,12 @@ class DevicesScreen(Screen):
                         markup=True)
 
         get_name=TextInput(multiline=False,
-                        focus=True,
-                        size_hint =(.5, .05),
+                        focus=False,
+                        hint_text="Device name is required",
+                        size_hint =(.5, .055),
                         pos_hint = {'x':.40, 'y':.9})
         get_name.bind(on_text_validate=partial(self.get_name_func,current_device))
+        get_name.bind(text=partial(self.get_name_func,current_device))
 
         get_device_label=ExactLabel(text="[size=18]Device Type:[/size]",
                         pos_hint = {'x':.05, 'y':.8},
@@ -922,8 +927,8 @@ class DevicesScreen(Screen):
                         markup=True)
 
         get_device_pin=Spinner(
-                        text=logic.available_pins[0],
-                        values=logic.available_pins,
+                        text=str(logic.available_pins[0]),
+                        values=(str(i) for i in logic.available_pins),
                         size_hint =(.5, .05),
                         pos_hint = {'x':.40, 'y':.7})
         get_device_pin.bind(text=partial(self.get_device_pin_func,current_device))
@@ -955,14 +960,15 @@ class DevicesScreen(Screen):
             read_file.seek(0)
             json.dump(d_list,read_file,indent=0)
             read_file.truncate()
+        self.aggregate_devices()
         self.widgets['overlay_menu'].dismiss()
 
-    def get_name_func(self,current_device,button,value):
-        current_device.name=value
+    def get_name_func(self,current_device,button,*args):
+        current_device.name=button.text
     def get_device_type_func(self,current_device,button,value):
         current_device.type=value
     def get_device_pin_func(self,current_device,button,value):
-        current_device.pin=value
+        current_device.pin=int(value)
 
 
 
@@ -976,6 +982,7 @@ class DevicesScreen(Screen):
         self.info_overlay(device)
 
     def aggregate_devices(self):
+        logic.get_devices()
         if logic.devices:
             self.widgets['device_layout'].clear_widgets()
             for i in logic.devices:

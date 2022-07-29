@@ -31,7 +31,7 @@ class Exhaust():
         data=self.read()
         if data:
             self.name=data["device_name"]
-            self.pin=data["gpio_pin"]
+            self.pin=int(data["gpio_pin"])
             self.run_time=float(data["run_time"])
             self.color=data["color"]
 
