@@ -927,7 +927,7 @@ class DevicesScreen(Screen):
                         markup=True)
 
         get_device_pin=Spinner(
-                        text=str(logic.available_pins[0]),
+                        text="Select GPIO Pin; BCM Mode",
                         values=(str(i) for i in logic.available_pins),
                         size_hint =(.5, .05),
                         pos_hint = {'x':.40, 'y':.7})

@@ -5,6 +5,8 @@ else:
     import RPi.GPIO as GPIO
 
 heat_sensor_timer=300
+#there are only 25 GPIO pins available for input/output.
+#the additional 15 are grounds, constant powers, and reserved for hats.
 available_pins=[i for i in range(2,28)]
 #inputs: fan switch,light switch,heat sensor, micro switch
 channels_in = [14,15,18,23]
@@ -37,8 +39,19 @@ def get_devices():
             i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
             if i.pin in available_pins:
                 available_pins.remove(i.pin)
-                print(f"removed {i.pin} from available_pins[]")
+                set_pin_mode(i)
             devices.append(i)
+
+def set_pin_mode(device):
+    if device.pin==0:
+        print(f"logic.set_pin_mode(): {device}.pin == 0")
+    else:
+        if device.mode=="in":
+            GPIO.setup(device.pin,GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
+        elif device.mode=="out":
+            GPIO.setup(device.pin, GPIO.OUT)
+        else:
+            print(f"logic.set_pin_mode(): {device}.mode is not \"in\" or \"out\"")
 
 def exfans_on():
     for i in (i for i in devices if isinstance(i,exhaust.Exhaust)):
@@ -64,7 +77,6 @@ def update_devices(*args):
 
 mau1=mau.Mau(8)
 dry_contact=12
-#lights=GPIO.input(7)
 lights_pin=7
 if os.name == 'nt':
     def heat_sensor_active():
