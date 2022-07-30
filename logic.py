@@ -11,13 +11,9 @@ available_pins=[i for i in range(2,28)]
 #inputs: fan switch,light switch,heat sensor, micro switch
 channels_in = [14,15,18,23]
 
-#outputs: additional relays
-channels_out = [12]
-
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(channels_in, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-GPIO.setup(channels_out, GPIO.OUT)
 
 off=0
 on=1
@@ -27,15 +23,18 @@ def get_devices():
     def load_devices():
         try:
             with open(rf"logs/devices/device_list.json","r") as read_file:
-                data = json.loads(read_file.read())
+                data = json.load(read_file)
             return data
         except FileNotFoundError:
-            print("logic.get_devices().load_devices(): FileNotFoundError")
-            return None
+            print("logic.get_devices().load_devices(): FileNotFoundError; Creating file")
+            with open(rf"logs/devices/device_list.json","w") as read_file:
+                data={}
+                json.dump(data, read_file,indent=0)
+            return load_devices()
+
 
     loaded_devices=load_devices()
     for d in loaded_devices:
-        print(loaded_devices[d])
         if d != "default" and not any(j for j in devices if j.name == d):
             i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
             if i.pin in available_pins:

@@ -1,6 +1,11 @@
 import os,json
 import traceback
 from kivy.config import Config
+
+from exhaust import Exhaust
+from mau import Mau
+from light import Light
+from drycontact import DryContact
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
 import logic,lang_dict,pindex
@@ -850,7 +855,7 @@ class DevicesScreen(Screen):
     def resize(self,popup,*args):
         pass
 
-    def info_overlay(self,device):
+    def info_overlay(self,device,open=True):
         overlay_menu=self.widgets['overlay_menu']
         overlay_menu.title=f'{device.name} Details'
         overlay_menu.separator_height=0
@@ -862,7 +867,7 @@ class DevicesScreen(Screen):
                         pos_hint = {'x':.85, 'y':.95})
         self.widgets['info_add_icon']=info_add_icon
         info_add_icon.color=(1,1,1,.5)
-        info_add_icon.bind(on_release=self.info_add_icon_func)
+        info_add_icon.bind(on_release=partial(self.info_add_icon_func,device))
         info_add_icon.bind(state=self.icon_change)
 
 
@@ -898,14 +903,15 @@ class DevicesScreen(Screen):
         self.widgets['overlay_layout'].add_widget(info_pin)
         self.widgets['overlay_layout'].add_widget(info_run_time)
         self.widgets['overlay_layout'].add_widget(info_back_button)
-        self.widgets['overlay_menu'].open()
+        if open:
+            self.widgets['overlay_menu'].open()
 
 
     def info_overlay_close(self,button):
         self.widgets['overlay_menu'].dismiss()
 
-    def info_add_icon_func(self,button):
-        pass
+    def info_add_icon_func(self,device,button):
+        self.edit_device_overlay(device)
 
     def icon_change(self,button,state):
         if state=='down':
@@ -913,13 +919,13 @@ class DevicesScreen(Screen):
         else:
             button.source=add_device_icon
 
-    def new_device_overlay(self):
+    def new_device_overlay(self,open=True):
         class InfoShelf():
             def __init__(self) -> None:
                 self.name='default'
                 self.type='Exfan'
                 self.pin=0
-                self.color=(0,0,0,0)
+                self.color=(170/255, 0/255, 0/255,.85)
                 self.run_time=0
                 self.device_types={
                     "Exfan":"exhaust.Exhaust",
@@ -1002,7 +1008,8 @@ class DevicesScreen(Screen):
         lay_out.add_widget(get_device_pin)
         lay_out.add_widget(new_device_back_button)
         lay_out.add_widget(new_device_save_button)
-        overlay_menu.open()
+        if open:
+            overlay_menu.open()
 
     def new_device_overlay_close(self,button):
         self.widgets['overlay_menu'].dismiss()
@@ -1042,6 +1049,145 @@ class DevicesScreen(Screen):
     def get_device_pin_func(self,current_device,button,value):
         current_device.pin=int(value)
 
+    def edit_device_overlay(self,device):
+        class InfoShelf():
+            def __init__(self,device) -> None:
+                self.name=device.name
+                if isinstance(device,Exhaust):
+                    self.type="Exfan"
+                elif isinstance(device,Mau):
+                    self.type="MAU"
+                elif isinstance(device,Light):
+                    self.type="Light"
+                elif isinstance(device,DryContact):
+                    self.type="Dry"
+                self.pin=device.pin
+                self.color=device.color
+                self.run_time=device.run_time
+                self.device_types={
+                    "Exfan":"exhaust.Exhaust",
+                    "MAU":"mau.Mau",
+                    "Light":"light.Light",
+                    "Dry":"drycontact.DryContact"}
+        current_device=InfoShelf(device)
+
+        overlay_menu=self.widgets['overlay_menu']
+        lay_out=self.widgets['overlay_layout']
+        overlay_menu.title='Edit Device Configuration'
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        edit_device_back_button=RoundedButton(text=current_language['about_back'],
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.05, 'y':.025},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['edit_device_back_button']=edit_device_back_button
+        edit_device_back_button.ref='about_back'
+        edit_device_back_button.bind(on_press=partial(self.edit_device_overlay_close,device))
+
+        edit_device_save_button=RoundedButton(text=current_language['save'],
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.55, 'y':.025},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['edit_device_save_button']=edit_device_save_button
+        edit_device_save_button.ref='save'
+        edit_device_save_button.bind(on_press=partial(self.edit_device_save,current_device,device))
+
+        get_name_label=ExactLabel(text="[size=18]Device Name:[/size]",
+                        pos_hint = {'x':.05, 'y':.9},
+                        color = (0,0,0,1),
+                        markup=True)
+
+        get_name=TextInput(multiline=False,
+                        focus=False,
+                        text=f"{device.name}",
+                        size_hint =(.5, .055),
+                        pos_hint = {'x':.40, 'y':.9})
+        get_name.bind(on_text_validate=partial(self.edit_name_func,current_device))
+        get_name.bind(text=partial(self.edit_name_func,current_device))
+
+        get_device_label=ExactLabel(text="[size=18]Device Type:[/size]",
+                        pos_hint = {'x':.05, 'y':.8},
+                        color = (0,0,0,1),
+                        markup=True)
+
+        get_device_type=Spinner(
+                        text=current_device.type,
+                        values=("Exfan","MAU","Heat","Light","Dry"),
+                        size_hint =(.5, .05),
+                        pos_hint = {'x':.40, 'y':.8})
+        get_device_type.bind(text=partial(self.edit_device_type_func,current_device))
+
+        get_device_pin_label=ExactLabel(text="[size=18]Device I/O Pin:[/size]",
+                        pos_hint = {'x':.05, 'y':.7},
+                        color = (0,0,0,1),
+                        markup=True)
+
+        get_device_pin=Spinner(
+                        text=str(device.pin),
+                        values=(str(i) for i in logic.available_pins),
+                        size_hint =(.5, .05),
+                        pos_hint = {'x':.40, 'y':.7})
+        get_device_pin.bind(text=partial(self.edit_device_pin_func,current_device))
+
+        lay_out.add_widget(get_name_label)
+        lay_out.add_widget(get_name)
+        lay_out.add_widget(get_device_label)
+        lay_out.add_widget(get_device_type)
+        lay_out.add_widget(get_device_pin_label)
+        lay_out.add_widget(get_device_pin)
+        lay_out.add_widget(edit_device_back_button)
+        lay_out.add_widget(edit_device_save_button)
+
+    def edit_device_overlay_close(self,device,button):
+        self.info_overlay(device,open=False)
+
+    def edit_device_save(self,current_device,device,button):
+        if current_device.name=="default":
+            print("main.edit_device_save(): can not save device without name")
+            return
+        data={
+            "device_name":current_device.name,
+            "gpio_pin":current_device.pin,
+            "run_time":current_device.run_time,
+            "color":current_device.color}
+        if device.name!=current_device.name:
+            os.rename(rf"logs/devices/{device.name}.json",rf"logs/devices/{current_device.name}.json")
+        with open(rf"logs/devices/{current_device.name}.json","w") as write_file:
+            json.dump(data, write_file,indent=0)
+        with open(rf"logs/devices/device_list.json","r+") as read_file:
+            d_list=json.load(read_file)
+            if device.name!=current_device.name:
+                d_list[current_device.name]=d_list.pop(device.name)
+            else:
+                d_list[current_device.name]=current_device.device_types[current_device.type]
+            read_file.seek(0)
+            json.dump(d_list,read_file,indent=0)
+            read_file.truncate()
+        self.aggregate_devices()
+        self.info_overlay(device,open=False)
+
+    def edit_name_func(self,current_device,button,*args):
+        current_device.name=button.text
+    def edit_device_type_func(self,current_device,button,value):
+        current_device.type=value
+        if value=="Exfan":
+            current_device.color=(170/255, 0/255, 0/255,.85)
+        elif value=="MAU":
+            current_device.color=(0/255, 0/255, 170/255,.85)
+        elif value=="Light":
+            current_device.color=(170/255, 170/255, 0/255,.85)
+        elif value=="Dry":
+            current_device.color=(170/255, 85/255, 0/255,.85)
+    def edit_device_pin_func(self,current_device,button,value):
+        current_device.pin=int(value)
 
 
     def devices_back (self,button):
