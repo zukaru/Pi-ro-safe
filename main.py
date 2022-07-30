@@ -1,6 +1,5 @@
 import os,json
 import traceback
-from turtle import onclick
 from kivy.config import Config
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
@@ -48,6 +47,7 @@ from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 from kivy.uix.vkeyboard import VKeyboard
 from kivy.uix.spinner import Spinner
+from kivy.graphics import RoundedRectangle
 
 
 kivy.require('2.0.0')
@@ -102,9 +102,6 @@ class PinPop(Popup):
         self.overlay_layout=FloatLayout()
         self.add_widget(self.overlay_layout)
 
-class LayoutButton(FloatLayout,Button):
-    pass
-
 class ScatterImage(Image,Scatter):
 
     def reset(self):
@@ -132,6 +129,67 @@ class OutlineScroll(ScrollView):
         self.rect.size = (self.size[0], self.size[1])
 
 class IconButton(ButtonBehavior, Image):
+    pass
+
+class RoundedButton(Button):
+    def __init__(self,**kwargs):
+        super(RoundedButton,self).__init__(**kwargs)
+        self.bg_color=kwargs["background_color"]
+        self.background_color = (self.bg_color[0], self.bg_color[1], self.bg_color[2], 0)  # Invisible background color to regular button
+
+        with self.canvas.before:
+            if self.background_normal=="":
+                self.shape_color = Color(self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3])
+            if self.background_down=="":
+                self.shape_color = Color(self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3])
+            self.shape = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
+            self.bind(pos=self.update_shape, size=self.update_shape,state=self.color_swap)
+
+    def update_shape(self, *args):
+        self.shape.pos = self.pos
+        self.shape.size = self.size
+    def color_swap(self,*args):
+        if self.state=="normal":
+            if self.background_normal=="":
+                self.shape_color.rgba = self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3]
+            else:
+                self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
+        if self.state=="down":
+            if self.background_down=="":
+                self.shape_color.rgba = self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3]
+            else:
+                self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
+
+
+class RoundedToggleButton(ToggleButton):
+    def __init__(self,**kwargs):
+        super(RoundedToggleButton,self).__init__(**kwargs)
+        self.bg_color=kwargs["background_color"]
+        self.background_color = (self.bg_color[0], self.bg_color[1], self.bg_color[2], 0)  # Invisible background color to regular button
+
+        with self.canvas.before:
+            if self.background_normal=="":
+                self.shape_color = Color(self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3])
+            if self.background_down=="":
+                self.shape_color = Color(self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3])
+            self.shape = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
+            self.bind(pos=self.update_shape, size=self.update_shape,state=self.color_swap)
+    def update_shape(self, *args):
+        self.shape.pos = self.pos
+        self.shape.size = self.size
+    def color_swap(self,*args):
+        if self.state=="normal":
+            if self.background_normal=="":
+                self.shape_color.rgba = self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3]
+            else:
+                self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
+        if self.state=="down":
+            if self.background_down=="":
+                self.shape_color.rgba = self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3]
+            else:
+                self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
+
+class LayoutButton(FloatLayout,RoundedButton):
     pass
 
 class trouble_template(Label):
@@ -272,7 +330,7 @@ class ControlGrid(Screen):
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
 
-        quick=ToggleButton(text=current_language['quick'],
+        quick=RoundedToggleButton(text=current_language['quick'],
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.53},
                     background_down='',
@@ -282,7 +340,7 @@ class ControlGrid(Screen):
         quick.ref='quick'
         quick.bind(on_press=self.quick_start)
 
-        fans=ToggleButton(text=current_language['fans'],
+        fans=RoundedToggleButton(text=current_language['fans'],
                     size_hint =(.45, .35),
                     pos_hint = {'x':.03, 'y':.15},
                     background_down='',
@@ -292,7 +350,7 @@ class ControlGrid(Screen):
         fans.ref='fans'
         fans.bind(on_press=self.fans_switch)
 
-        lights=ToggleButton(text=current_language['lights'],
+        lights=RoundedToggleButton(text=current_language['lights'],
                     size_hint =(.45, .35),
                     pos_hint = {'x':.52, 'y':.15},
                     background_down='',
@@ -370,7 +428,7 @@ class ActuationScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        alert=Button(text=current_language['alert'],
+        alert=RoundedButton(text=current_language['alert'],
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.5},
                     background_normal='',
@@ -380,7 +438,7 @@ class ActuationScreen(Screen):
         self.widgets['alert']=alert
         alert.ref='alert'
 
-        acknowledge=Button(text=current_language['acknowledge'],
+        acknowledge=RoundedButton(text=current_language['acknowledge'],
                     size_hint =(.45, .40),
                     pos_hint = {'x':.03, 'y':.05},
                     background_normal='',
@@ -392,7 +450,7 @@ class ActuationScreen(Screen):
         acknowledge.bind(on_release=self.acknowledgement)
 
 
-        reset=Button(text=current_language['reset'],
+        reset=RoundedButton(text=current_language['reset'],
                     size_hint =(.45, .40),
                     pos_hint = {'x':.52, 'y':.05},
                     background_normal='',
@@ -416,7 +474,7 @@ class SettingsScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text=current_language['settings_back'],
+        back=RoundedButton(text=current_language['settings_back'],
                         size_hint =(.4, .25),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
@@ -426,7 +484,7 @@ class SettingsScreen(Screen):
         back.ref='settings_back'
         back.bind(on_press=self.settings_back)
 
-        logs=Button(text=current_language['logs'],
+        logs=RoundedButton(text=current_language['logs'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.78},
                         background_down='',
@@ -436,7 +494,7 @@ class SettingsScreen(Screen):
         logs.ref='logs'
         logs.bind(on_release=self.device_logs)
 
-        sys_report=Button(text=current_language['sys_report'],
+        sys_report=RoundedButton(text=current_language['sys_report'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.56},
                         background_normal='',
@@ -446,7 +504,7 @@ class SettingsScreen(Screen):
         sys_report.ref='sys_report'
         sys_report.bind(on_release=self.sys_report)
 
-        preferences=Button(text=current_language['preferences'],
+        preferences=RoundedButton(text=current_language['preferences'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.34},
                         background_down='',
@@ -456,7 +514,7 @@ class SettingsScreen(Screen):
         preferences.ref='preferences'
         preferences.bind(on_release=self.preferences_func)
 
-        train=Button(text=current_language['train'],
+        train=RoundedButton(text=current_language['train'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.78},
                         background_down='',
@@ -481,7 +539,7 @@ class SettingsScreen(Screen):
         language.bind(on_release=self.language_func)
 
 
-        about=Button(text=current_language['about'],
+        about=RoundedButton(text=current_language['about'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.34},
                         background_down='',
@@ -522,7 +580,7 @@ class SettingsScreen(Screen):
         overlay_menu.separator_height=0
         self.widgets['overlay_layout'].clear_widgets()
 
-        english=Button(text="[size=30][b][color=#000000]  English [/color][/b][/size]",
+        english=RoundedButton(text="[size=30][b][color=#000000]  English [/color][/b][/size]",
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.9},
                         background_normal='',
@@ -531,7 +589,7 @@ class SettingsScreen(Screen):
         self.widgets['english']=english
         
 
-        spanish=Button(text="[size=30][b][color=#000000]  Español [/color][/b][/size]",
+        spanish=RoundedButton(text="[size=30][b][color=#000000]  Español [/color][/b][/size]",
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.7},
                         background_normal='',
@@ -587,7 +645,7 @@ class SettingsScreen(Screen):
             size_hint =(.5,.5),
             pos_hint = {'x':.6, 'y':.53})
 
-        about_back_button=Button(text=current_language['about_back'],
+        about_back_button=RoundedButton(text=current_language['about_back'],
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -637,7 +695,7 @@ class ReportScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text=current_language['report_back'],
+        back=RoundedButton(text=current_language['report_back'],
                     size_hint =(.4, .15),
                     pos_hint = {'x':.06, 'y':.02},
                     background_down='',
@@ -647,7 +705,7 @@ class ReportScreen(Screen):
         back.ref='report_back'
         back.bind(on_press=self.Report_back)
 
-        back_main=Button(text=current_language['report_back_main'],
+        back_main=RoundedButton(text=current_language['report_back_main'],
                         size_hint =(.4, .15),
                         pos_hint = {'x':.52, 'y':.02},
                         background_down='',
@@ -725,7 +783,7 @@ class DevicesScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
         self.widgets={}
 
-        back=Button(text=current_language['report_back'],
+        back=RoundedButton(text=current_language['report_back'],
                     size_hint =(.4, .15),
                     pos_hint = {'x':.06, 'y':.02},
                     background_down='',
@@ -735,7 +793,7 @@ class DevicesScreen(Screen):
         back.ref='report_back'
         back.bind(on_press=self.devices_back)
 
-        back_main=Button(text=current_language['report_back_main'],
+        back_main=RoundedButton(text=current_language['report_back_main'],
                         size_hint =(.4, .15),
                         pos_hint = {'x':.52, 'y':.02},
                         background_down='',
@@ -824,7 +882,7 @@ class DevicesScreen(Screen):
                 pos_hint = {'x':.05, 'y':.7},
                 markup=True)
 
-        info_back_button=Button(text=current_language['about_back'],
+        info_back_button=RoundedButton(text=current_language['about_back'],
                         size_hint =(.9, .15),
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
@@ -874,7 +932,7 @@ class DevicesScreen(Screen):
         overlay_menu.auto_dismiss=True
         self.widgets['overlay_layout'].clear_widgets()
 
-        new_device_back_button=Button(text=current_language['about_back'],
+        new_device_back_button=RoundedButton(text=current_language['about_back'],
                         size_hint =(.4, .15),
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
@@ -885,7 +943,7 @@ class DevicesScreen(Screen):
         new_device_back_button.ref='about_back'
         new_device_back_button.bind(on_press=self.new_device_overlay_close)
 
-        new_device_save_button=Button(text=current_language['save'],
+        new_device_save_button=RoundedButton(text=current_language['save'],
                         size_hint =(.4, .15),
                         pos_hint = {'x':.55, 'y':.025},
                         background_normal='',
@@ -1012,7 +1070,7 @@ class TrainScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
         self.widgets={}
 
-        back=Button(text=current_language['report_back'],
+        back=RoundedButton(text=current_language['report_back'],
                     size_hint =(.4, .15),
                     pos_hint = {'x':.06, 'y':.02},
                     background_down='',
@@ -1022,7 +1080,7 @@ class TrainScreen(Screen):
         back.ref='report_back'
         back.bind(on_press=self.train_back)
 
-        back_main=Button(text=current_language['report_back_main'],
+        back_main=RoundedButton(text=current_language['report_back_main'],
                         size_hint =(.4, .15),
                         pos_hint = {'x':.52, 'y':.02},
                         background_down='',
@@ -1079,7 +1137,7 @@ class PreferenceScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
         self.duration_flag=0
 
-        back=Button(text=current_language['preferences_back'],
+        back=RoundedButton(text=current_language['preferences_back'],
                         size_hint =(.4, .25),
                         pos_hint = {'x':.02, 'y':.02},
                         background_down='',
@@ -1089,7 +1147,7 @@ class PreferenceScreen(Screen):
         back.ref='preferences_back'
         back.bind(on_press=self.settings_back)
 
-        back_main=Button(text=current_language['preferences_back_main'],
+        back_main=RoundedButton(text=current_language['preferences_back_main'],
                         size_hint =(.48, .25),
                         pos_hint = {'x':.49, 'y':.02},
                         background_down='',
@@ -1099,7 +1157,7 @@ class PreferenceScreen(Screen):
         back_main.ref='preferences_back_main'
         back_main.bind(on_press=self.settings_back_main)
 
-        heat_sensor=Button(text=current_language['heat_sensor'],
+        heat_sensor=RoundedButton(text=current_language['heat_sensor'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.78},
                         background_down='',
@@ -1110,7 +1168,7 @@ class PreferenceScreen(Screen):
         heat_sensor.bind(on_release=self.heat_sensor_func)
         heat_sensor.bind(on_release=self.blur_screen)
 
-        temp_1=Button(text="[size=40][b][color=#000000]  temp_1 [/color][/b][/size]",
+        temp_1=RoundedButton(text="[size=40][b][color=#000000]  temp_1 [/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.56},
                         background_down='',
@@ -1119,7 +1177,7 @@ class PreferenceScreen(Screen):
         self.widgets['temp_1']=temp_1
         #temp_1.bind(on_release=self.sys_report_func)
 
-        temp_2=Button(text="[size=40][b][color=#000000]  temp_2 [/color][/b][/size]",
+        temp_2=RoundedButton(text="[size=40][b][color=#000000]  temp_2 [/color][/b][/size]",
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.34},
                         background_down='',
@@ -1128,7 +1186,7 @@ class PreferenceScreen(Screen):
         self.widgets['temp_2']=temp_2
         #preferences.bind(on_release=self.preferences_func)
 
-        clean_mode=Button(text=current_language['clean_mode'],
+        clean_mode=RoundedButton(text=current_language['clean_mode'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.78},
                         background_down='',
@@ -1138,7 +1196,7 @@ class PreferenceScreen(Screen):
         clean_mode.ref='clean_mode'
         clean_mode.bind(on_release=self.clean_mode_func)
 
-        commission=Button(text=current_language['commission'],
+        commission=RoundedButton(text=current_language['commission'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.56},
                         background_down='',
@@ -1148,7 +1206,7 @@ class PreferenceScreen(Screen):
         commission.ref='commission'
         commission.bind(on_release=self.commission_func)
 
-        pins=Button(text=current_language['pins'],
+        pins=RoundedButton(text=current_language['pins'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.54, 'y':.34},
                         background_down='',
@@ -1202,7 +1260,7 @@ class PreferenceScreen(Screen):
         overlay_menu.auto_dismiss=True
         self.widgets['overlay_layout'].clear_widgets()
 
-        duration_1=Button(text=current_language['duration_1'],
+        duration_1=RoundedButton(text=current_language['duration_1'],
                         size_hint =(.3, .50),
                         pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
@@ -1211,7 +1269,7 @@ class PreferenceScreen(Screen):
         self.widgets['duration_1']=duration_1
         duration_1.ref='duration_1'
 
-        duration_2=Button(text=current_language['duration_2'],
+        duration_2=RoundedButton(text=current_language['duration_2'],
                         size_hint =(.3, .50),
                         pos_hint = {'x':.35, 'y':.3},
                         background_normal='',
@@ -1220,7 +1278,7 @@ class PreferenceScreen(Screen):
         self.widgets['duration_2']=duration_2
         duration_1.ref='duration_2'
 
-        duration_3=Button(text=current_language['duration_3'],
+        duration_3=RoundedButton(text=current_language['duration_3'],
                         size_hint =(.3, .50),
                         pos_hint = {'x':.68, 'y':.3},
                         background_normal='',
@@ -1277,7 +1335,7 @@ class PreferenceScreen(Screen):
         self.widgets['warning_text']=warning_text
         warning_text.ref='maint_overlay_warning_text'
 
-        continue_button=Button(text=current_language['continue_button'],
+        continue_button=RoundedButton(text=current_language['continue_button'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -1287,7 +1345,7 @@ class PreferenceScreen(Screen):
         self.widgets['continue_button']=continue_button
         continue_button.ref='continue_button'
 
-        cancel_button=Button(text=current_language['cancel_button'],
+        cancel_button=RoundedButton(text=current_language['cancel_button'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
@@ -1327,7 +1385,7 @@ class PreferenceScreen(Screen):
         self.widgets['warning_text']=warning_text
         warning_text.ref='override_overlay_warning_text'
 
-        disable_button=Button(text=current_language['disable_button'],
+        disable_button=RoundedButton(text=current_language['disable_button'],
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -1337,7 +1395,7 @@ class PreferenceScreen(Screen):
         self.widgets['disable_button']=disable_button
         disable_button.ref='disable_button'
 
-        light_button=ToggleButton(text=current_language['lights'],
+        light_button=RoundedToggleButton(text=current_language['lights'],
                         size_hint =(.2, .25),
                         pos_hint = {'x':.75, 'y':.05},
                         background_down='',
@@ -1411,7 +1469,7 @@ class PinScreen(Screen):
         self.pin=''
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text=current_language['pin_back'],
+        back=RoundedButton(text=current_language['pin_back'],
                     size_hint =(.4, .15),
                     pos_hint = {'x':.06, 'y':.02},
                     background_down='',
@@ -1421,7 +1479,7 @@ class PinScreen(Screen):
         back.ref='pin_back'
         back.bind(on_press=self.Pin_back)
 
-        back_main=Button(text=current_language['pin_back_main'],
+        back_main=RoundedButton(text=current_language['pin_back_main'],
                         size_hint =(.4, .15),
                         pos_hint = {'x':.52, 'y':.02},
                         background_down='',
@@ -1435,7 +1493,7 @@ class PinScreen(Screen):
             pos_hint = {'center_x':.6, 'center_y':.4})
         self.widgets['num_pad']=num_pad
 
-        one=Button(text="[size=35][b][color=#000000] 1 [/color][/b][/size]",
+        one=RoundedButton(text="[size=35][b][color=#000000] 1 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':0, 'y':.85},
             background_down='',
@@ -1444,7 +1502,7 @@ class PinScreen(Screen):
         self.widgets['one']=one
         one.bind(on_release=self.one_func)
 
-        two=Button(text="[size=35][b][color=#000000] 2 [/color][/b][/size]",
+        two=RoundedButton(text="[size=35][b][color=#000000] 2 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':.2, 'y':.85},
             background_down='',
@@ -1453,7 +1511,7 @@ class PinScreen(Screen):
         self.widgets['two']=two
         two.bind(on_release=self.two_func)
 
-        three=Button(text="[size=35][b][color=#000000] 3 [/color][/b][/size]",
+        three=RoundedButton(text="[size=35][b][color=#000000] 3 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':.4, 'y':.85},
             background_down='',
@@ -1462,7 +1520,7 @@ class PinScreen(Screen):
         self.widgets['three']=three
         three.bind(on_release=self.three_func)
 
-        four=Button(text="[size=35][b][color=#000000] 4 [/color][/b][/size]",
+        four=RoundedButton(text="[size=35][b][color=#000000] 4 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':0, 'y':.65},
             background_down='',
@@ -1471,7 +1529,7 @@ class PinScreen(Screen):
         self.widgets['four']=four
         four.bind(on_release=self.four_func)
 
-        five=Button(text="[size=35][b][color=#000000] 5 [/color][/b][/size]",
+        five=RoundedButton(text="[size=35][b][color=#000000] 5 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':.2, 'y':.65},
             background_down='',
@@ -1480,7 +1538,7 @@ class PinScreen(Screen):
         self.widgets['five']=five
         five.bind(on_release=self.five_func)
 
-        six=Button(text="[size=35][b][color=#000000] 6 [/color][/b][/size]",
+        six=RoundedButton(text="[size=35][b][color=#000000] 6 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':.4, 'y':.65},
             background_down='',
@@ -1489,7 +1547,7 @@ class PinScreen(Screen):
         self.widgets['six']=six
         six.bind(on_release=self.six_func)
 
-        seven=Button(text="[size=35][b][color=#000000] 7 [/color][/b][/size]",
+        seven=RoundedButton(text="[size=35][b][color=#000000] 7 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':0, 'y':.45},
             background_down='',
@@ -1498,7 +1556,7 @@ class PinScreen(Screen):
         self.widgets['seven']=seven
         seven.bind(on_release=self.seven_func)
 
-        eight=Button(text="[size=35][b][color=#000000] 8 [/color][/b][/size]",
+        eight=RoundedButton(text="[size=35][b][color=#000000] 8 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':.2, 'y':.45},
             background_down='',
@@ -1507,7 +1565,7 @@ class PinScreen(Screen):
         self.widgets['eight']=eight
         eight.bind(on_release=self.eight_func)
 
-        nine=Button(text="[size=35][b][color=#000000] 9 [/color][/b][/size]",
+        nine=RoundedButton(text="[size=35][b][color=#000000] 9 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':.4, 'y':.45},
             background_down='',
@@ -1516,7 +1574,7 @@ class PinScreen(Screen):
         self.widgets['nine']=nine
         nine.bind(on_release=self.nine_func)
 
-        zero=Button(text="[size=35][b][color=#000000] 0 [/color][/b][/size]",
+        zero=RoundedButton(text="[size=35][b][color=#000000] 0 [/color][/b][/size]",
             size_hint =(.15, .15),
             pos_hint = {'x':0, 'y':.25},
             background_down='',
@@ -1525,7 +1583,7 @@ class PinScreen(Screen):
         self.widgets['zero']=zero
         zero.bind(on_release=self.zero_func)
 
-        backspace=Button(text="[size=35][b][color=#000000] <- [/color][/b][/size]",
+        backspace=RoundedButton(text="[size=35][b][color=#000000] <- [/color][/b][/size]",
             size_hint =(.35, .15),
             pos_hint = {'x':.2, 'y':.25},
             background_down='',
@@ -1534,7 +1592,7 @@ class PinScreen(Screen):
         self.widgets['backspace']=backspace
         backspace.bind(on_release=self.backspace_func)
 
-        enter=Button(text="[size=35][b][color=#000000] -> [/color][/b][/size]",
+        enter=RoundedButton(text="[size=35][b][color=#000000] -> [/color][/b][/size]",
             size_hint =(.15, .75),
             pos_hint = {'x':.6, 'y':.25},
             background_down='',
@@ -1565,7 +1623,7 @@ class PinScreen(Screen):
         self.widgets['reset_text']=reset_text
         reset_text.ref='reset_text'
 
-        reset_confirm=Button(text=current_language['reset_confirm'],
+        reset_confirm=RoundedButton(text=current_language['reset_confirm'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -1575,7 +1633,7 @@ class PinScreen(Screen):
         self.widgets['reset_confirm']=reset_confirm
         reset_confirm.ref='reset_confirm'
 
-        reset_cancel=Button(text=current_language['reset_cancel'],
+        reset_cancel=RoundedButton(text=current_language['reset_cancel'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
@@ -1609,7 +1667,7 @@ class PinScreen(Screen):
         self.widgets['date_text']=date_text
         date_text.ref='date_text'
 
-        date_confirm=Button(text=current_language['date_confirm'],
+        date_confirm=RoundedButton(text=current_language['date_confirm'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -1619,7 +1677,7 @@ class PinScreen(Screen):
         self.widgets['date_confirm']=date_confirm
         date_confirm.ref='date_confirm'
 
-        date_cancel=Button(text=current_language['date_cancel'],
+        date_cancel=RoundedButton(text=current_language['date_cancel'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
@@ -1652,7 +1710,7 @@ class PinScreen(Screen):
         self.widgets['heat_override_text']=heat_override_text
         heat_override_text.ref='heat_override_text'
 
-        heat_override_confirm=Button(text=current_language['heat_override_confirm'],
+        heat_override_confirm=RoundedButton(text=current_language['heat_override_confirm'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
@@ -1662,7 +1720,7 @@ class PinScreen(Screen):
         self.widgets['heat_override_confirm']=heat_override_confirm
         heat_override_confirm.ref='heat_override_confirm'
 
-        heat_override_cancel=Button(text=current_language['heat_override_cancel'],
+        heat_override_cancel=RoundedButton(text=current_language['heat_override_cancel'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
@@ -1792,7 +1850,7 @@ class DocumentScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
+        back=RoundedButton(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
                     size_hint =(.4, .15),
                     pos_hint = {'x':.06, 'y':.02},
                     background_down='',
@@ -1802,7 +1860,7 @@ class DocumentScreen(Screen):
         back.ref='report_back'
         back.bind(on_press=self.Report_back)
 
-        back_main=Button(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+        back_main=RoundedButton(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
                         size_hint =(.4, .15),
                         pos_hint = {'x':.52, 'y':.02},
                         background_down='',
@@ -1894,7 +1952,7 @@ class TroubleScreen(Screen):
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
-        back=Button(text=current_language['trouble_back'],
+        back=RoundedButton(text=current_language['trouble_back'],
                     size_hint =(.4, .15),
                     pos_hint = {'x':.02, 'y':.02},
                     background_down='',
