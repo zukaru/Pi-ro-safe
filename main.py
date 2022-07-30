@@ -947,6 +947,9 @@ class DevicesScreen(Screen):
         self.widgets['overlay_menu'].dismiss()
 
     def new_device_save(self,current_device,button):
+        if current_device.name=="default":
+            print("main.new_device_save(): can not save device without name")
+            return
         data={
             "device_name":current_device.name,
             "gpio_pin":current_device.pin,
