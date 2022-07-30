@@ -55,7 +55,7 @@ current_language=lang_dict.english
 
 if os.name == 'nt':
     preferences_path='hood_control.ini'
-    generic_image=r'media\drops_crop.jpg'
+    generic_image=r'media\patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
     language_image=r'media\language_icon-1.png'
     settings_icon=r'media\tiny gear.png'
     trouble_icon=r'media\trouble icon.png'
@@ -73,7 +73,7 @@ if os.name == 'nt':
 if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
     Window.fullscreen = 'auto'
-    generic_image=r'media/lit_hood.jpg'
+    generic_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
     language_image=r'media/language_icon-1.png'
     settings_icon=r'media/tiny gear.png'
     trouble_icon=r'media/trouble icon.png'
@@ -159,7 +159,6 @@ class RoundedButton(Button):
                 self.shape_color.rgba = self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3]
             else:
                 self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
-
 
 class RoundedToggleButton(ToggleButton):
     def __init__(self,**kwargs):
