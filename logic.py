@@ -1,4 +1,4 @@
-import os,mau,exhaust,time,json
+import os,mau,exhaust,light,drycontact,time,json
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -11,8 +11,8 @@ available_pins=[i for i in range(2,28)]
 #inputs: fan switch,light switch,heat sensor, micro switch
 channels_in = [14,15,18,23]
 
-#outputs: lights, additional relays
-channels_out = [7,12]
+#outputs: additional relays
+channels_out = [12]
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -35,6 +35,7 @@ def get_devices():
 
     loaded_devices=load_devices()
     for d in loaded_devices:
+        print(loaded_devices[d])
         if d != "default" and not any(j for j in devices if j.name == d):
             i=eval(f"{loaded_devices[d]}(name=\"{d}\")")
             if i.pin in available_pins:
@@ -75,6 +76,28 @@ def maufans_off():
         GPIO.output(i.pin,off)
         i.off()
 
+def lights_on():
+    for i in (i for i in devices if isinstance(i,light.Light)):
+        if i.pin!=0:
+            GPIO.output(i.pin,on)
+            i.on()
+
+def lights_off():
+    for i in (i for i in devices if isinstance(i,light.Light)):
+        GPIO.output(i.pin,off)
+        i.off()
+
+def dry_on():
+    for i in (i for i in devices if isinstance(i,drycontact.DryContact)):
+        if i.pin!=0:
+            GPIO.output(i.pin,on)
+            i.on()
+
+def dry_off():
+    for i in (i for i in devices if isinstance(i,drycontact.DryContact)):
+        GPIO.output(i.pin,off)
+        i.off()
+
 def save_devices(*args):
     for i in devices:
         i.write()
@@ -108,12 +131,8 @@ if os.name == 'posix':
     def light_switch_on():
         return GPIO.input(15)
 def clean_exit():
-    GPIO.output(25,off)
-    GPIO.output(8,off)
-    GPIO.output(7,off)
-    GPIO.output(12,off)
-    # for i in devices:
-    #     i.off()
+    all_pins=[i for i in range(2,28)]
+    GPIO.setup(all_pins, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
 def clean_list(list,element):
     while True:
@@ -164,16 +183,16 @@ class Logic():
             self.state='Fire'
             self.milo['micro_switch']=on
         elif self.moli['maint_override']==1:
-            GPIO.output(dry_contact,on)
+            dry_on()
             exfans_off()
             maufans_off()
             if self.moli['maint_override_light']==1:
-                GPIO.output(lights_pin,on)
+                lights_on()
             elif self.moli['maint_override_light']==0:
-                GPIO.output(lights_pin,off)
+                lights_off()
         else:
 
-            GPIO.output(dry_contact,on)
+            dry_on()
 
             if self.moli['exhaust']==on or fan_switch_on():
                 exfans_on()
@@ -193,22 +212,11 @@ class Logic():
             else:
                 self.milo['heat_sensor']=off
             if self.moli['lights']==on or light_switch_on():
-                GPIO.output(lights_pin,on)
+                lights_on()
                 self.milo['lights']=on
             elif self.moli['lights']==off or not light_switch_on():
-                GPIO.output(lights_pin,off)
+                lights_off()
                 self.milo['lights']=off
-            # if self.devices['dry_contact']==1:
-            #     GPIO.output(dry_contact.pin,on)
-            # elif self.devices['dry_contact']==0:
-            #     GPIO.output(dry_contact.pin,off)
-                # GPIO.output(dry contacts,on)
-                # GPIO.output(dry contacts,on)
-            # if fire_mode:
-            #     self.running=False
-            #     self.state='Fire'
-            # elif not self.switch():
-            #     self.state='Off'
     def heat_trip(self):
         self.sensor_target=time.time()+heat_sensor_timer
         self.aux_state.append('heat_sensor')
@@ -247,8 +255,8 @@ class Logic():
         if not self.fired:
             exfans_on()
             maufans_off()
-            GPIO.output(lights_pin,off)
-            GPIO.output(dry_contact,off)
+            lights_off()
+            dry_off()
             self.fired = True
         if not micro_switch_active():
             self.fired = False
