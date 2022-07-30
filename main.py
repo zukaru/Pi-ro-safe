@@ -921,7 +921,9 @@ class DevicesScreen(Screen):
                 self.pin=0
                 self.color=(0,0,0,0)
                 self.run_time=0
-                self.device_types={"Exfan":"exhaust.Exhaust",}
+                self.device_types={
+                    "Exfan":"exhaust.Exhaust",
+                    "MAU":"mau.Mau"}
         current_device=InfoShelf()
 
         overlay_menu=self.widgets['overlay_menu']
@@ -973,7 +975,7 @@ class DevicesScreen(Screen):
 
         get_device_type=Spinner(
                         text="Exfan",
-                        values=("Exfan","MUA","Heat","Dry"),
+                        values=("Exfan","MAU","Heat","Dry"),
                         size_hint =(.5, .05),
                         pos_hint = {'x':.40, 'y':.8})
         get_device_type.bind(text=partial(self.get_device_type_func,current_device))
@@ -1027,6 +1029,10 @@ class DevicesScreen(Screen):
         current_device.name=button.text
     def get_device_type_func(self,current_device,button,value):
         current_device.type=value
+        if value=="Exfan":
+            current_device.color=(170/255, 0/255, 0/255,.85)
+        elif value=="MAU":
+            current_device.color=(0/255, 0/255, 170/255,.85)
     def get_device_pin_func(self,current_device,button,value):
         current_device.pin=int(value)
 

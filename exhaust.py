@@ -2,6 +2,7 @@ import os,time,json
 import os.path
 
 class Exhaust():
+    color=(170/255, 0/255, 0/255,.85)
     def __init__(self,name="default",pin=0,color=(170/255, 0/255, 0/255,.85)) -> None:
         self.name=name
         self.type='Exhaust Fan'
