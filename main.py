@@ -972,7 +972,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
         # self.widgets['delete_progress']=delete_progress
 
         delete_progress=CircularProgressBar()
-        delete_progress._widget_size=100
+        delete_progress._widget_size=200
         delete_progress._progress_colour=(180/255, 10/255, 10/255,1)
         self.widgets['delete_progress']=delete_progress
 
@@ -1695,7 +1695,7 @@ class PreferenceScreen(Screen):
         # self.widgets['disable_progress']=disable_progress
 
         disable_progress=CircularProgressBar()
-        disable_progress._widget_size=100
+        disable_progress._widget_size=200
         disable_progress._progress_colour=(255/255, 121/255, 0/255,1)
         self.widgets['disable_progress']=disable_progress
 
