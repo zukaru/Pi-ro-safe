@@ -27,7 +27,7 @@ def get_devices():
             return data
         except FileNotFoundError:
             print("logic.get_devices().load_devices(): FileNotFoundError; Creating file")
-            with open(rf"logs/devices/device_list.json","w") as read_file:
+            with open(rf"logs/devices/device_list.json","w+") as read_file:
                 data={}
                 json.dump(data, read_file,indent=0)
             return load_devices()
