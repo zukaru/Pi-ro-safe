@@ -1,4 +1,4 @@
-import os,json
+import os,json,time
 import traceback
 from kivy.config import Config
 
@@ -53,6 +53,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.vkeyboard import VKeyboard
 from kivy.uix.spinner import Spinner
 from kivy.graphics import RoundedRectangle
+from kivy.uix.progressbar import ProgressBar
+from circle_progress_bar import CircularProgressBar
 
 
 kivy.require('2.0.0')
@@ -74,6 +76,8 @@ if os.name == 'nt':
     qr_link =r'media\qr link.png'
     add_device_icon=r'media\icons8-edit-64.png'
     add_device_down=r'media\icons8-edit-64_down.png'
+    delete_normal=r'media\delete_normal.png'
+    delete_down=r'media\delete_down.png'
 
 if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
@@ -92,6 +96,8 @@ if os.name == 'posix':
     qr_link =r'media/qr link.png'
     add_device_icon=r'media/icons8-edit-64.png'
     add_device_down=r'media/icons8-edit-64_down.png'
+    delete_normal=r'media/delete_normal.png'
+    delete_down=r'media/delete_down.png'
 
 class PinPop(Popup):
     def __init__(self,name, **kwargs):
@@ -275,6 +281,13 @@ class ExactLabel(Label):
 
 class EventpassGridLayout(GridLayout):
     pass
+
+class ColorProgressBar(ProgressBar):
+    def __init__(self, **kwargs):
+        super(ColorProgressBar).__init__(**kwargs)
+
+        with self.canvas.before:
+            self.background=BorderImage
 
 class ControlGrid(Screen):
     def quick_start(self,button):
@@ -786,6 +799,7 @@ class DevicesScreen(Screen):
         super(DevicesScreen,self).__init__(**kw)
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
         self.widgets={}
+        self.ud={}
 
         back=RoundedButton(text=current_language['report_back'],
                     size_hint =(.4, .15),
@@ -870,6 +884,14 @@ class DevicesScreen(Screen):
         info_add_icon.bind(on_release=partial(self.info_add_icon_func,device))
         info_add_icon.bind(state=self.icon_change)
 
+        delete_icon=IconButton(source=delete_normal,
+                        size_hint =(.2, .2),
+                        pos_hint = {'x':.0, 'y':.90})
+        self.widgets['delete_icon']=delete_icon
+        delete_icon.color=(1,1,1,.8)
+        delete_icon.bind(on_release=partial(self.delete_icon_func,device))
+        delete_icon.bind(state=self.delete_icon_change)
+
 
         info_type=ExactLabel(text=f"[size=18]Device Type:                    {device.type}[/size]",
                         color=(0,0,0,1),
@@ -899,6 +921,7 @@ class DevicesScreen(Screen):
 
         # self.widgets['overlay_layout'].add_widget(info_text)
         self.widgets['overlay_layout'].add_widget(info_add_icon)
+        self.widgets['overlay_layout'].add_widget(delete_icon)
         self.widgets['overlay_layout'].add_widget(info_type)
         self.widgets['overlay_layout'].add_widget(info_pin)
         self.widgets['overlay_layout'].add_widget(info_run_time)
@@ -906,6 +929,97 @@ class DevicesScreen(Screen):
         if open:
             self.widgets['overlay_menu'].open()
 
+    def delete_device_overlay(self,device,open=True):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.title=f'Delete {device.name}?'
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        delete_back_button=RoundedButton(text=current_language['cancel_button'],
+                        size_hint =(.9, .15),
+                        pos_hint = {'x':.05, 'y':.025},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['delete_back_button']=delete_back_button
+        delete_back_button.ref='cancel_button'
+        delete_back_button.bind(on_press=partial(self.delete_overlay_close,device))
+
+        delete_confirm_button=RoundedButton(text="Delete",
+                        size_hint =(.4, .10),
+                        pos_hint = {'x':.3, 'y':.35},
+                        background_normal='',
+                        background_color=(180/255, 10/255, 10/255,.9),
+                        markup=True)
+        self.widgets['delete_confirm_button']=delete_confirm_button
+        delete_confirm_button.ref='about_back'
+        delete_confirm_button.bind(on_press=partial(self.create_clock,device),on_touch_up=self.delete_clock)
+
+        delete_device_text=ExactLabel(text=f"""[size=18][color=#000000]Deleting device will remove all existing data and
+terminate the associated GPIO pin usage immediately.
+        
+Only proceed if necessary; This action cannot be undone.[/color][/size]""",
+                        color=(0,0,0,1),
+                        pos_hint = {'x':.25, 'y':.7},
+                        markup=True)
+
+        # delete_progress=ProgressBar(
+        #     max=1000,
+        #     size_hint =(.30, .10),
+        #     pos_hint = {'x':.35, 'y':.42},)
+        # self.widgets['delete_progress']=delete_progress
+
+        delete_progress=CircularProgressBar()
+        delete_progress._widget_size=100
+        delete_progress._progress_colour=(180/255, 10/255, 10/255,1)
+        self.widgets['delete_progress']=delete_progress
+
+        self.widgets['overlay_layout'].add_widget(delete_back_button)
+        self.widgets['overlay_layout'].add_widget(delete_confirm_button)
+        self.widgets['overlay_layout'].add_widget(delete_device_text)
+        self.widgets['overlay_layout'].add_widget(delete_progress)
+        if open:
+            self.widgets['overlay_menu'].open()
+
+    def progress_bar_update(self,*args):
+        self.widgets['delete_progress'].pos=self.widgets['delete_confirm_button'].last_touch.pos
+        if not self.widgets['delete_progress'].parent:
+            self.widgets['overlay_layout'].add_widget(self.widgets['delete_progress'])
+        if self.widgets['delete_progress'].value >= 1000: # Checks to see if progress_bar.value has met 1000
+            return False # Returning False schedule is canceled and won't repeat
+        self.widgets['delete_progress'].value += 5.75 # Updates progress_bar's progress
+
+    def delete_overlay_close(self,device,button):
+        self.info_overlay(device,False)
+
+    def delete_device_confirm(self,device,*args):
+        logic.devices.remove(device)
+        os.remove(rf"logs/devices/{device.name}.json")
+        with open(rf"logs/devices/device_list.json","r+") as read_file:
+            d_list=json.load(read_file)
+            del d_list[device.name]
+            read_file.seek(0)
+            json.dump(d_list,read_file,indent=0)
+            read_file.truncate()
+        self.aggregate_devices()
+        self.widgets['overlay_menu'].dismiss()
+
+    def create_clock(self,device,*args):
+        scheduled_delete=partial(self.delete_device_confirm,device)
+        Clock.schedule_once(scheduled_delete, 2)
+        self.ud['event'] = scheduled_delete
+        Clock.schedule_interval(self.progress_bar_update,.0001)
+        self.ud['event_bar'] = self.progress_bar_update
+
+    def delete_clock(self,*args):
+        if 'event' in self.ud:
+            Clock.unschedule(self.ud['event'])
+        if 'event_bar' in self.ud:
+            Clock.unschedule(self.ud['event_bar'])
+            self.widgets['delete_progress'].value=0
+            self.widgets['overlay_layout'].remove_widget(self.widgets['delete_progress'])
 
     def info_overlay_close(self,button):
         self.widgets['overlay_menu'].dismiss()
@@ -913,11 +1027,19 @@ class DevicesScreen(Screen):
     def info_add_icon_func(self,device,button):
         self.edit_device_overlay(device)
 
+    def delete_icon_func(self,device,button):
+        self.delete_device_overlay(device,open=False)
+
     def icon_change(self,button,state):
         if state=='down':
             button.source=add_device_down
         else:
             button.source=add_device_icon
+    def delete_icon_change(self,button,state):
+        if state=='down':
+            button.source=delete_down
+        else:
+            button.source=delete_normal
 
     def new_device_overlay(self,open=True):
         class InfoShelf():
@@ -1113,12 +1235,13 @@ class DevicesScreen(Screen):
         get_name.bind(on_text_validate=partial(self.edit_name_func,current_device))
         get_name.bind(text=partial(self.edit_name_func,current_device))
 
-        get_device_label=ExactLabel(text="[size=18]Device Type:[/size]",
+        get_device_label=ExactLabel(text="[size=18]Device Type: (Locked)[/size]",
                         pos_hint = {'x':.05, 'y':.8},
                         color = (0,0,0,1),
                         markup=True)
 
         get_device_type=Spinner(
+                        disabled=True,
                         text=current_device.type,
                         values=("Exfan","MAU","Heat","Light","Dry"),
                         size_hint =(.5, .05),
@@ -1171,6 +1294,12 @@ class DevicesScreen(Screen):
             read_file.seek(0)
             json.dump(d_list,read_file,indent=0)
             read_file.truncate()
+        device.name=current_device.name
+        if device.pin != current_device.pin:
+            logic.available_pins.append(device.pin)
+            logic.available_pins.remove(current_device.pin)
+            logic.available_pins.sort()
+            device.pin=current_device.pin
         self.aggregate_devices()
         self.info_overlay(device,open=False)
 
@@ -1291,6 +1420,7 @@ class PreferenceScreen(Screen):
         super(PreferenceScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
+        self.ud={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
         self.duration_flag=0
 
@@ -1496,7 +1626,6 @@ class PreferenceScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
         self.widgets['continue_button']=continue_button
@@ -1506,7 +1635,6 @@ class PreferenceScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
-                        background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
         self.widgets['cancel_button']=cancel_button
@@ -1546,7 +1674,6 @@ class PreferenceScreen(Screen):
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
         self.widgets['disable_button']=disable_button
@@ -1561,6 +1688,17 @@ class PreferenceScreen(Screen):
         self.widgets['light_button']=light_button
         light_button.ref='lights'
 
+        # disable_progress=ProgressBar(
+        #     max=1000,
+        #     size_hint =(.8, .10),
+        #     pos_hint = {'x':.10, 'y':.27},)
+        # self.widgets['disable_progress']=disable_progress
+
+        disable_progress=CircularProgressBar()
+        disable_progress._widget_size=100
+        disable_progress._progress_colour=(255/255, 121/255, 0/255,1)
+        self.widgets['disable_progress']=disable_progress
+
         def light_button_func(button):
             if logic.fs.moli['maint_override_light']==1:
                 logic.fs.moli['maint_override_light']=0
@@ -1572,21 +1710,40 @@ class PreferenceScreen(Screen):
             logic.fs.moli['maint_override']=0
             self.widgets['overlay_menu'].dismiss()
 
-        def create_clock(widget, touch, *args):
-            Clock.schedule_once(disable_button_func, 3)
-            touch.ud['event'] = disable_button_func
+        def progress_bar_update(*args):
+            self.widgets['disable_progress'].pos=self.widgets['disable_button'].last_touch.pos
+            if not self.widgets['disable_progress'].parent:
+                self.widgets['overlay_layout'].add_widget(self.widgets['disable_progress'])
+            bar=App.get_running_app().context_screen.get_screen('preferences').widgets["disable_progress"]
+            if bar.value >= 1000: # Checks to see if progress_bar.value has met 1000
+                return False # Returning False schedule is canceled and won't repeat
+            bar.value += 4.00 # Updates progress_bar's progress
 
-        def delete_clock(widget, touch, *args):
-            if 'event' in touch.ud:
-                Clock.unschedule(touch.ud['event'])
+
+
+        def create_clock(*args):
+            Clock.schedule_once(disable_button_func, 3)
+            self.ud['event'] = disable_button_func
+            Clock.schedule_interval(progress_bar_update,.01)
+            self.ud['event_bar'] = progress_bar_update
+
+        def delete_clock(*args):
+            bar=App.get_running_app().context_screen.get_screen('preferences').widgets["disable_progress"]
+            if 'event' in self.ud:
+                Clock.unschedule(self.ud['event'])
+            if 'event_bar' in self.ud:
+                self.widgets['overlay_layout'].remove_widget(disable_progress)
+                Clock.unschedule(self.ud['event_bar'])
+                bar.value=0
 
         disable_button.bind(
-            on_touch_down=create_clock,
+            on_press=create_clock,
             on_touch_up=delete_clock)
 
         self.widgets['overlay_layout'].add_widget(warning_text)
         self.widgets['overlay_layout'].add_widget(disable_button)
         self.widgets['overlay_layout'].add_widget(light_button)
+        self.widgets['overlay_layout'].add_widget(disable_progress)
 
     def settings_back(self,button):
         self.parent.transition = SlideTransition(direction='down')
