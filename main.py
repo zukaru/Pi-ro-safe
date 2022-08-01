@@ -1145,7 +1145,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
             "gpio_pin":current_device.pin,
             "run_time":current_device.run_time,
             "color":current_device.color}
-        with open(rf"logs/devices/{current_device.name}.json","w") as write_file:
+        with open(rf"logs/devices/{current_device.name}.json","w+") as write_file:
             json.dump(data, write_file,indent=0)
         with open(rf"logs/devices/device_list.json","r+") as read_file:
             d_list=json.load(read_file)
