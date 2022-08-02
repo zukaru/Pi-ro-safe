@@ -105,7 +105,8 @@ def update_devices(*args):
     for i in devices:
         i.update()
 
-
+def pin_off(pin):
+    GPIO.output(pin,off)
 
 
 mau1=mau.Mau(8)
