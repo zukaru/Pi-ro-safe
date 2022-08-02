@@ -996,6 +996,8 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
 
     def delete_device_confirm(self,device,*args):
         logic.devices.remove(device)
+        logic.available_pins.append(device.pin)
+        logic.available_pins.sort()
         os.remove(rf"logs/devices/{device.name}.json")
         with open(rf"logs/devices/device_list.json","r+") as read_file:
             d_list=json.load(read_file)
