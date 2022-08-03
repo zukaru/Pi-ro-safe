@@ -10,6 +10,8 @@ heat_sensor_timer=300
 available_pins=[i for i in range(2,28)]
 #inputs: fan switch,light switch,heat sensor, micro switch
 channels_in = [14,15,18,23]
+for i in channels_in:
+    available_pins.remove(i)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -49,7 +51,7 @@ def set_pin_mode(device):
         if device.mode=="in":
             GPIO.setup(device.pin,GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
         elif device.mode=="out":
-            GPIO.setup(device.pin, GPIO.OUT)
+            GPIO.setup(device.pin, GPIO.OUT,initial=GPIO.HIGH)
         else:
             print(f"logic.set_pin_mode(): {device}.mode is not \"in\" or \"out\"")
 
@@ -106,10 +108,10 @@ def update_devices(*args):
         i.update()
 
 def pin_off(pin):
-    GPIO.output(pin,off)
+    func = GPIO.gpio_function(pin)
+    if func==GPIO.OUT:
+        GPIO.output(pin,off)
 
-
-mau1=mau.Mau(8)
 dry_contact=12
 lights_pin=7
 if os.name == 'nt':
