@@ -983,13 +983,13 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
         if open:
             self.widgets['overlay_menu'].open()
 
-    def progress_bar_update(self,*args):
+    def progress_bar_update(self,dt,*args):
         self.widgets['delete_progress'].pos=self.widgets['delete_confirm_button'].last_touch.pos
         if not self.widgets['delete_progress'].parent:
             self.widgets['overlay_layout'].add_widget(self.widgets['delete_progress'])
         if self.widgets['delete_progress'].value >= 1000: # Checks to see if progress_bar.value has met 1000
             return False # Returning False schedule is canceled and won't repeat
-        self.widgets['delete_progress'].value += 5.75 # Updates progress_bar's progress
+        self.widgets['delete_progress'].value += 1000/2*dt # Updates progress_bar's progress
 
     def delete_overlay_close(self,device,button):
         self.info_overlay(device,False)
@@ -1713,14 +1713,14 @@ class PreferenceScreen(Screen):
             logic.fs.moli['maint_override']=0
             self.widgets['overlay_menu'].dismiss()
 
-        def progress_bar_update(*args):
+        def progress_bar_update(dt,*args):
             self.widgets['disable_progress'].pos=self.widgets['disable_button'].last_touch.pos
             if not self.widgets['disable_progress'].parent:
                 self.widgets['overlay_layout'].add_widget(self.widgets['disable_progress'])
             bar=App.get_running_app().context_screen.get_screen('preferences').widgets["disable_progress"]
             if bar.value >= 1000: # Checks to see if progress_bar.value has met 1000
                 return False # Returning False schedule is canceled and won't repeat
-            bar.value += 4.00 # Updates progress_bar's progress
+            bar.value += 1000/3*dt#4.00 # Updates progress_bar's progress
 
 
 
