@@ -1784,6 +1784,7 @@ class PinScreen(Screen):
         self.date_flag=0
         self.cols = 2
         self.widgets={}
+        self.popups=[]
         self.pin=''
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
@@ -1928,6 +1929,7 @@ class PinScreen(Screen):
         self.widgets['display']=display
 
         reset_overlay=PinPop('system_reset')
+        self.popups.append(reset_overlay)
         self.widgets['reset_overlay']=reset_overlay
         reset_overlay.ref='reset_overlay'
         reset_overlay.widgets['overlay_layout']=reset_overlay.overlay_layout
@@ -1972,6 +1974,7 @@ class PinScreen(Screen):
         reset_cancel.bind(on_release=reset_cancel_func)
 
         date_overlay=PinPop('date')
+        self.popups.append(date_overlay)
         self.widgets['date_overlay']=date_overlay
         date_overlay.ref='date_overlay'
         date_overlay.widgets['overlay_layout']=date_overlay.overlay_layout
@@ -2015,6 +2018,7 @@ class PinScreen(Screen):
         date_cancel.bind(on_release=date_cancel_func)
         
         heat_override_overlay=PinPop('heat_override')
+        self.popups.append(heat_override_overlay)
         self.widgets['heat_override_overlay']=heat_override_overlay
         heat_override_overlay.ref='heat_overlay'
         heat_override_overlay.widgets['overlay_layout']=heat_override_overlay.overlay_layout
@@ -2360,6 +2364,14 @@ def listen(app_object,*args):
                 app_object.transition = SlideTransition(direction='left')
                 app_object.current='alert'
                 app_object.get_screen('preferences').widgets['overlay_menu'].dismiss()
+                app_object.get_screen('devices').widgets['overlay_menu'].dismiss()
+                app_object.get_screen('settings').widgets['overlay_menu'].dismiss()
+                for i in app_object.get_screen('pin').popups:
+                    try:
+                        i.dismiss()
+                    except KeyError:
+                        print("main.listen()#micro switch: pop.dismiss() error")
+
                 logic.fs.moli['maint_override']=0
         elif event_log['micro_switch']==0:
             if app_object.current=='alert':

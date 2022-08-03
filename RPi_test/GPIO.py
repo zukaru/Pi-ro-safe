@@ -3,12 +3,14 @@ BOARD = 1
 BCM = 1
 OUT = 1
 IN = 1
+LOW=0
+HIGH=1
 PUD_DOWN = 1
 micro=0
 heatsensor=0
 def setmode(a):
    pass
-def setup(a, b,pull_up_down=1):
+def setup(a, b,pull_up_down=1,initial=LOW):
    pass
 def output(a, b):
    # print(a,b)
@@ -35,4 +37,5 @@ def input(number,source):
          
       else:
          return False
-   
+def gpio_function(pin):
+   pass
