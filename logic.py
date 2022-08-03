@@ -51,7 +51,7 @@ def set_pin_mode(device):
         if device.mode=="in":
             GPIO.setup(device.pin,GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
         elif device.mode=="out":
-            GPIO.setup(device.pin, GPIO.OUT,initial=GPIO.HIGH)
+            GPIO.setup(device.pin, GPIO.OUT,initial=GPIO.LOW)
         else:
             print(f"logic.set_pin_mode(): {device}.mode is not \"in\" or \"out\"")
 
