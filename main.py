@@ -6,6 +6,7 @@ from exhaust import Exhaust
 from mau import Mau
 from light import Light
 from drycontact import DryContact
+from gas_valve import GasValve
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
 import logic,lang_dict,pindex
@@ -78,6 +79,7 @@ if os.name == 'nt':
     add_device_down=r'media\icons8-edit-64_down.png'
     delete_normal=r'media\delete_normal.png'
     delete_down=r'media\delete_down.png'
+    reset_valve=r'media\redo.png'
 
 if os.name == 'posix':
     preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
@@ -98,6 +100,7 @@ if os.name == 'posix':
     add_device_down=r'media/icons8-edit-64_down.png'
     delete_normal=r'media/delete_normal.png'
     delete_down=r'media/delete_down.png'
+    reset_valve=r'media/redo.png'
 
 class PinPop(Popup):
     def __init__(self,name, **kwargs):
@@ -919,6 +922,13 @@ class DevicesScreen(Screen):
         info_back_button.ref='about_back'
         info_back_button.bind(on_press=self.info_overlay_close)
 
+        info_gv_reset=IconButton(source=reset_valve,
+                        size_hint =(.12, .12),
+                        pos_hint = {'x':.15, 'y':.98})
+        info_gv_reset.color=(1,1,1,.8)
+        self.widgets['info_gv_reset']=info_gv_reset
+        info_gv_reset.bind(on_press=partial(self.info_gv_reset_func,device))
+
         # self.widgets['overlay_layout'].add_widget(info_text)
         self.widgets['overlay_layout'].add_widget(info_add_icon)
         self.widgets['overlay_layout'].add_widget(delete_icon)
@@ -926,8 +936,13 @@ class DevicesScreen(Screen):
         self.widgets['overlay_layout'].add_widget(info_pin)
         self.widgets['overlay_layout'].add_widget(info_run_time)
         self.widgets['overlay_layout'].add_widget(info_back_button)
+        if isinstance(device,GasValve) :
+            self.widgets['overlay_layout'].add_widget(info_gv_reset)
         if open:
             self.widgets['overlay_menu'].open()
+
+    def info_gv_reset_func(self,device,*args):
+        device.latched=True
 
     def delete_device_overlay(self,device,open=True):
         overlay_menu=self.widgets['overlay_menu']
@@ -1056,7 +1071,8 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                     "Exfan":"exhaust.Exhaust",
                     "MAU":"mau.Mau",
                     "Light":"light.Light",
-                    "Dry":"drycontact.DryContact"}
+                    "Dry":"drycontact.DryContact",
+                    "GV":"gas_valve.GasValve"}
         current_device=InfoShelf()
 
         overlay_menu=self.widgets['overlay_menu']
@@ -1108,7 +1124,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
 
         get_device_type=Spinner(
                         text="Exfan",
-                        values=("Exfan","MAU","Heat","Light","Dry"),
+                        values=("Exfan","MAU","Heat","Light","Dry","GV"),
                         size_hint =(.5, .05),
                         pos_hint = {'x':.40, 'y':.8})
         get_device_type.bind(text=partial(self.get_device_type_func,current_device))
@@ -1171,6 +1187,8 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
             current_device.color=(170/255, 170/255, 0/255,.85)
         elif value=="Dry":
             current_device.color=(170/255, 85/255, 0/255,.85)
+        elif value=="GV":
+            current_device.color=(0/255, 0/255, 170/255,.85)
     def get_device_pin_func(self,current_device,button,value):
         current_device.pin=int(value)
 
@@ -1186,6 +1204,8 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                     self.type="Light"
                 elif isinstance(device,DryContact):
                     self.type="Dry"
+                elif isinstance(device,GasValve):
+                    self.type="GV"
                 self.pin=device.pin
                 self.color=device.color
                 self.run_time=device.run_time
@@ -1193,7 +1213,8 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                     "Exfan":"exhaust.Exhaust",
                     "MAU":"mau.Mau",
                     "Light":"light.Light",
-                    "Dry":"drycontact.DryContact"}
+                    "Dry":"drycontact.DryContact",
+                    "GV":"gas_valve.GasValve"}
         current_device=InfoShelf(device)
 
         overlay_menu=self.widgets['overlay_menu']
@@ -1319,6 +1340,8 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
             current_device.color=(170/255, 170/255, 0/255,.85)
         elif value=="Dry":
             current_device.color=(170/255, 85/255, 0/255,.85)
+        elif value=="GV":
+            current_device.color=(0/255, 0/255, 170/255,.85)
     def edit_device_pin_func(self,current_device,button,value):
         current_device.pin=int(value)
 

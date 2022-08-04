@@ -1,4 +1,4 @@
-import os,mau,exhaust,light,drycontact,time,json
+import os,mau,exhaust,light,drycontact,gas_valve,time,json
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -99,6 +99,17 @@ def dry_off():
         GPIO.output(i.pin,off)
         i.off()
 
+def gv_on():
+    for i in (i for i in devices if isinstance(i,gas_valve.GasValve)):
+        if i.pin!=0 and i.latched:
+            GPIO.output(i.pin,on)
+            i.on()
+
+def gv_off():
+    for i in (i for i in devices if isinstance(i,gas_valve.GasValve)):
+        GPIO.output(i.pin,off)
+        i.off()
+
 def save_devices(*args):
     for i in devices:
         i.write()
@@ -186,6 +197,7 @@ class Logic():
             self.milo['micro_switch']=on
         elif self.moli['maint_override']==1:
             dry_on()
+            gv_on()
             exfans_off()
             maufans_off()
             if self.moli['maint_override_light']==1:
@@ -195,6 +207,7 @@ class Logic():
         else:
 
             dry_on()
+            gv_on()
 
             if self.moli['exhaust']==on or fan_switch_on():
                 exfans_on()
@@ -259,6 +272,7 @@ class Logic():
             maufans_off()
             lights_off()
             dry_off()
+            gv_off()
             self.fired = True
         if not micro_switch_active():
             self.fired = False
