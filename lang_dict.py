@@ -55,7 +55,7 @@ DISABLE for 3 seconds.
     'disable_button' : "[size=30][b][color=#000000]  DISABLE [/color][/b][/size]",
     'trouble_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'fans_heat' : '[size=32][b][color=#000000]           Fans \n On by Heat Sensor [/color][/b][/size]',
-    'no_trouble' : '-No active troubles detected-',
+    'no_trouble' : '[size=24]-No active troubles detected-[/size]',
     'heat_trouble_title' : '                        -Heat Sensor-',
     'heat_trouble_body' : 'Unsafe temps detected in hood; fan override activated',
     'heat_trouble_link' : '                    Turn on fans',
@@ -88,8 +88,8 @@ DISABLE for 3 seconds.
     'heat_override_text' : '[size=30][color=#000000] Set heat override duration to 10 seconds? [/color][/size]',
     'heat_override_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
-    'no_device':'-No active devices detected-',
-   'no_train':'-No training items found-',
+    'no_device':'[size=24]-No active devices detected-[/size]',
+   'no_train':'[size=24]-No training items found-[/size]',
     'save':"[size=30][b][color=#000000]  Save [/color][/b][/size]"
 }
 
