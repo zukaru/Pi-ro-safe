@@ -205,7 +205,7 @@ class RoundedToggleButton(ToggleButton):
 class LayoutButton(FloatLayout,RoundedButton):
     pass
 
-class trouble_template(Label):
+class trouble_template(Button):
     def __init__(self,trouble_tag,trouble_text='',link_text=None,ref_tag=None, **kwargs):
         if link_text == None:
             link_text=''
@@ -217,12 +217,21 @@ class trouble_template(Label):
         size_hint_y=None,
         size_hint_x=1,
         color = (0,0,0,1),
+        background_down='',
+        background_normal='',
+        background_color=(245/250, 216/250, 41/250,.85),
         **kwargs)
         self.bind(pos=self.update_rect)
         self.bind(size=self.update_rect)
+        self.bind(state=self.color_swap)
         with self.canvas.before:
-                    Color(245/250, 216/250, 41/250,.85)
-                    self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
+            Color(245/250, 216/250, 41/250,.85)
+            self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
+    def color_swap(self,*args):
+        if self.state=="normal":
+            self.background_color=(245/250, 216/250, 41/250,.85)
+        if self.state=="down":
+            self.background_color=((245/250)*.5, (216/250)*.5, (41/250)*.5,(.85)*.5)
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
@@ -2430,7 +2439,7 @@ def listen(app_object,*args):
                     link_text=current_language['heat_trouble_link'],ref_tag='fans')
                     heat_trouble.ref='heat_trouble'
 
-                    def fan_switch(a,b):
+                    def fan_switch(*args):
                         app_object.get_screen('main').widgets['fans'].state = 'down'
                         app_object.get_screen('main').fans_switch(app_object.get_screen('main').widgets['fans'])
 
@@ -2451,11 +2460,10 @@ def listen(app_object,*args):
                     link_text=current_language['duration_trouble_link'],ref_tag='duration_trouble')
                     duration_trouble.ref='duration_trouble'
 
-                    def duration_overlay(a,b):
+                    def duration_overlay(*args):
                         app_object.get_screen('preferences').duration_flag=1
                         app_object.transition = SlideTransition(direction='up')
                         app_object.current='preferences'
-
 
                     duration_trouble.bind(on_ref_press=duration_overlay)
                     troubles_screen.widgets['duration_trouble']=duration_trouble
@@ -2465,6 +2473,24 @@ def listen(app_object,*args):
             if 'duration_trouble' in troubles_screen.widgets:
                 trouble_display.remove_widget(troubles_screen.widgets['duration_trouble'])
                 del troubles_screen.widgets['duration_trouble']
+
+    #gas valve trip trouble
+        if trouble_log['gv_trip']==1:
+            if app_object.current!='alert':
+                if 'gasvalve_trouble' not in troubles_screen.widgets:
+                    gasvalve_trouble=trouble_template(current_language['gasvalve_trouble_title'],
+                    current_language['gasvalve_trouble_body'],
+                    link_text=current_language['gasvalve_trouble_link'],ref_tag='gasvalve_trouble')
+                    gasvalve_trouble.ref='gasvalve_trouble'
+
+                    gasvalve_trouble.bind(on_release=logic.gv_reset_all)
+                    troubles_screen.widgets['gasvalve_trouble']=gasvalve_trouble
+                    troubles_screen.widgets['gasvalve_trouble'].bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
+                    trouble_display.add_widget(gasvalve_trouble)
+        elif trouble_log['gv_trip']==0:
+            if 'gasvalve_trouble' in troubles_screen.widgets:
+                trouble_display.remove_widget(troubles_screen.widgets['gasvalve_trouble'])
+                del troubles_screen.widgets['gasvalve_trouble']
 
 
 class Hood_Control(App):

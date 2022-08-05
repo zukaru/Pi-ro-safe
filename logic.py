@@ -110,6 +110,10 @@ def gv_off():
         GPIO.output(i.pin,off)
         i.off()
 
+def gv_reset_all(*args):
+    for i in (i for i in devices if isinstance(i,gas_valve.GasValve)):
+        i.latched=True
+
 def save_devices(*args):
     for i in devices:
         i.write()
@@ -169,7 +173,8 @@ class Logic():
         '''
         self.troubles={
             'heat_override':0,
-            'short_duration':0
+            'short_duration':0,
+            'gv_trip':0
         }
 
         self.moli={
@@ -256,15 +261,21 @@ class Logic():
 
 
     def trouble(self):
+    #heat sensor active
         if heat_sensor_active() and not self.moli['exhaust']==1:
             self.milo['troubles']['heat_override']=1
         else:
             self.milo['troubles']['heat_override']=0
-
+    #heat timer
         if heat_sensor_timer==10:
             self.milo['troubles']['short_duration']=1
         else:
             self.milo['troubles']['short_duration']=0
+    #gas valve unlatched
+        if any(i for i in devices if isinstance(i,gas_valve.GasValve) and i.pin!=0 and not i.latched):
+            self.milo['troubles']['gv_trip']=1
+        else:
+            self.milo['troubles']['gv_trip']=0
 
     def fire(self):
         if not self.fired:

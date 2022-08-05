@@ -90,7 +90,10 @@ DISABLE for 3 seconds.
     'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
     'no_device':'[size=24]-No active devices detected-[/size]',
    'no_train':'[size=24]-No training items found-[/size]',
-    'save':"[size=30][b][color=#000000]  Save [/color][/b][/size]"
+    'save':"[size=30][b][color=#000000]  Save [/color][/b][/size]",
+    'gasvalve_trouble_title':'                  -Gas Valve-',
+    'gasvalve_trouble_body' :'Unlatched gas valve detected in system',
+    'gasvalve_trouble_link' : '        Reset all gas valves',
 }
 
 spanish={
