@@ -9,7 +9,7 @@ from drycontact import DryContact
 from gas_valve import GasValve
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
-import logic,lang_dict,pindex
+import logic,lang_dict,pindex,general
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -74,7 +74,7 @@ if os.name == 'nt':
     left_arrow_image=r'media\left_arrow.png'
     right_arrow_image=r'media\right_arrow.png'
     stock_photo_test=r'media\download.jpeg'
-    qr_link =r'media\qr link.png'
+    qr_link =r'media\frame.png'
     add_device_icon=r'media\icons8-edit-64.png'
     add_device_down=r'media\icons8-edit-64_down.png'
     delete_normal=r'media\delete_normal.png'
@@ -95,7 +95,7 @@ if os.name == 'posix':
     left_arrow_image=r'media/left_arrow.png'
     right_arrow_image=r'media/right_arrow.png'
     stock_photo_test=r'media/download.jpeg'
-    qr_link =r'media/qr link.png'
+    qr_link =r'media/frame.png'
     add_device_icon=r'media/icons8-edit-64.png'
     add_device_down=r'media/icons8-edit-64_down.png'
     delete_normal=r'media/delete_normal.png'
@@ -671,8 +671,8 @@ class SettingsScreen(Screen):
         about_qr=Image(source=qr_link,
             allow_stretch=False,
             keep_ratio=True,
-            size_hint =(.5,.5),
-            pos_hint = {'x':.6, 'y':.53})
+            size_hint =(.45,.45),
+            pos_hint = {'x':.6, 'y':.58})
 
         about_back_button=RoundedButton(text=current_language['about_back'],
                         size_hint =(.9, .25),
@@ -915,7 +915,7 @@ class DevicesScreen(Screen):
                         pos_hint = {'x':.05, 'y':.8},
                         markup=True)
 
-        info_run_time=ExactLabel(text=f"[size=18]Device Run Time:           {device.run_time}[/size]",
+        info_run_time=ExactLabel(text=f"[size=18]Device Run Time:           {general.Convert_time(device.run_time)}[/size]",
                 color=(0,0,0,1),
                 pos_hint = {'x':.05, 'y':.7},
                 markup=True)
