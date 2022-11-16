@@ -9,7 +9,7 @@ english={
     'acknowledge' : "[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
     'reset' : "[size=32][b][color=#000000] Reset [/color][/b][/size]",
     'settings_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
-    'logs' : "[size=32][b][color=#000000]  Device Logs [/color][/b][/size]",
+    'logs' : "[size=32][b][color=#000000]  Devices [/color][/b][/size]",
     'sys_report' : "[size=32][b][color=#000000]  System Report [/color][/b][/size]",
     'preferences' : "[size=32][b][color=#000000]  Settings [/color][/b][/size]",
     'train' : "[size=32][b][color=#000000]  Training [/color][/b][/size]",
@@ -106,7 +106,7 @@ spanish={
     'acknowledge' : "[size=32][b][color=#000000] Reconocer [/color][/b][/size]",
     'reset' : "[size=32][b][color=#000000] Reiniciar [/color][/b][/size]",
     'settings_back' : "[size=50][b][color=#000000]  Regresa [/color][/b][/size]",
-    'logs' : "[size=40][b][color=#000000]  Registros [/color][/b][/size]",
+    'logs' : "[size=40][b][color=#000000]  Dispositivos [/color][/b][/size]",
     'sys_report' : "[size=40][b][color=#000000]  Informe [/color][/b][/size]",
     'preferences' : "[size=40][b][color=#000000]  Ajustes [/color][/b][/size]",
     'train' : "[size=40][b][color=#000000]  Capacitación [/color][/b][/size]",
@@ -159,5 +159,27 @@ para 3 segundos.
 
     ¿Quieres continuar?[/color][/size]""",
     'reset_confirm' : '[size=30][b][color=#000000] Reiniciar [/color][/b][/size]',
-    'reset_cancel' : '[size=30][b][color=#000000] Regresa [/color][/b][/size]'
+    'reset_cancel' : '[size=30][b][color=#000000] Regresa [/color][/b][/size]',
+
+###
+    'date_overlay' : 'Set Report Date ',
+    'date_text' : """[size=30][color=#000000]    Change date on current report?
+    
+    You will be returned to the pin menu; 
+    Enter the new date in: mmddyyyy 
+    format and press enter.
+    Do not use spaces, dashes,
+    or any delineators.[/color][/size]""",
+    'date_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'date_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'heat_override_overlay' : 'Heat Override Duration',
+    'heat_override_text' : '[size=30][color=#000000] Set heat override duration to 10 seconds? [/color][/size]',
+    'heat_override_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'heat_override_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'no_device':'[size=24]-No active devices detected-[/size]',
+   'no_train':'[size=24]-No training items found-[/size]',
+    'save':"[size=30][b][color=#000000]  Save [/color][/b][/size]",
+    'gasvalve_trouble_title':'                  -Gas Valve-',
+    'gasvalve_trouble_body' :'Unlatched gas valve detected in system',
+    'gasvalve_trouble_link' : '        Reset all gas valves',
 }
