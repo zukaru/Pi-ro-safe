@@ -82,7 +82,7 @@ if os.name == 'nt':
     reset_valve=r'media\redo.png'
 
 if os.name == 'posix':
-    preferences_path='/home/pi/Desktop/Pi-ro-safe/hood_control.ini'
+    preferences_path='/home/pi/Pi-ro-safe/hood_control.ini'
     Window.fullscreen = 'auto'
     generic_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
     language_image=r'media/language_icon-1.png'
