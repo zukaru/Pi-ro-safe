@@ -1,4 +1,5 @@
-import os,mau,exhaust,light,drycontact,gas_valve,time,json
+import os,time,json
+import mau,exhaust,light,drycontact,gas_valve,micro_switch,heat_sensor,switch_light,switch_fans
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:
@@ -8,18 +9,12 @@ heat_sensor_timer=300
 #there are only 25 GPIO pins available for input/output.
 #the additional 15 are grounds, constant powers, and reserved for hats.
 available_pins=[i for i in range(2,28)]
-#inputs: fan switch,light switch,heat sensor, micro switch
-channels_in = [14,15,18,23]
-for i in channels_in:
-    available_pins.remove(i)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-GPIO.setup(channels_in, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
 off=0
 on=1
-#hmi=GPIO.input(14)
 devices=[]
 def get_devices():
     def load_devices():
@@ -131,22 +126,46 @@ dry_contact=12
 lights_pin=7
 if os.name == 'nt':
     def heat_sensor_active():
-        return GPIO.input(18,'h')
+        for i in (i for i in devices if isinstance(i,heat_sensor.HeatSensor)):
+            if GPIO.input(i.pin,'h'):
+                return True
+        return False
     def micro_switch_active():
-        return GPIO.input(23,'m')
+        for i in (i for i in devices if isinstance(i,micro_switch.MicroSwitch)):
+            if GPIO.input(i.pin,'m'):
+                return True
+        return False
     def fan_switch_on():
-        return GPIO.input(14,'f')
+        for i in (i for i in devices if isinstance(i,switch_fans.SwitchFans)):
+            if GPIO.input(i.pin,'f'):
+                return True
+        return False
     def light_switch_on():
-        return GPIO.input(15,'l')
+        for i in (i for i in devices if isinstance(i,switch_light.SwitchLight)):
+            if GPIO.input(i.pin,'l'):
+                return True
+        return False
 if os.name == 'posix':
     def heat_sensor_active():
-        return GPIO.input(18)
+        for i in (i for i in devices if isinstance(i,heat_sensor.HeatSensor)):
+            if GPIO.input(i.pin):
+                return True
+        return False
     def micro_switch_active():
-        return  not GPIO.input(23)
+        for i in (i for i in devices if isinstance(i,micro_switch.MicroSwitch)):
+            if GPIO.input(i.pin):
+                return True
+        return False
     def fan_switch_on():
-        return GPIO.input(14)
+        for i in (i for i in devices if isinstance(i,switch_fans.SwitchFans)):
+            if GPIO.input(i.pin):
+                return True
+        return False
     def light_switch_on():
-        return GPIO.input(15)
+        for i in (i for i in devices if isinstance(i,switch_light.SwitchLight)):
+            if GPIO.input(i.pin):
+                return True
+        return False
 def clean_exit():
     all_pins=[i for i in range(2,28)]
     GPIO.setup(all_pins, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
@@ -311,7 +330,7 @@ fs=Logic()
 def logic():
     while True:
         fs.update()
-        time.sleep(.75)
+        time.sleep(.5)
 
 if __name__=='__main__':
     try:

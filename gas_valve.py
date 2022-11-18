@@ -3,8 +3,8 @@ from sys import settrace
 import os.path
 
 class GasValve():
-    color=(0/255, 0/255, 170/255,.85)
-    def __init__(self,name="default",pin=0,color=(0/255, 0/255, 170/255,.85)) -> None:
+    color=(47/250, 247/250, 54/250,.85)
+    def __init__(self,name="default",pin=0,color=(47/250, 247/250, 54/250,.85)) -> None:
         self.name=name
         self.type='Gas Valve'
         self.latched=False

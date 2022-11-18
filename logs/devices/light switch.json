@@ -1,0 +1,11 @@
+{
+"device_name": "light switch",
+"gpio_pin": 9,
+"run_time": 0.0,
+"color": [
+0.0,
+0.0,
+0.0,
+0.85
+]
+}

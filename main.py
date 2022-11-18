@@ -7,6 +7,11 @@ from mau import Mau
 from light import Light
 from drycontact import DryContact
 from gas_valve import GasValve
+from micro_switch import MicroSwitch
+from switch_light import SwitchLight
+from switch_fans import SwitchFans
+from heat_sensor import HeatSensor
+
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
 import logic,lang_dict,pindex,general
@@ -1081,7 +1086,11 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                     "MAU":"mau.Mau",
                     "Light":"light.Light",
                     "Dry":"drycontact.DryContact",
-                    "GV":"gas_valve.GasValve"}
+                    "GV":"gas_valve.GasValve",
+                    "Micro":"micro_switch.MicroSwitch",
+                    "Heat":"heat_sensor.HeatSensor",
+                    "Light Switch":"switch_light.SwitchLight",
+                    "Fans Switch":"switch_fans.SwitchFans"}
         current_device=InfoShelf()
 
         overlay_menu=self.widgets['overlay_menu']
@@ -1133,7 +1142,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
 
         get_device_type=Spinner(
                         text="Exfan",
-                        values=("Exfan","MAU","Heat","Light","Dry","GV"),
+                        values=("Exfan","MAU","Heat","Light","Dry","GV","Micro","Light Switch","Fans Switch"),
                         size_hint =(.5, .05),
                         pos_hint = {'x':.40, 'y':.8})
         get_device_type.bind(text=partial(self.get_device_type_func,current_device))
@@ -1197,7 +1206,15 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
         elif value=="Dry":
             current_device.color=(170/255, 85/255, 0/255,.85)
         elif value=="GV":
-            current_device.color=(0/255, 0/255, 170/255,.85)
+            current_device.color=(47/250, 247/250, 54/250,.85)
+        elif value=="Micro":
+            current_device.color=(255/255, 140/255, 25/255,.85)
+        elif value=="Heat":
+            current_device.color=(75/255, 0/255, 130/255,.85)
+        elif value=="Light Switch":
+            current_device.color=(0/255, 0/255, 0/255,.85)
+        elif value=="Fans Switch":
+            current_device.color=(0/255, 0/255, 0/255,.85)
     def get_device_pin_func(self,current_device,button,value):
         current_device.pin=int(value)
 
@@ -1215,6 +1232,14 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                     self.type="Dry"
                 elif isinstance(device,GasValve):
                     self.type="GV"
+                elif isinstance(device,MicroSwitch):
+                    self.type="Micro"
+                elif isinstance(device,HeatSensor):
+                    self.type="Heat"
+                elif isinstance(device,SwitchLight):
+                    self.type="Light Switch"
+                elif isinstance(device,SwitchFans):
+                    self.type="Fans Switch"
                 self.pin=device.pin
                 self.color=device.color
                 self.run_time=device.run_time
@@ -1223,7 +1248,11 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                     "MAU":"mau.Mau",
                     "Light":"light.Light",
                     "Dry":"drycontact.DryContact",
-                    "GV":"gas_valve.GasValve"}
+                    "GV":"gas_valve.GasValve",
+                    "Micro":"micro_switch.MicroSwitch",
+                    "Heat":"heat_sensor.HeatSensor",
+                    "Light Switch":"switch_light.SwitchLight",
+                    "Fans Switch":"switch_fans.SwitchFans"}
         current_device=InfoShelf(device)
 
         overlay_menu=self.widgets['overlay_menu']
@@ -1276,7 +1305,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
         get_device_type=Spinner(
                         disabled=True,
                         text=current_device.type,
-                        values=("Exfan","MAU","Heat","Light","Dry"),
+                        values=("Exfan","MAU","Heat","Light","Dry","Micro","Light Switch","Fans Switch"),
                         size_hint =(.5, .05),
                         pos_hint = {'x':.40, 'y':.8})
         get_device_type.bind(text=partial(self.edit_device_type_func,current_device))
@@ -1350,7 +1379,15 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
         elif value=="Dry":
             current_device.color=(170/255, 85/255, 0/255,.85)
         elif value=="GV":
-            current_device.color=(0/255, 0/255, 170/255,.85)
+            current_device.color=(47/250, 247/250, 54/250,.85)
+        elif value=="Micro":
+            current_device.color=(255/255, 140/255, 25/255,.85)
+        elif value=="Heat":
+            current_device.color=(75/255, 0/255, 130/255,.85)
+        elif value=="Light Switch":
+            current_device.color=(0/255, 0/255, 0/255,.85)
+        elif value=="Fans Switch":
+            current_device.color=(0/255, 0/255, 0/255,.85)
     def edit_device_pin_func(self,current_device,button,value):
         current_device.pin=int(value)
 

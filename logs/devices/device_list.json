@@ -1,0 +1,11 @@
+{
+"exfan": "exhaust.Exhaust",
+"mau": "mau.Mau",
+"light": "light.Light",
+"dry": "drycontact.DryContact",
+"gv": "gas_valve.GasValve",
+"heat": "heat_sensor.HeatSensor",
+"micro": "micro_switch.MicroSwitch",
+"light switch": "switch_light.SwitchLight",
+"fs": "switch_fans.SwitchFans"
+}

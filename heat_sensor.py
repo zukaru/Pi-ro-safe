@@ -1,13 +1,13 @@
 import os,time,json
 import os.path
 
-class Light():
-    color=(170/255, 170/255, 0/255,.85)
-    def __init__(self,name="default",pin=0,color=(170/255, 170/255, 0/255,.85)) -> None:
+class HeatSensor():
+    color=(75/255, 0/255, 130/255,.85)
+    def __init__(self,name="default",pin=0,color=(75/255, 0/255, 130/255,.85)) -> None:
         self.name=name
-        self.type='Lights'
+        self.type='heat'
         self.pin=pin
-        self.mode="out"
+        self.mode="in"
         self.color=color
         self.log={}
         self.unsafe_state_trigger=0
