@@ -7,5 +7,6 @@
 "heat": "heat_sensor.HeatSensor",
 "micro": "micro_switch.MicroSwitch",
 "light switch": "switch_light.SwitchLight",
-"fs": "switch_fans.SwitchFans"
+"fs": "switch_fans.SwitchFans",
+"test": "exhaust.Exhaust"
 }

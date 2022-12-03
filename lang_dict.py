@@ -94,6 +94,10 @@ DISABLE for 3 seconds.
     'gasvalve_trouble_title':'                  -Gas Valve-',
     'gasvalve_trouble_body' :'Unlatched gas valve detected in system',
     'gasvalve_trouble_link' : '        Reset all gas valves',
+    'admin_overlay' : 'Admin Mode',
+    'admin_text' : '[size=30][color=#000000] Enable Admin mode? [/color][/size]',
+    'admin_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'admin_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
 }
 
 spanish={
@@ -182,4 +186,8 @@ para 3 segundos.
     'gasvalve_trouble_title':'                  -Gas Valve-',
     'gasvalve_trouble_body' :'Unlatched gas valve detected in system',
     'gasvalve_trouble_link' : '        Reset all gas valves',
+    'admin_overlay' : 'Admin Mode',
+    'admin_text' : '[size=30][color=#000000] Enable Admin mode? [/color][/size]',
+    'admin_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'admin_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
 }

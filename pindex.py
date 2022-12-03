@@ -16,3 +16,6 @@ class Pindex:
 
     def p1438(pin_screen):
         pin_screen.widgets['heat_override_overlay'].open()
+
+    def p3141(pin_screen):
+        pin_screen.widgets['admin_overlay'].open()

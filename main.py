@@ -890,7 +890,6 @@ class DevicesScreen(Screen):
         self.widgets['info_gv_reset']=info_gv_reset
         info_gv_reset.bind(on_press=partial(self.info_gv_reset_func,device))
 
-        # self.widgets['overlay_layout'].add_widget(info_text)
         self.widgets['overlay_layout'].add_widget(info_add_icon)
         self.widgets['overlay_layout'].add_widget(delete_icon)
         self.widgets['overlay_layout'].add_widget(info_type)
@@ -940,12 +939,6 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                         color=(0,0,0,1),
                         pos_hint = {'x':.25, 'y':.7},
                         markup=True)
-
-        # delete_progress=ProgressBar(
-        #     max=1000,
-        #     size_hint =(.30, .10),
-        #     pos_hint = {'x':.35, 'y':.42},)
-        # self.widgets['delete_progress']=delete_progress
 
         delete_progress=CircularProgressBar()
         delete_progress._widget_size=200
@@ -2076,7 +2069,7 @@ class PinScreen(Screen):
         def date_cancel_func(button):
             self.widgets['date_overlay'].dismiss()
         date_cancel.bind(on_release=date_cancel_func)
-        
+
         heat_override_overlay=PinPop('heat_override')
         self.popups.append(heat_override_overlay)
         self.widgets['heat_override_overlay']=heat_override_overlay
@@ -2087,8 +2080,7 @@ class PinScreen(Screen):
             text=current_language['heat_override_text'],
             markup=True,
             size_hint =(1,.6),
-            pos_hint = {'x':0, 'y':.35},
-        )
+            pos_hint = {'x':0, 'y':.35},)
         self.widgets['heat_override_text']=heat_override_text
         heat_override_text.ref='heat_override_text'
 
@@ -2126,6 +2118,49 @@ class PinScreen(Screen):
             self.widgets['heat_override_overlay'].dismiss()
         heat_override_cancel.bind(on_release=heat_override_cancel_func)
 
+        admin_overlay=PinPop('admin')
+        self.popups.append(admin_overlay)
+        self.widgets['admin_overlay']=admin_overlay
+        admin_overlay.ref='admin_overlay'
+        admin_overlay.widgets['overlay_layout']=admin_overlay.overlay_layout
+
+        admin_text=Label(
+            text=current_language['admin_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},)
+        self.widgets['admin_text']=admin_text
+        admin_text.ref='admin_text'
+
+        admin_confirm=RoundedButton(text=current_language['admin_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['admin_confirm']=admin_confirm
+        admin_confirm.ref='admin_confirm'
+
+        admin_cancel=RoundedButton(text=current_language['admin_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(255/255, 121/255, 0/255,.9),
+                        markup=True)
+        self.widgets['admin_cancel']=admin_cancel
+        admin_cancel.ref='admin_cancel'
+
+        def admin_confirm_func(button):
+            
+            self.widgets['admin_overlay'].dismiss()
+        admin_confirm.bind(on_release=admin_confirm_func)
+
+        def admin_cancel_func(button):
+            self.widgets['admin_overlay'].dismiss()
+        admin_cancel.bind(on_release=admin_cancel_func)
+
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
@@ -2135,6 +2170,9 @@ class PinScreen(Screen):
         self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_text)
         self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_confirm)
         self.widgets['heat_override_overlay'].widgets['overlay_layout'].add_widget(heat_override_cancel)
+        self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_text)
+        self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_confirm)
+        self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_cancel)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
