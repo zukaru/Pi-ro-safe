@@ -212,11 +212,17 @@ class LayoutButton(FloatLayout,RoundedButton):
 
 class trouble_template(Button):
     def __init__(self,trouble_tag,trouble_text='',link_text=None,ref_tag=None, **kwargs):
+        self.trouble_tag=trouble_tag
+        self.trouble_text=trouble_text
+        self.link_text=link_text
+        self.ref_tag=ref_tag
         if link_text == None:
             link_text=''
         else:
-            link_text='\n'+str(link_text)
-        super().__init__(text=f'''[size=24][b]{trouble_tag}[/b][/size]
+            link_text='\n'+str(current_language[link_text])
+        if trouble_text!='':
+            trouble_text=current_language[trouble_text]
+        super().__init__(text=f'''[size=24][b]{current_language[trouble_tag]}[/b][/size]
         [size=18][i]{trouble_text}[/i][/size][size=30][color=#de2500][i][ref={ref_tag}]{link_text}[/ref][/i][/color][/size]''',
         markup=True,
         size_hint_y=None,
@@ -226,6 +232,7 @@ class trouble_template(Button):
         background_normal='',
         background_color=(245/250, 216/250, 41/250,.85),
         **kwargs)
+        
         self.bind(pos=self.update_rect)
         self.bind(size=self.update_rect)
         self.bind(state=self.color_swap)
@@ -240,6 +247,17 @@ class trouble_template(Button):
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
+    def translate(self,current_language):
+        if self.link_text == None:
+            link_text=''
+        else:
+            link_text='\n'+str(current_language[self.link_text])
+        if self.trouble_text!='':
+            trouble_text=current_language[self.trouble_text]
+        else:
+            trouble_text=''
+        self.text=f'''[size=24][b]{current_language[self.trouble_tag]}[/b][/size]
+        [size=18][i]{trouble_text}[/i][/size][size=30][color=#de2500][i][ref={self.ref_tag}]{link_text}[/ref][/i][/color][/size]'''
 
 class ScrollItemTemplate(Button):
     def __init__(self,Item_tag,Item_text='',link_text=None,ref_tag=None,color=(245/250, 216/250, 41/250,.85),**kwargs):
@@ -363,20 +381,9 @@ class ControlGrid(Screen):
         self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
-
-        quick=RoundedToggleButton(text=current_language['quick'],
-                    size_hint =(.96, .45),
-                    pos_hint = {'x':.02, 'y':.53},
-                    background_down='',
-                    background_color=(47/250, 247/250, 54/250,.85),
-                    markup=True)
-        self.widgets['quick']=quick
-        quick.ref='quick'
-        quick.bind(on_press=self.quick_start)
-
         fans=RoundedToggleButton(text=current_language['fans'],
-                    size_hint =(.45, .35),
-                    pos_hint = {'x':.03, 'y':.15},
+                    size_hint =(.45, .42),
+                    pos_hint = {'x':.03, 'y':.53},
                     background_down='',
                     background_color=(0/250, 159/250, 232/250,.85),
                     markup=True)
@@ -385,8 +392,8 @@ class ControlGrid(Screen):
         fans.bind(on_press=self.fans_switch)
 
         lights=RoundedToggleButton(text=current_language['lights'],
-                    size_hint =(.45, .35),
-                    pos_hint = {'x':.52, 'y':.15},
+                    size_hint =(.45, .42),
+                    pos_hint = {'x':.52, 'y':.53},
                     background_down='',
                     background_color=(245/250, 216/250, 41/250,.85),
                     markup=True)
@@ -394,11 +401,22 @@ class ControlGrid(Screen):
         lights.ref='lights'
         lights.bind(on_press=self.lights_switch)
 
-        settings_button=IconButton(source=settings_icon, allow_stretch=True, keep_ratio=True)
-        settings_button.size_hint =(.10, .10)
-        settings_button.pos_hint = {'x':.01, 'y':.02}
+        settings_button=RoundedButton(
+                    size_hint =(.94, .1),
+                    pos_hint = {'x':.03, 'y':.15},
+                    background_down='',
+                    background_color=(250/250, 250/250, 250/250,.9),
+                    markup=True)
         self.widgets['settings_button']=settings_button
         settings_button.bind(on_press=self.open_settings)
+
+
+        menu_icon=Image(source=r'media/menu_lines.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.2, .05),
+                    pos_hint = {'x':.4, 'y':.17},)
+        menu_icon.center=settings_button.center
 
         trouble_button=IconButton(source=trouble_icon_dull, allow_stretch=True, keep_ratio=True)
         trouble_button.size_hint =(.10, .10)
@@ -407,22 +425,43 @@ class ControlGrid(Screen):
         trouble_button.bind(on_press=self.open_trouble)
         trouble_button.color=(1,1,1,.15)
 
+        language_button=IconButton(source=r'media/New Piskel-1.png.png', allow_stretch=True, keep_ratio=True)
+        language_button.size_hint =(.10, .10)
+        language_button.pos_hint = {'x':.75, 'y':.02}
+        self.widgets['language_button']=language_button
+        language_button.bind(on_press=self.language_func)
+        language_button.color=(1,1,1,.65)
+
         fs_logo=Image(source=logo,
                 size_hint_x=.25,
                 size_hint_y=.25,
-                pos_hint = {'x':.2, 'center_y':.07})
+                pos_hint = {'x':.05, 'center_y':.07})
 
         version_info=Label(text=current_language['version_info'],
                 markup=True,
-                pos_hint = {'x':.15, 'center_y':.07})
+                pos_hint = {'x':-.08, 'center_y':.07})
         version_info.ref='version_info'
 
+        overlay_menu=Popup(
+            size_hint=(.8, .8),
+            background = 'atlas://data/images/defaulttheme/button',
+            title_color=[0, 0, 0, 1],
+            title_size='38',
+            title_align='center',
+            separator_color=[255/255, 0/255, 0/255, .5])
+        self.widgets['overlay_menu']=overlay_menu
+
+        overlay_layout=FloatLayout()
+        self.widgets['overlay_layout']=overlay_layout
+
+        overlay_menu.add_widget(overlay_layout)
         self.add_widget(bg_image)
-        self.add_widget(quick)
         self.add_widget(fans)
         self.add_widget(lights)
         self.add_widget(settings_button)
+        self.add_widget(menu_icon)
         self.add_widget(trouble_button)
+        self.add_widget(language_button)
         self.add_widget(fs_logo)
         self.add_widget(version_info)
 
@@ -432,6 +471,56 @@ class ControlGrid(Screen):
     def open_trouble(self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='trouble'
+    def language_func (self,button):
+        self.language_overlay()
+    def language_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.auto_dismiss=True
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        self.widgets['overlay_layout'].clear_widgets()
+
+        english=RoundedButton(text="[size=30][b][color=#000000]  English [/color][/b][/size]",
+                        size_hint =(.96, .125),
+                        pos_hint = {'x':.02, 'y':.9},
+                        background_normal='',
+                        background_color=(0/250, 70/250, 90/250,.9),
+                        markup=True)
+        self.widgets['english']=english
+
+        spanish=RoundedButton(text="[size=30][b][color=#000000]  Español [/color][/b][/size]",
+                        size_hint =(.96, .125),
+                        pos_hint = {'x':.02, 'y':.7},
+                        background_normal='',
+                        background_color=(0/250, 70/250, 90/250,.9),
+                        markup=True)
+        self.widgets['spanish']=spanish
+
+        def english_func(button):
+            global current_language
+            config=App.get_running_app().config_
+            current_language=lang_dict.english
+            config.set('preferences','language','english')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+            language_setter()
+            self.widgets['overlay_menu'].dismiss()
+        english.bind(on_release=english_func)
+
+        def spanish_func(button):
+            global current_language
+            config=App.get_running_app().config_
+            current_language=lang_dict.spanish
+            config.set('preferences','language','spanish')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+            language_setter()
+            self.widgets['overlay_menu'].dismiss()
+        spanish.bind(on_release=spanish_func)
+
+        self.widgets['overlay_layout'].add_widget(english)
+        self.widgets['overlay_layout'].add_widget(spanish)
+        self.widgets['overlay_menu'].open()
 
 class ActuationScreen(Screen):
 
@@ -2353,13 +2442,11 @@ class TroubleScreen(Screen):
         back.ref='trouble_back'
         back.bind(on_press=self.trouble_back)
 
-        trouble_details=trouble_template(current_language['no_trouble'])
+        trouble_details=trouble_template('no_trouble')
         self.widgets['trouble_details']=trouble_details
         trouble_details.ref='no_trouble'
-        # trouble_details.bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))
-        # trouble_details.bind(width=lambda instance, value: setattr(instance, 'text_size', (value, None)))
 
-        trouble_layout=EventpassGridLayout(
+        trouble_layout=GridLayout(
             size_hint_y=None,
             size_hint_x=1,
             cols=1,
@@ -2463,7 +2550,7 @@ def listen(app_object,*args):
                 main_screen.widgets['trouble_button'].source=trouble_icon_dull
                 main_screen.widgets['trouble_button'].color=(1,1,1,.15)
             if 'trouble_details' not in troubles_screen.widgets:
-                trouble_details=trouble_template(current_language['no_trouble'])
+                trouble_details=trouble_template('no_trouble')
                 troubles_screen.widgets['trouble_details']=trouble_details
                 trouble_display.add_widget(trouble_details)
     #heat trouble
@@ -2471,9 +2558,9 @@ def listen(app_object,*args):
             if app_object.current!='alert':
                 main_screen.widgets['fans'].text =current_language['fans_heat']
                 if 'heat_trouble' not in troubles_screen.widgets:
-                    heat_trouble=trouble_template(current_language['heat_trouble_title'],
-                    current_language['heat_trouble_body'],
-                    link_text=current_language['heat_trouble_link'],ref_tag='fans')
+                    heat_trouble=trouble_template('heat_trouble_title',
+                    'heat_trouble_body',
+                    link_text='heat_trouble_link',ref_tag='fans')
                     heat_trouble.ref='heat_trouble'
 
                     def fan_switch(*args):
@@ -2493,9 +2580,9 @@ def listen(app_object,*args):
         if trouble_log['short_duration']==1:
             if app_object.current!='alert':
                 if 'duration_trouble' not in troubles_screen.widgets:
-                    duration_trouble=trouble_template(current_language['duration_trouble_title'],
-                    current_language['duration_trouble_body'],
-                    link_text=current_language['duration_trouble_link'],ref_tag='duration_trouble')
+                    duration_trouble=trouble_template('duration_trouble_title',
+                    'duration_trouble_body',
+                    link_text='duration_trouble_link',ref_tag='duration_trouble')
                     duration_trouble.ref='duration_trouble'
 
                     def duration_overlay(*args):
@@ -2517,9 +2604,9 @@ def listen(app_object,*args):
         if trouble_log['gv_trip']==1:
             if app_object.current!='alert':
                 if 'gasvalve_trouble' not in troubles_screen.widgets:
-                    gasvalve_trouble=trouble_template(current_language['gasvalve_trouble_title'],
-                    current_language['gasvalve_trouble_body'],
-                    link_text=current_language['gasvalve_trouble_link'],ref_tag='gasvalve_trouble')
+                    gasvalve_trouble=trouble_template('gasvalve_trouble_title',
+                    'gasvalve_trouble_body',
+                    link_text='gasvalve_trouble_link',ref_tag='gasvalve_trouble')
                     gasvalve_trouble.ref='gasvalve_trouble'
 
                     gasvalve_trouble.bind(on_release=logic.gv_reset_all)
@@ -2566,6 +2653,9 @@ def settings_setter(config):
 
 def language_setter(*args,config=None):
     def widget_walker(widget,current_language):
+        if isinstance(widget,trouble_template):
+            widget.translate(current_language)
+            return
         if hasattr(widget,'children'):
             for i in widget.children:
                 widget_walker(i,current_language)
