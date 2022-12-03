@@ -115,7 +115,7 @@ class PinPop(Popup):
         title_color=[0, 0, 0, 1],
         title_size='38',
         title_align='center',
-        separator_color=[255/255, 0/255, 0/255, .5],
+        separator_color=[255/255, 121/255, 0/255,.5],
         **kwargs)
         self.widgets={}
         self.overlay_layout=FloatLayout()
@@ -1991,15 +1991,13 @@ class PinScreen(Screen):
             text=current_language['reset_text'],
             markup=True,
             size_hint =(1,.6),
-            pos_hint = {'x':0, 'y':.35},
-        )
+            pos_hint = {'x':0, 'y':.35},)
         self.widgets['reset_text']=reset_text
         reset_text.ref='reset_text'
 
         reset_confirm=RoundedButton(text=current_language['reset_confirm'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2009,7 +2007,6 @@ class PinScreen(Screen):
         reset_cancel=RoundedButton(text=current_language['reset_cancel'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2017,7 +2014,7 @@ class PinScreen(Screen):
         reset_cancel.ref='reset_cancel'
 
         def reset_confirm_func(button):
-            print(self.widgets['reset_overlay'].widgets['overlay_layout'].children )
+            print(self.widgets['reset_overlay'].widgets['overlay_layout'].children)
             if os.name=='posix':
                 os.system("sudo reboot")
         reset_confirm.bind(on_release=reset_confirm_func)
@@ -2036,15 +2033,13 @@ class PinScreen(Screen):
             text=current_language['date_text'],
             markup=True,
             size_hint =(1,.6),
-            pos_hint = {'x':0, 'y':.35},
-        )
+            pos_hint = {'x':0, 'y':.35},)
         self.widgets['date_text']=date_text
         date_text.ref='date_text'
 
         date_confirm=RoundedButton(text=current_language['date_confirm'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2054,7 +2049,6 @@ class PinScreen(Screen):
         date_cancel=RoundedButton(text=current_language['date_cancel'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2087,7 +2081,6 @@ class PinScreen(Screen):
         heat_override_confirm=RoundedButton(text=current_language['heat_override_confirm'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2097,7 +2090,6 @@ class PinScreen(Screen):
         heat_override_cancel=RoundedButton(text=current_language['heat_override_cancel'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2135,7 +2127,6 @@ class PinScreen(Screen):
         admin_confirm=RoundedButton(text=current_language['admin_confirm'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2145,7 +2136,6 @@ class PinScreen(Screen):
         admin_cancel=RoundedButton(text=current_language['admin_cancel'],
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
-                        background_normal='',
                         background_down='',
                         background_color=(255/255, 121/255, 0/255,.9),
                         markup=True)
@@ -2153,7 +2143,7 @@ class PinScreen(Screen):
         admin_cancel.ref='admin_cancel'
 
         def admin_confirm_func(button):
-            
+            App.get_running_app().admin_mode_start=time.time()
             self.widgets['admin_overlay'].dismiss()
         admin_confirm.bind(on_release=admin_confirm_func)
 
@@ -2562,6 +2552,7 @@ def listen(app_object,*args):
 
 class Hood_Control(App):
     def build(self):
+        self.admin_mode_start=time.time()
         self.config_ = configparser.ConfigParser()
         self.config_.read(preferences_path)
         settings_setter(self.config_)
