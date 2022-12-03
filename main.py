@@ -382,8 +382,8 @@ class ControlGrid(Screen):
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
         fans=RoundedToggleButton(text=current_language['fans'],
-                    size_hint =(.45, .42),
-                    pos_hint = {'x':.03, 'y':.53},
+                    size_hint =(.45, .4),
+                    pos_hint = {'x':.03, 'y':.4},
                     background_down='',
                     background_color=(0/250, 159/250, 232/250,.85),
                     markup=True)
@@ -392,8 +392,8 @@ class ControlGrid(Screen):
         fans.bind(on_press=self.fans_switch)
 
         lights=RoundedToggleButton(text=current_language['lights'],
-                    size_hint =(.45, .42),
-                    pos_hint = {'x':.52, 'y':.53},
+                    size_hint =(.45, .4),
+                    pos_hint = {'x':.52, 'y':.4},
                     background_down='',
                     background_color=(245/250, 216/250, 41/250,.85),
                     markup=True)
