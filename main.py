@@ -872,6 +872,12 @@ class DevicesScreen(Screen):
                 pos_hint = {'x':.05, 'y':.7},
                 markup=True)
 
+        info_admin_hint=ExactLabel(text=f"[size=18]Enable Admin mode to edit device[/size]",
+                color=(0,0,0,1),
+                pos_hint = {'x':.33, 'y':.18},
+                markup=True)
+        self.widgets['info_admin_hint']=info_admin_hint
+
         info_back_button=RoundedButton(text=current_language['about_back'],
                         size_hint =(.9, .15),
                         pos_hint = {'x':.05, 'y':.025},
@@ -900,6 +906,7 @@ class DevicesScreen(Screen):
             self.widgets['overlay_layout'].add_widget(info_gv_reset)
         if open:
             self.widgets['overlay_menu'].open()
+        self.check_admin_mode()
 
     def info_gv_reset_func(self,device,*args):
         device.latched=True
@@ -1360,8 +1367,24 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
     def new_device_func(self,button):
         self.new_device_overlay()
 
+    def check_admin_mode(self):
+        if App.get_running_app().admin_mode_start>time.time():
+            self.widgets['info_add_icon'].disabled=False
+            self.widgets['delete_icon'].disabled=False
+            self.widgets['info_add_icon'].color=(1,1,1,.5)
+            self.widgets['delete_icon'].color=(1,1,1,.8)
+            self.widgets['overlay_layout'].remove_widget(self.widgets['info_admin_hint'])
+
+        else:
+            self.widgets['overlay_layout'].add_widget(self.widgets['info_admin_hint'])
+            self.widgets['info_add_icon'].disabled=True
+            self.widgets['delete_icon'].disabled=True
+            self.widgets['info_add_icon'].color=(1,1,1,.15)
+            self.widgets['delete_icon'].color=(1,1,1,.15)
+
     def on_pre_enter(self):
         self.aggregate_devices()
+
 
 class TrainScreen(Screen):
     def __init__(self, **kw):
@@ -2143,7 +2166,7 @@ class PinScreen(Screen):
         admin_cancel.ref='admin_cancel'
 
         def admin_confirm_func(button):
-            App.get_running_app().admin_mode_start=time.time()
+            App.get_running_app().admin_mode_start=time.time()+900#admin mode lasts 15 minutes
             self.widgets['admin_overlay'].dismiss()
         admin_confirm.bind(on_release=admin_confirm_func)
 
