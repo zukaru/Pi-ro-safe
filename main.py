@@ -41,7 +41,7 @@ from kivy.clock import Clock
 from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
-from kivy.graphics import Rectangle, Color
+from kivy.graphics import Rectangle, Color, Line
 from kivy.properties import ListProperty
 import configparser
 import preferences
@@ -410,12 +410,17 @@ class ControlGrid(Screen):
         self.widgets['settings_button']=settings_button
         settings_button.bind(on_press=self.open_settings)
 
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
 
         menu_icon=Image(source=r'media/menu_lines.png',
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.2, .055),
-                    pos_hint = {'x':.065, 'y':.195},)
+                    pos_hint = {'x':.065, 'y':.195})
         menu_icon.center=settings_button.center
 
         trouble_button=IconButton(source=trouble_icon_dull, allow_stretch=True, keep_ratio=True)
@@ -443,7 +448,7 @@ class ControlGrid(Screen):
                 background_color=(200/255, 50/255, 50/255,.65),
                 disabled=True,
                 size_hint =(.18, .1),
-                pos_hint = {'x':.35, 'y':.02},)
+                pos_hint = {'x':.35, 'y':.015},)
         version_info.ref='version_info'
 
         overlay_menu=Popup(
@@ -463,6 +468,7 @@ class ControlGrid(Screen):
         self.add_widget(fans)
         self.add_widget(lights)
         self.add_widget(settings_button)
+        self.add_widget(seperator_line)
         self.add_widget(menu_icon)
         self.add_widget(trouble_button)
         self.add_widget(language_button)
@@ -2354,7 +2360,7 @@ class DocumentScreen(Screen):
 
         report_pages=Carousel(loop=True,
         scroll_distance=5000,
-        scroll_timeout=0,
+        scroll_timeout=1,
         size_hint =(1, .75),
         pos_hint = {'center_x':.5, 'center_y':.60}
         )
