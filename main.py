@@ -402,8 +402,8 @@ class ControlGrid(Screen):
         lights.bind(on_press=self.lights_switch)
 
         settings_button=RoundedButton(
-                    size_hint =(.94, .1),
-                    pos_hint = {'x':.03, 'y':.15},
+                    size_hint =(.25, .15),
+                    pos_hint = {'x':.04, 'y':.15},#.35
                     background_down='',
                     background_color=(250/250, 250/250, 250/250,.9),
                     markup=True)
@@ -414,8 +414,8 @@ class ControlGrid(Screen):
         menu_icon=Image(source=r'media/menu_lines.png',
                     allow_stretch=True,
                     keep_ratio=False,
-                    size_hint =(.2, .05),
-                    pos_hint = {'x':.4, 'y':.17},)
+                    size_hint =(.2, .055),
+                    pos_hint = {'x':.065, 'y':.195},)
         menu_icon.center=settings_button.center
 
         trouble_button=IconButton(source=trouble_icon_dull, allow_stretch=True, keep_ratio=True)
@@ -437,9 +437,13 @@ class ControlGrid(Screen):
                 size_hint_y=.25,
                 pos_hint = {'x':.05, 'center_y':.07})
 
-        version_info=Label(text=current_language['version_info'],
+        version_info=RoundedButton(text=current_language['version_info'],
                 markup=True,
-                pos_hint = {'x':-.08, 'center_y':.07})
+                background_normal='',
+                background_color=(200/255, 50/255, 50/255,.65),
+                disabled=True,
+                size_hint =(.18, .1),
+                pos_hint = {'x':.35, 'y':.02},)
         version_info.ref='version_info'
 
         overlay_menu=Popup(
@@ -598,8 +602,8 @@ class SettingsScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['settings_back'],
-                        size_hint =(.4, .25),
-                        pos_hint = {'x':.02, 'y':.02},
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.06, 'y':.02},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1385,7 +1389,6 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
     def on_pre_enter(self):
         self.aggregate_devices()
 
-
 class TrainScreen(Screen):
     def __init__(self, **kw):
         super(TrainScreen,self).__init__(**kw)
@@ -1446,7 +1449,7 @@ class TrainScreen(Screen):
 
     def train_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
-        self.manager.current='settings'
+        self.manager.current='preferences'
     def train_back_main (self,button):
             self.parent.transition = SlideTransition(direction='left')
             self.manager.current='main'
@@ -1461,8 +1464,8 @@ class PreferenceScreen(Screen):
         self.duration_flag=0
 
         back=RoundedButton(text=current_language['preferences_back'],
-                        size_hint =(.4, .25),
-                        pos_hint = {'x':.02, 'y':.02},
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.06, 'y':.02},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1471,8 +1474,8 @@ class PreferenceScreen(Screen):
         back.bind(on_press=self.settings_back)
 
         back_main=RoundedButton(text=current_language['preferences_back_main'],
-                        size_hint =(.48, .25),
-                        pos_hint = {'x':.49, 'y':.02},
+                        size_hint =(.4, .15),
+                        pos_hint = {'x':.52, 'y':.02},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
@@ -1793,10 +1796,14 @@ class PreferenceScreen(Screen):
             text=current_language['about_overlay_text'],
             markup=True,
             size_hint =(1,.6),
-            pos_hint = {'x':0, 'y':.4},
-        )
+            pos_hint = {'x':0, 'y':.4},)
         self.widgets['about_text']=about_text
         about_text.ref='about_overlay_text'
+
+        version_info=ExactLabel(text=current_language['version_info'],
+                markup=True,
+                pos_hint = {'x':.2, 'center_y':.6})
+        version_info.ref='version_info'
 
         about_qr=Image(source=qr_link,
             allow_stretch=False,
@@ -1819,6 +1826,7 @@ class PreferenceScreen(Screen):
         about_back_button.bind(on_press=about_overlay_close)
 
         self.widgets['overlay_layout'].add_widget(about_text)
+        self.widgets['overlay_layout'].add_widget(version_info)
         self.widgets['overlay_layout'].add_widget(about_qr)
         self.widgets['overlay_layout'].add_widget(about_back_button)
         self.widgets['overlay_menu'].open()
