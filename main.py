@@ -608,7 +608,7 @@ class SettingsScreen(Screen):
         back.bind(on_press=self.settings_back)
 
         logs=RoundedButton(text=current_language['logs'],
-                        size_hint =(.4, .20),
+                        size_hint =(.9, .18),
                         pos_hint = {'x':.05, 'y':.78},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -618,7 +618,7 @@ class SettingsScreen(Screen):
         logs.bind(on_release=self.device_logs)
 
         sys_report=RoundedButton(text=current_language['sys_report'],
-                        size_hint =(.4, .20),
+                        size_hint =(.9, .18),
                         pos_hint = {'x':.05, 'y':.56},
                         background_normal='',
                         background_color=(180/255, 10/255, 10/255,.9),
@@ -628,7 +628,7 @@ class SettingsScreen(Screen):
         sys_report.bind(on_release=self.sys_report)
 
         preferences=RoundedButton(text=current_language['preferences'],
-                        size_hint =(.4, .20),
+                        size_hint =(.9, .18),
                         pos_hint = {'x':.05, 'y':.34},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -637,49 +637,13 @@ class SettingsScreen(Screen):
         preferences.ref='preferences'
         preferences.bind(on_release=self.preferences_func)
 
-        train=RoundedButton(text=current_language['train'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.54, 'y':.78},
-                        background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
-                        markup=True)
-        self.widgets['train']=train
-        train.ref='train'
-        train.bind(on_release=self.train_func)
-
-        language_icon=Image(
-            source=language_image,
-            pos_hint = {'center_x':.5, 'center_y':.53},
-            size_hint =(1, 1))
-
-        language=LayoutButton(text='',
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.54, 'y':.56},
-                        background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
-                        markup=True)
-        self.widgets['language']=language
-        language.bind(on_release=self.language_func)
-
-
-        about=RoundedButton(text=current_language['about'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.54, 'y':.34},
-                        background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
-                        markup=True)
-        self.widgets['about']=about
-        about.ref='about'
-        about.bind(on_release=self.about_func)
-
         overlay_menu=Popup(
             size_hint=(.8, .8),
             background = 'atlas://data/images/defaulttheme/button',
             title_color=[0, 0, 0, 1],
             title_size='38',
             title_align='center',
-            separator_color=[255/255, 0/255, 0/255, .5]
-        )
+            separator_color=[255/255, 0/255, 0/255, .5])
         self.widgets['overlay_menu']=overlay_menu
 
         overlay_layout=FloatLayout()
@@ -691,101 +655,6 @@ class SettingsScreen(Screen):
         self.add_widget(logs)
         self.add_widget(sys_report)
         self.add_widget(preferences)
-        self.add_widget(train)
-        language.add_widget(language_icon)
-        self.add_widget(language)
-        self.add_widget(about)
-        
-    def language_overlay(self):
-        overlay_menu=self.widgets['overlay_menu']
-        overlay_menu.auto_dismiss=True
-        overlay_menu.title=''
-        overlay_menu.separator_height=0
-        self.widgets['overlay_layout'].clear_widgets()
-
-        english=RoundedButton(text="[size=30][b][color=#000000]  English [/color][/b][/size]",
-                        size_hint =(.96, .125),
-                        pos_hint = {'x':.02, 'y':.9},
-                        background_normal='',
-                        background_color=(0/250, 70/250, 90/250,.9),
-                        markup=True)
-        self.widgets['english']=english
-        
-
-        spanish=RoundedButton(text="[size=30][b][color=#000000]  Español [/color][/b][/size]",
-                        size_hint =(.96, .125),
-                        pos_hint = {'x':.02, 'y':.7},
-                        background_normal='',
-                        background_color=(0/250, 70/250, 90/250,.9),
-                        markup=True)
-        self.widgets['spanish']=spanish
-
-        def english_func(button):
-            global current_language
-            config=App.get_running_app().config_
-            current_language=lang_dict.english
-            config.set('preferences','language','english')
-            with open('hood_control.ini','w') as configfile:
-                config.write(configfile)
-            language_setter()
-            self.widgets['overlay_menu'].dismiss()
-        english.bind(on_release=english_func)
-
-        def spanish_func(button):
-            global current_language
-            config=App.get_running_app().config_
-            current_language=lang_dict.spanish
-            config.set('preferences','language','spanish')
-            with open('hood_control.ini','w') as configfile:
-                config.write(configfile)
-            language_setter()
-            self.widgets['overlay_menu'].dismiss()
-        spanish.bind(on_release=spanish_func)
-
-        self.widgets['overlay_layout'].add_widget(english)
-        self.widgets['overlay_layout'].add_widget(spanish)
-        self.widgets['overlay_menu'].open()
-
-    def about_overlay(self):
-        overlay_menu=self.widgets['overlay_menu']
-        overlay_menu.title=''
-        overlay_menu.separator_height=0
-        overlay_menu.auto_dismiss=True
-        self.widgets['overlay_layout'].clear_widgets()
-
-        about_text=Label(
-            text=current_language['about_overlay_text'],
-            markup=True,
-            size_hint =(1,.6),
-            pos_hint = {'x':0, 'y':.4},
-        )
-        self.widgets['about_text']=about_text
-        about_text.ref='about_overlay_text'
-
-        about_qr=Image(source=qr_link,
-            allow_stretch=False,
-            keep_ratio=True,
-            size_hint =(.45,.45),
-            pos_hint = {'x':.6, 'y':.58})
-
-        about_back_button=RoundedButton(text=current_language['about_back'],
-                        size_hint =(.9, .25),
-                        pos_hint = {'x':.05, 'y':.05},
-                        background_normal='',
-                        background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
-                        markup=True)
-        self.widgets['about_back_button']=about_back_button
-        about_back_button.ref='about_back'
-
-        def about_overlay_close(button):
-            self.widgets['overlay_menu'].dismiss()
-        about_back_button.bind(on_press=about_overlay_close)
-
-        self.widgets['overlay_layout'].add_widget(about_text)
-        self.widgets['overlay_layout'].add_widget(about_qr)
-        self.widgets['overlay_layout'].add_widget(about_back_button)
-        self.widgets['overlay_menu'].open()
 
     def settings_back (self,button):
         self.parent.transition = SlideTransition(direction='left')
@@ -798,18 +667,7 @@ class SettingsScreen(Screen):
         self.manager.current='report'
     def preferences_func (self,button):
         self.parent.transition = SlideTransition(direction='up')
-        #App.get_running_app().open_settings()
         self.manager.current='preferences'
-    def train_func (self,button):
-        self.parent.transition = SlideTransition(direction='down')
-        self.manager.current='train'
-    def language_func (self,button):
-        self.parent.transition = SlideTransition(direction='down')
-        self.language_overlay()
-    def about_func (self,button):
-        self.parent.transition = SlideTransition(direction='right')
-        #self.manager.current='sys_report'
-        self.about_overlay()
 
 class ReportScreen(Screen):
     def __init__(self, **kwargs):
@@ -1617,23 +1475,25 @@ class PreferenceScreen(Screen):
         heat_sensor.bind(on_release=self.heat_sensor_func)
         heat_sensor.bind(on_release=self.blur_screen)
 
-        temp_1=RoundedButton(text="[size=40][b][color=#000000]  temp_1 [/color][/b][/size]",
+        train=RoundedButton(text=current_language['train'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.56},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp_1']=temp_1
-        #temp_1.bind(on_release=self.sys_report_func)
+        self.widgets['train']=train
+        train.ref='train'
+        train.bind(on_release=self.train_func)
 
-        temp_2=RoundedButton(text="[size=40][b][color=#000000]  temp_2 [/color][/b][/size]",
+        about=RoundedButton(text=current_language['about'],
                         size_hint =(.4, .20),
                         pos_hint = {'x':.05, 'y':.34},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
-        self.widgets['temp_2']=temp_2
-        #preferences.bind(on_release=self.preferences_func)
+        self.widgets['about']=about
+        about.ref='about'
+        about.bind(on_release=self.about_func)
 
         clean_mode=RoundedButton(text=current_language['clean_mode'],
                         size_hint =(.4, .20),
@@ -1674,8 +1534,7 @@ class PreferenceScreen(Screen):
             title_color=[0, 0, 0, 1],
             title_size='38',
             title_align='center',
-            separator_color=[255/255, 0/255, 0/255, .5]
-        )
+            separator_color=[255/255, 0/255, 0/255, .5])
         self.widgets['overlay_menu']=overlay_menu
         overlay_menu.ref='heat_overlay'
 
@@ -1688,8 +1547,8 @@ class PreferenceScreen(Screen):
         self.blur.add_widget(back)
         self.blur.add_widget(back_main)
         self.blur.add_widget(heat_sensor)
-        self.blur.add_widget(temp_1)
-        self.blur.add_widget(temp_2)
+        self.blur.add_widget(train)
+        self.blur.add_widget(about)
         self.blur.add_widget(clean_mode)
         self.blur.add_widget(commission)
         self.blur.add_widget(pins)
@@ -1907,6 +1766,47 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_layout'].add_widget(light_button)
         self.widgets['overlay_layout'].add_widget(disable_progress)
 
+    def about_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        about_text=Label(
+            text=current_language['about_overlay_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},
+        )
+        self.widgets['about_text']=about_text
+        about_text.ref='about_overlay_text'
+
+        about_qr=Image(source=qr_link,
+            allow_stretch=False,
+            keep_ratio=True,
+            size_hint =(.45,.45),
+            pos_hint = {'x':.6, 'y':.58})
+
+        about_back_button=RoundedButton(text=current_language['about_back'],
+                        size_hint =(.9, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['about_back_button']=about_back_button
+        about_back_button.ref='about_back'
+
+        def about_overlay_close(button):
+            self.widgets['overlay_menu'].dismiss()
+        about_back_button.bind(on_press=about_overlay_close)
+
+        self.widgets['overlay_layout'].add_widget(about_text)
+        self.widgets['overlay_layout'].add_widget(about_qr)
+        self.widgets['overlay_layout'].add_widget(about_back_button)
+        self.widgets['overlay_menu'].open()
+
     def settings_back(self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='settings'
@@ -1916,10 +1816,12 @@ class PreferenceScreen(Screen):
     def heat_sensor_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.heat_overlay()
-    def sys_report_func (self,button):
-        self.parent.transition = SlideTransition(direction='left')
-    def preferences_func(self,button):
-        self.parent.transition = SlideTransition(direction='left')
+    def train_func (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        self.manager.current='train'
+    def about_func (self,button):
+        self.parent.transition = SlideTransition(direction='right')
+        self.about_overlay()
     def clean_mode_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.maint_overlay()
