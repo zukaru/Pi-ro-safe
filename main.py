@@ -128,7 +128,7 @@ class ScatterImage(Image,Scatter):
 
     def on_transform_with_touch(self,touch):
         if self.scale<1:
-            pass
+            return
         return super(ScatterImage, self).on_transform_with_touch(touch)
 
     def on_touch_up(self, touch):
@@ -382,7 +382,7 @@ class ControlGrid(Screen):
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
         fans=RoundedToggleButton(text=current_language['fans'],
-                    size_hint =(.45, .4),
+                    size_hint =(.45, .5),
                     pos_hint = {'x':.03, 'y':.4},
                     background_down='',
                     background_color=(0/250, 159/250, 232/250,.85),
@@ -392,7 +392,7 @@ class ControlGrid(Screen):
         fans.bind(on_press=self.fans_switch)
 
         lights=RoundedToggleButton(text=current_language['lights'],
-                    size_hint =(.45, .4),
+                    size_hint =(.45, .5),
                     pos_hint = {'x':.52, 'y':.4},
                     background_down='',
                     background_color=(245/250, 216/250, 41/250,.85),
@@ -453,11 +453,13 @@ class ControlGrid(Screen):
 
         overlay_menu=Popup(
             size_hint=(.8, .8),
-            background = 'atlas://data/images/defaulttheme/button',
+            background_color=(0,0,0,0),
+            #background = 'atlas://data/images/defaulttheme/button',
             title_color=[0, 0, 0, 1],
             title_size='38',
             title_align='center',
             separator_color=[255/255, 0/255, 0/255, .5])
+        overlay_menu.bind(on_touch_down=overlay_menu.dismiss)
         self.widgets['overlay_menu']=overlay_menu
 
         overlay_layout=FloatLayout()
@@ -492,17 +494,17 @@ class ControlGrid(Screen):
 
         english=RoundedButton(text="[size=30][b][color=#000000]  English [/color][/b][/size]",
                         size_hint =(.96, .125),
-                        pos_hint = {'x':.02, 'y':.9},
+                        pos_hint = {'x':.02, 'y':.7},
                         background_normal='',
-                        background_color=(0/250, 70/250, 90/250,.9),
+                        background_color=(200/255, 50/255, 50/255,.85),
                         markup=True)
         self.widgets['english']=english
 
         spanish=RoundedButton(text="[size=30][b][color=#000000]  Español [/color][/b][/size]",
                         size_hint =(.96, .125),
-                        pos_hint = {'x':.02, 'y':.7},
+                        pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
-                        background_color=(0/250, 70/250, 90/250,.9),
+                        background_color=(200/255, 50/255, 50/255,.85),
                         markup=True)
         self.widgets['spanish']=spanish
 
@@ -608,8 +610,8 @@ class SettingsScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['settings_back'],
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.06, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.06, 'y':.015},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -659,12 +661,19 @@ class SettingsScreen(Screen):
         overlay_layout=FloatLayout()
         self.widgets['overlay_layout']=overlay_layout
 
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
+
         overlay_menu.add_widget(overlay_layout)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(logs)
         self.add_widget(sys_report)
         self.add_widget(preferences)
+        self.add_widget(seperator_line)
 
     def settings_back (self,button):
         self.parent.transition = SlideTransition(direction='left')
@@ -687,8 +696,8 @@ class ReportScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['report_back'],
-                    size_hint =(.4, .15),
-                    pos_hint = {'x':.06, 'y':.02},
+                    size_hint =(.4, .1),
+                    pos_hint = {'x':.06, 'y':.015},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
@@ -697,8 +706,8 @@ class ReportScreen(Screen):
         back.bind(on_press=self.Report_back)
 
         back_main=RoundedButton(text=current_language['report_back_main'],
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.52, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.52, 'y':.015},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
@@ -744,6 +753,12 @@ class ReportScreen(Screen):
             )
         self.widgets['report_scatter']=report_scatter
 
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
+
         self.add_widget(bg_image)
         scroll_layout.add_widget(report_image)
         scroll_layout.add_widget(date_label)
@@ -751,6 +766,7 @@ class ReportScreen(Screen):
         self.add_widget(report_scroll)
         self.add_widget(back)
         self.add_widget(back_main)
+        self.add_widget(seperator_line)
 
     def on_pre_enter(self):
         self.date_setter()
@@ -776,8 +792,8 @@ class DevicesScreen(Screen):
         self.ud={}
 
         back=RoundedButton(text=current_language['report_back'],
-                    size_hint =(.4, .15),
-                    pos_hint = {'x':.06, 'y':.02},
+                    size_hint =(.4, .1),
+                    pos_hint = {'x':.06, 'y':.015},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
@@ -786,8 +802,8 @@ class DevicesScreen(Screen):
         back.bind(on_press=self.devices_back)
 
         back_main=RoundedButton(text=current_language['report_back_main'],
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.52, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.52, 'y':.015},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
@@ -833,12 +849,19 @@ class DevicesScreen(Screen):
 
         overlay_menu.add_widget(overlay_layout)
 
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
+
         device_layout.add_widget(device_details)
         device_scroll.add_widget(device_layout)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
         self.add_widget(device_scroll)
+        self.add_widget(seperator_line)
 
     def resize(self,popup,*args):
         pass
@@ -1402,8 +1425,8 @@ class TrainScreen(Screen):
         self.widgets={}
 
         back=RoundedButton(text=current_language['report_back'],
-                    size_hint =(.4, .15),
-                    pos_hint = {'x':.06, 'y':.02},
+                    size_hint =(.4, .1),
+                    pos_hint = {'x':.06, 'y':.015},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
@@ -1412,8 +1435,8 @@ class TrainScreen(Screen):
         back.bind(on_press=self.train_back)
 
         back_main=RoundedButton(text=current_language['report_back_main'],
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.52, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.52, 'y':.015},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
@@ -1446,18 +1469,25 @@ class TrainScreen(Screen):
             )
         self.widgets['train_scroll']=train_scroll
 
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
+
         train_layout.add_widget(train_details)
         train_scroll.add_widget(train_layout)
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
         self.add_widget(train_scroll)
+        self.add_widget(seperator_line)
 
     def train_back (self,button):
-        self.parent.transition = SlideTransition(direction='up')
+        self.parent.transition = SlideTransition(direction='right')
         self.manager.current='preferences'
     def train_back_main (self,button):
-            self.parent.transition = SlideTransition(direction='left')
+            self.parent.transition = SlideTransition(direction='down')
             self.manager.current='main'
 
 class PreferenceScreen(Screen):
@@ -1470,8 +1500,8 @@ class PreferenceScreen(Screen):
         self.duration_flag=0
 
         back=RoundedButton(text=current_language['preferences_back'],
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.06, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.06, 'y':.015},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1480,8 +1510,8 @@ class PreferenceScreen(Screen):
         back.bind(on_press=self.settings_back)
 
         back_main=RoundedButton(text=current_language['preferences_back_main'],
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.52, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.52, 'y':.015},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
@@ -1566,6 +1596,12 @@ class PreferenceScreen(Screen):
         overlay_layout=FloatLayout()
         self.widgets['overlay_layout']=overlay_layout
 
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
+
 
         overlay_menu.add_widget(overlay_layout)
         self.blur.add_widget(bg_image)
@@ -1578,6 +1614,7 @@ class PreferenceScreen(Screen):
         self.blur.add_widget(commission)
         self.blur.add_widget(pins)
         self.add_widget(self.blur)
+        self.add_widget(seperator_line)
 
     def blur_screen(self,button):
         #self.blur.effects = [HorizontalBlurEffect(size=5.0),VerticalBlurEffect(size=5.0)]
@@ -1847,7 +1884,7 @@ class PreferenceScreen(Screen):
         self.parent.transition = SlideTransition(direction='left')
         self.heat_overlay()
     def train_func (self,button):
-        self.parent.transition = SlideTransition(direction='down')
+        self.parent.transition = SlideTransition(direction='left')
         self.manager.current='train'
     def about_func (self,button):
         self.parent.transition = SlideTransition(direction='right')
@@ -1879,8 +1916,8 @@ class PinScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['pin_back'],
-                    size_hint =(.4, .15),
-                    pos_hint = {'x':.06, 'y':.02},
+                    size_hint =(.4, .1),
+                    pos_hint = {'x':.06, 'y':.015},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
@@ -1889,8 +1926,8 @@ class PinScreen(Screen):
         back.bind(on_press=self.Pin_back)
 
         back_main=RoundedButton(text=current_language['pin_back_main'],
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.52, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.52, 'y':.015},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
@@ -2200,6 +2237,13 @@ class PinScreen(Screen):
         self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_text)
         self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_confirm)
         self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_cancel)
+
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
+
         self.add_widget(bg_image)
         self.add_widget(back)
         self.add_widget(back_main)
@@ -2217,6 +2261,7 @@ class PinScreen(Screen):
         num_pad.add_widget(enter)
         self.add_widget(num_pad)
         self.add_widget(display)
+        self.add_widget(seperator_line)
 
     def Pin_back(self,button):
         self.pin=''
@@ -2298,8 +2343,8 @@ class DocumentScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
-                    size_hint =(.4, .15),
-                    pos_hint = {'x':.06, 'y':.02},
+                    size_hint =(.4, .1),
+                    pos_hint = {'x':.06, 'y':.015},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
@@ -2308,8 +2353,8 @@ class DocumentScreen(Screen):
         back.bind(on_press=self.Report_back)
 
         back_main=RoundedButton(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
-                        size_hint =(.4, .15),
-                        pos_hint = {'x':.52, 'y':.02},
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.52, 'y':.015},
                         background_down='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
@@ -2317,69 +2362,93 @@ class DocumentScreen(Screen):
         back_main.ref='report_back_main'
         back_main.bind(on_press=self.Report_back_main)
 
-        left_arrow=IconButton(source=left_arrow_image,
-                        size_hint =(.4, .25),
-                        pos_hint = {'x':-.1, 'center_y':.55})
-        self.widgets['left_arrow']=left_arrow
-        left_arrow.bind(on_press=self.left_arrow_func)
+        doc_pages=PageLayout()
 
-        right_arrow=IconButton(source=right_arrow_image,
-                        size_hint =(.4, .25),
-                        pos_hint = {'x':.7, 'center_y':.55})
-        self.widgets['right_arrow']=right_arrow
-        right_arrow.bind(on_press=self.right_arrow_func)
-
-        report_scroll=ScrollView(
-            bar_width=8,
-            bar_margin=20,
-            do_scroll_y=True,
-            do_scroll_x=False,
-            size_hint_y=1,
-            size_hint_x=1)
-        self.widgets['report_scroll']=report_scroll
-
-        report_image=IconButton(
+        test1=ScatterImage(
             source=report_current,
-            size_hint_y=2,
-            size_hint_x=.95,
-            pos_hint = {'center_x':.5, 'y':1})
+            size_hint_x = .95,
+            pos_hint = {'center_x':.5, 'y':.18},
+            do_rotation=False,
+            scale_min=.5,
+            scale_max=3.)
 
-        report_scroll2=ScrollView(
-            bar_width=8,
-            bar_margin=20,
-            do_scroll_y=True,
-            do_scroll_x=False,
-            size_hint_y=1,
-            size_hint_x=1)
-        self.widgets['report_scroll2']=report_scroll2
+        test2=Image(source=report_current)
 
-        report_image2=IconButton(
-            source=report_original,
-            size_hint_y=2,
-            size_hint_x=.98)
-
-        report_pages=Carousel(loop=True,
-        scroll_distance=5000,
-        scroll_timeout=1,
-        size_hint =(1, .75),
-        pos_hint = {'center_x':.5, 'center_y':.60}
-        )
-        self.widgets['report_pages']=report_pages
-
-        stock_photo=Image(source=stock_photo_test)
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
 
         self.add_widget(bg_image)
-        report_scroll.add_widget(report_image)
-        report_scroll2.add_widget(report_image2)
+        self.add_widget(test1)
+        self.add_widget(seperator_line)
+        # doc_pages.add_widget(test2)
+        # self.add_widget(doc_pages)
 
-        report_pages.add_widget(report_scroll)
-        report_pages.add_widget(report_scroll2)
-        report_pages.add_widget(stock_photo)
-        self.add_widget(report_pages)
+        # left_arrow=IconButton(source=left_arrow_image,
+        #                 size_hint =(.4, .25),
+        #                 pos_hint = {'x':-.1, 'center_y':.55})
+        # self.widgets['left_arrow']=left_arrow
+        # left_arrow.bind(on_press=self.left_arrow_func)
+
+        # right_arrow=IconButton(source=right_arrow_image,
+        #                 size_hint =(.4, .25),
+        #                 pos_hint = {'x':.7, 'center_y':.55})
+        # self.widgets['right_arrow']=right_arrow
+        # right_arrow.bind(on_press=self.right_arrow_func)
+
+        # report_scroll=ScrollView(
+        #     bar_width=8,
+        #     bar_margin=20,
+        #     do_scroll_y=True,
+        #     do_scroll_x=False,
+        #     size_hint_y=1,
+        #     size_hint_x=1)
+        # self.widgets['report_scroll']=report_scroll
+
+        # report_image=IconButton(
+        #     source=report_current,
+        #     size_hint_y=2,
+        #     size_hint_x=.95,
+        #     pos_hint = {'center_x':.5, 'y':1})
+
+        # report_scroll2=ScrollView(
+        #     bar_width=8,
+        #     bar_margin=20,
+        #     do_scroll_y=True,
+        #     do_scroll_x=False,
+        #     size_hint_y=1,
+        #     size_hint_x=1)
+        # self.widgets['report_scroll2']=report_scroll2
+
+        # report_image2=IconButton(
+        #     source=report_original,
+        #     size_hint_y=2,
+        #     size_hint_x=.98)
+
+        # report_pages=Carousel(loop=True,
+        # scroll_distance=5000,
+        # scroll_timeout=1,
+        # size_hint =(1, .75),
+        # pos_hint = {'center_x':.5, 'center_y':.60}
+        # )
+        # self.widgets['report_pages']=report_pages
+
+        # stock_photo=Image(source=stock_photo_test)
+
+        
+        # report_scroll.add_widget(report_image)
+        # report_scroll2.add_widget(report_image2)
+
+        # report_pages.add_widget(report_scroll)
+        # report_pages.add_widget(report_scroll2)
+        # report_pages.add_widget(stock_photo)
+        # self.add_widget(report_pages)
         self.add_widget(back)
         self.add_widget(back_main)
-        self.add_widget(left_arrow)
-        self.add_widget(right_arrow)
+        # self.add_widget(left_arrow)
+        # self.add_widget(right_arrow)
 
     def Report_back (self,button):
         self.parent.transition = SlideTransition(direction='right')
@@ -2387,10 +2456,10 @@ class DocumentScreen(Screen):
     def Report_back_main (self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
-    def left_arrow_func(self,*args):
-            self.widgets['report_pages'].load_previous()
-    def right_arrow_func(self,*args):
-            self.widgets['report_pages'].load_next()
+    # def left_arrow_func(self,*args):
+    #         self.widgets['report_pages'].load_previous()
+    # def right_arrow_func(self,*args):
+    #         self.widgets['report_pages'].load_next()
 
 class TroubleScreen(Screen):
     def __init__(self, **kwargs):
@@ -2400,8 +2469,8 @@ class TroubleScreen(Screen):
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['trouble_back'],
-                    size_hint =(.4, .15),
-                    pos_hint = {'x':.02, 'y':.02},
+                    size_hint =(.4, .1),
+                    pos_hint = {'x':.02, 'y':.015},
                     background_down='',
                     background_color=(200/250, 200/250, 200/250,.85),
                     markup=True)
@@ -2438,8 +2507,15 @@ class TroubleScreen(Screen):
         trouble_layout.add_widget(trouble_details)
         trouble_scroll.add_widget(trouble_layout)
 
+        seperator_line=Image(source=r'media/line_gray.png',
+                    allow_stretch=True,
+                    keep_ratio=False,
+                    size_hint =(.98, .001),
+                    pos_hint = {'x':.01, 'y':.13})
+
         self.add_widget(trouble_scroll)
         self.add_widget(back)
+        self.add_widget(seperator_line)
 
     def trouble_back (self,button):
         self.parent.transition = SlideTransition(direction='up')
