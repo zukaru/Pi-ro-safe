@@ -324,6 +324,8 @@ class ColorProgressBar(ProgressBar):
         with self.canvas.before:
             self.background=BorderImage
 
+#<<<<<<<<<<>>>>>>>>>>#
+
 class ControlGrid(Screen):
     def quick_start(self,button):
         if button.state == 'down':
@@ -437,24 +439,24 @@ class ControlGrid(Screen):
         language_button.bind(on_press=self.language_func)
         language_button.color=(1,1,1,.65)
 
-        fs_logo=Image(source=logo,
+        fs_logo=IconButton(source=logo,
                 size_hint_x=.25,
                 size_hint_y=.25,
                 pos_hint = {'x':.05, 'center_y':.07})
+        fs_logo.bind(on_release=self.about_func)
 
         version_info=RoundedButton(text=current_language['version_info'],
                 markup=True,
                 background_normal='',
                 background_color=(200/255, 50/255, 50/255,.65),
-                disabled=True,
                 size_hint =(.18, .1),
                 pos_hint = {'x':.35, 'y':.015},)
         version_info.ref='version_info'
+        version_info.bind(on_release=self.about_func)
 
         overlay_menu=Popup(
             size_hint=(.8, .8),
-            background_color=(0,0,0,0),
-            #background = 'atlas://data/images/defaulttheme/button',
+            background = 'atlas://data/images/defaulttheme/button',
             title_color=[0, 0, 0, 1],
             title_size='38',
             title_align='center',
@@ -485,8 +487,10 @@ class ControlGrid(Screen):
         self.manager.current='trouble'
     def language_func (self,button):
         self.language_overlay()
+
     def language_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,0)
         overlay_menu.auto_dismiss=True
         overlay_menu.title=''
         overlay_menu.separator_height=0
@@ -533,6 +537,56 @@ class ControlGrid(Screen):
         self.widgets['overlay_layout'].add_widget(english)
         self.widgets['overlay_layout'].add_widget(spanish)
         self.widgets['overlay_menu'].open()
+
+    def about_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(1,1,1,1)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        about_text=Label(
+            text=current_language['about_overlay_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},)
+        self.widgets['about_text']=about_text
+        about_text.ref='about_overlay_text'
+
+        version_info=ExactLabel(text=current_language['version_info'],
+                markup=True,
+                pos_hint = {'x':.2, 'center_y':.6})
+        version_info.ref='version_info'
+
+        about_qr=Image(source=qr_link,
+            allow_stretch=False,
+            keep_ratio=True,
+            size_hint =(.45,.45),
+            pos_hint = {'x':.6, 'y':.58})
+
+        about_back_button=RoundedButton(text=current_language['about_back'],
+                        size_hint =(.9, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_down='',
+                        background_color=(0/250, 159/250, 232/250,.9),
+                        markup=True)
+        self.widgets['about_back_button']=about_back_button
+        about_back_button.ref='about_back'
+
+        def about_overlay_close(button):
+            self.widgets['overlay_menu'].dismiss()
+        about_back_button.bind(on_press=about_overlay_close)
+
+        self.widgets['overlay_layout'].add_widget(about_text)
+        self.widgets['overlay_layout'].add_widget(version_info)
+        self.widgets['overlay_layout'].add_widget(about_qr)
+        self.widgets['overlay_layout'].add_widget(about_back_button)
+        self.widgets['overlay_menu'].open()
+
+    def about_func (self,button):
+        self.about_overlay()
 
 class ActuationScreen(Screen):
 
