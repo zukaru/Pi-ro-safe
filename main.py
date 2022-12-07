@@ -404,8 +404,8 @@ class ControlGrid(Screen):
         lights.bind(on_press=self.lights_switch)
 
         settings_button=RoundedButton(
-                    size_hint =(.25, .15),
-                    pos_hint = {'x':.04, 'y':.15},#.35
+                    size_hint =(.18, .1),
+                    pos_hint = {'x':.02, 'y':.015},
                     background_down='',
                     background_color=(250/250, 250/250, 250/250,.9),
                     markup=True)
@@ -421,8 +421,8 @@ class ControlGrid(Screen):
         menu_icon=Image(source=r'media/menu_lines.png',
                     allow_stretch=True,
                     keep_ratio=False,
-                    size_hint =(.2, .055),
-                    pos_hint = {'x':.065, 'y':.195})
+                    size_hint =(.135, .038),
+                    pos_hint = {'x':.043, 'y':.045})
         menu_icon.center=settings_button.center
 
         trouble_button=IconButton(source=trouble_icon_dull, allow_stretch=True, keep_ratio=True)
@@ -442,7 +442,7 @@ class ControlGrid(Screen):
         fs_logo=IconButton(source=logo,
                 size_hint_x=.25,
                 size_hint_y=.25,
-                pos_hint = {'x':.05, 'center_y':.07})
+                pos_hint = {'x':.225, 'center_y':.07})
         fs_logo.bind(on_release=self.about_func)
 
         version_info=RoundedButton(text=current_language['version_info'],
@@ -450,7 +450,7 @@ class ControlGrid(Screen):
                 background_normal='',
                 background_color=(200/255, 50/255, 50/255,.65),
                 size_hint =(.18, .1),
-                pos_hint = {'x':.35, 'y':.015},)
+                pos_hint = {'x':.5, 'y':.015},)
         version_info.ref='version_info'
         version_info.bind(on_release=self.about_func)
 
