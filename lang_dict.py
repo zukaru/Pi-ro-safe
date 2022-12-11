@@ -4,6 +4,8 @@ english={
     'lights' : "[size=32][b][color=#000000] Lights [/color][/b][/size]",
     'version_info' : '''[size=16][color=#000000]      Hood Control[/size]
 [size=22][i]-Version 1.0.0-[/i][/color][/size]''',
+    'version_info_white' : '''[size=16][color=#ffffff]      Hood Control[/size]
+[size=22][i]-Version 1.0.0-[/i][/color][/size]''',
     'alert' : "[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
     'alert_acknowledged' : "[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]",
     'acknowledge' : "[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
@@ -14,7 +16,7 @@ english={
     'preferences' : "[size=32][b][color=#000000]  Settings [/color][/b][/size]",
     'train' : "[size=32][b][color=#000000]  Training [/color][/b][/size]",
     'about' : "[size=32][b][color=#000000]  About [/color][/b][/size]",
-    'about_overlay_text' : """[size=20][color=#000000]Hood Control™ developed
+    'about_overlay_text' : """[size=20][color=#ffffff]Hood Control™ developed
 by Fire Safe Extinguisher Service.
 PO Box 1071, Murray, Kentucky
 42071, United States
@@ -33,11 +35,11 @@ Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""
     'clean_mode' : "[size=32][b][color=#000000]  Maint. Override [/color][/b][/size]",
     'commission' : "[size=32][b][color=#000000]  Documents [/color][/b][/size]",
     'pins' : "[size=32][b][color=#000000]  Enter Pin [/color][/b][/size]",
-    'heat_overlay' : 'Heat-Sensor Override Duration',
+    'heat_overlay' : "[size=30][color=#ffffff]Heat-Sensor Override Duration[/color][/size]",
     'duration_1' : "[size=30][b][color=#000000]  5 Minutes [/color][/b][/size]",
     'duration_2' : "[size=30][b][color=#000000]  15 Minutes [/color][/b][/size]",
     'duration_3' : "[size=30][b][color=#000000]  30 Minutes [/color][/b][/size]",
-    'maint_overlay_warning_text' : """[size=30][color=#000000]Maintenance Override disables heat 
+    'maint_overlay_warning_text' : """[size=30][color=#ffffff]Maintenance Override disables heat 
 sensors allowing neccessary maintenance 
 to take place safely.
 You will be locked on this screen untill
@@ -47,7 +49,7 @@ Disable all fans?
   [/color][/size]""",
     'continue_button' : "[size=30][b][color=#000000]  Continue [/color][/b][/size]",
     'cancel_button' : "[size=30][b][color=#000000]  Cancel [/color][/b][/size]",
-    'override_overlay_warning_text' : """[size=30][color=#000000]Maintenance Override active.
+    'override_overlay_warning_text' : """[size=30][color=#ffffff]Maintenance Override active.
 All fans currently disabled.
 Disable override by holding down 
 DISABLE for 3 seconds.

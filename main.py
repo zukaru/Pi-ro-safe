@@ -448,7 +448,7 @@ class ControlGrid(Screen):
         version_info=RoundedButton(text=current_language['version_info'],
                 markup=True,
                 background_normal='',
-                background_color=(200/255, 50/255, 50/255,.65),
+                background_color=(255/255, 121/255, 0/255,.5),
                 size_hint =(.18, .1),
                 pos_hint = {'x':.5, 'y':.015},)
         version_info.ref='version_info'
@@ -456,7 +456,7 @@ class ControlGrid(Screen):
 
         overlay_menu=Popup(
             size_hint=(.8, .8),
-            background = 'atlas://data/images/defaulttheme/button',
+            background = 'atlas://data/images/defaulttheme/bubble',
             title_color=[0, 0, 0, 1],
             title_size='38',
             title_align='center',
@@ -500,7 +500,7 @@ class ControlGrid(Screen):
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.7},
                         background_normal='',
-                        background_color=(200/255, 50/255, 50/255,.85),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['english']=english
 
@@ -508,7 +508,7 @@ class ControlGrid(Screen):
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
-                        background_color=(200/255, 50/255, 50/255,.85),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['spanish']=spanish
 
@@ -540,7 +540,7 @@ class ControlGrid(Screen):
 
     def about_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
-        overlay_menu.background_color=(1,1,1,1)
+        overlay_menu.background_color=(0,0,0,.75)
         overlay_menu.title=''
         overlay_menu.separator_height=0
         overlay_menu.auto_dismiss=True
@@ -554,9 +554,9 @@ class ControlGrid(Screen):
         self.widgets['about_text']=about_text
         about_text.ref='about_overlay_text'
 
-        version_info=ExactLabel(text=current_language['version_info'],
+        version_info=Label(text=current_language['version_info_white'],
                 markup=True,
-                pos_hint = {'x':.2, 'center_y':.6})
+                pos_hint = {'x':-.05, 'center_y':.6})
         version_info.ref='version_info'
 
         about_qr=Image(source=qr_link,
@@ -565,12 +565,16 @@ class ControlGrid(Screen):
             size_hint =(.45,.45),
             pos_hint = {'x':.6, 'y':.58})
 
+        qr_label=Label(text='[size=16][color=#ffffff]firesafeextinguisher.com[/color][/size]',
+                markup=True,
+                pos_hint = {'x':.33, 'center_y':.55})
+        qr_label.ref='qr_label'
+
         about_back_button=RoundedButton(text=current_language['about_back'],
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['about_back_button']=about_back_button
         about_back_button.ref='about_back'
@@ -582,6 +586,7 @@ class ControlGrid(Screen):
         self.widgets['overlay_layout'].add_widget(about_text)
         self.widgets['overlay_layout'].add_widget(version_info)
         self.widgets['overlay_layout'].add_widget(about_qr)
+        self.widgets['overlay_layout'].add_widget(qr_label)
         self.widgets['overlay_layout'].add_widget(about_back_button)
         self.widgets['overlay_menu'].open()
 
@@ -685,7 +690,7 @@ class SettingsScreen(Screen):
 
         sys_report=RoundedButton(text=current_language['sys_report'],
                         size_hint =(.9, .18),
-                        pos_hint = {'x':.05, 'y':.56},
+                        pos_hint = {'x':.05, 'y':.51},
                         background_normal='',
                         background_color=(180/255, 10/255, 10/255,.9),
                         markup=True)
@@ -695,7 +700,7 @@ class SettingsScreen(Screen):
 
         preferences=RoundedButton(text=current_language['preferences'],
                         size_hint =(.9, .18),
-                        pos_hint = {'x':.05, 'y':.34},
+                        pos_hint = {'x':.05, 'y':.24},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1638,8 +1643,7 @@ class PreferenceScreen(Screen):
 
         overlay_menu=Popup(
             size_hint=(.8, .8),
-            background = 'atlas://data/images/defaulttheme/button',
-            title=current_language['heat_overlay'],
+            background = 'atlas://data/images/defaulttheme/bubble',
             title_color=[0, 0, 0, 1],
             title_size='38',
             title_align='center',
@@ -1679,34 +1683,41 @@ class PreferenceScreen(Screen):
 
     def heat_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
-        overlay_menu.title=current_language['heat_overlay']
-        overlay_menu.separator_height=1
+        overlay_menu.background_color=(0,0,0,.75)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
         overlay_menu.auto_dismiss=True
         self.widgets['overlay_layout'].clear_widgets()
 
+        overlay_title=Label(text=current_language['heat_overlay'],
+                        pos_hint = {'x':.0, 'y':.5},
+                        markup=True)
+        self.widgets['overlay_title']=overlay_title
+        overlay_title.ref='heat_overlay'
+
         duration_1=RoundedButton(text=current_language['duration_1'],
-                        size_hint =(.3, .50),
-                        pos_hint = {'x':.02, 'y':.3},
+                        size_hint =(.96, .125),
+                        pos_hint = {'x':.02, 'y':.5},
                         background_normal='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['duration_1']=duration_1
         duration_1.ref='duration_1'
 
         duration_2=RoundedButton(text=current_language['duration_2'],
-                        size_hint =(.3, .50),
-                        pos_hint = {'x':.35, 'y':.3},
+                        size_hint =(.96, .125),
+                        pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['duration_2']=duration_2
         duration_1.ref='duration_2'
 
         duration_3=RoundedButton(text=current_language['duration_3'],
-                        size_hint =(.3, .50),
-                        pos_hint = {'x':.68, 'y':.3},
+                        size_hint =(.96, .125),
+                        pos_hint = {'x':.02, 'y':.1},
                         background_normal='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['duration_3']=duration_3
         duration_1.ref='duration_3'
@@ -1738,6 +1749,7 @@ class PreferenceScreen(Screen):
             self.widgets['overlay_menu'].dismiss()
         duration_3.bind(on_release=duration_3_func)
 
+        self.widgets['overlay_layout'].add_widget(overlay_title)
         self.widgets['overlay_layout'].add_widget(duration_1)
         self.widgets['overlay_layout'].add_widget(duration_2)
         self.widgets['overlay_layout'].add_widget(duration_3)
@@ -1745,6 +1757,7 @@ class PreferenceScreen(Screen):
 
     def maint_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.75)
         overlay_menu.title=''
         overlay_menu.separator_height=0
         overlay_menu.auto_dismiss=True
@@ -1763,7 +1776,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['continue_button']=continue_button
         continue_button.ref='continue_button'
@@ -1772,7 +1785,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['cancel_button']=cancel_button
         cancel_button.ref='cancel_button'
@@ -1811,7 +1824,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['disable_button']=disable_button
         disable_button.ref='disable_button'
@@ -1897,9 +1910,9 @@ class PreferenceScreen(Screen):
         self.widgets['about_text']=about_text
         about_text.ref='about_overlay_text'
 
-        version_info=ExactLabel(text=current_language['version_info'],
+        version_info=Label(text=current_language['version_info_white'],
                 markup=True,
-                pos_hint = {'x':.2, 'center_y':.6})
+                pos_hint = {'x':-.05, 'center_y':.6})
         version_info.ref='version_info'
 
         about_qr=Image(source=qr_link,
@@ -1908,12 +1921,16 @@ class PreferenceScreen(Screen):
             size_hint =(.45,.45),
             pos_hint = {'x':.6, 'y':.58})
 
+        qr_label=Label(text='[size=16][color=#ffffff]firesafeextinguisher.com[/color][/size]',
+                markup=True,
+                pos_hint = {'x':.33, 'center_y':.55})
+        qr_label.ref='qr_label'
+
         about_back_button=RoundedButton(text=current_language['about_back'],
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 121/255, 0/255,.85),
                         markup=True)
         self.widgets['about_back_button']=about_back_button
         about_back_button.ref='about_back'
@@ -1925,6 +1942,7 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_layout'].add_widget(about_text)
         self.widgets['overlay_layout'].add_widget(version_info)
         self.widgets['overlay_layout'].add_widget(about_qr)
+        self.widgets['overlay_layout'].add_widget(qr_label)
         self.widgets['overlay_layout'].add_widget(about_back_button)
         self.widgets['overlay_menu'].open()
 
