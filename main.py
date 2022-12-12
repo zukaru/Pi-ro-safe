@@ -1578,9 +1578,21 @@ class PreferenceScreen(Screen):
         back_main.ref='preferences_back_main'
         back_main.bind(on_press=self.settings_back_main)
 
+        pref_scroll=ScrollView(
+            bar_width=8,
+            do_scroll_y=True,
+            do_scroll_x=False,
+            size_hint =(.9, .85),
+            pos_hint = {'center_x':.5, 'y':.14})
+        self.widgets['pref_scroll']=pref_scroll
+
+        scroll_layout=RelativeLayout(
+            size_hint_y=2.5,
+            size_hint_x=.95)
+
         heat_sensor=RoundedButton(text=current_language['heat_sensor'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.05, 'y':.78},
+                        size_hint =(1, .085),
+                        pos_hint = {'x':.01, 'y':.9},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1590,18 +1602,19 @@ class PreferenceScreen(Screen):
         heat_sensor.bind(on_release=self.blur_screen)
 
         train=RoundedButton(text=current_language['train'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.05, 'y':.56},
+                        size_hint =(1, .085),
+                        pos_hint = {'x':.01, 'y':.6},
                         background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
+                        disabled=True,
+                        background_color=(100/250, 100/250, 100/250,.9),
                         markup=True)
         self.widgets['train']=train
         train.ref='train'
         train.bind(on_release=self.train_func)
 
         about=RoundedButton(text=current_language['about'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.05, 'y':.34},
+                        size_hint =(1, .085),
+                        pos_hint = {'x':.01, 'y':.7},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1610,8 +1623,8 @@ class PreferenceScreen(Screen):
         about.bind(on_release=self.about_func)
 
         clean_mode=RoundedButton(text=current_language['clean_mode'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.54, 'y':.78},
+                        size_hint =(1, .085),
+                        pos_hint = {'x':.01, 'y':.8},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1620,18 +1633,19 @@ class PreferenceScreen(Screen):
         clean_mode.bind(on_release=self.clean_mode_func)
 
         commission=RoundedButton(text=current_language['commission'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.54, 'y':.56},
+                        size_hint =(1, .085),
+                        pos_hint = {'x':.01, 'y':.5},
                         background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
+                        disabled=True,
+                        background_color=(100/250, 100/250, 100/250,.9),
                         markup=True)
         self.widgets['commission']=commission
         commission.ref='commission'
         commission.bind(on_release=self.commission_func)
 
         pins=RoundedButton(text=current_language['pins'],
-                        size_hint =(.4, .20),
-                        pos_hint = {'x':.54, 'y':.34},
+                        size_hint =(1, .085),
+                        pos_hint = {'x':.01, 'y':.4},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1662,16 +1676,17 @@ class PreferenceScreen(Screen):
 
 
         overlay_menu.add_widget(overlay_layout)
-        self.blur.add_widget(bg_image)
-        self.blur.add_widget(back)
-        self.blur.add_widget(back_main)
-        self.blur.add_widget(heat_sensor)
-        self.blur.add_widget(train)
-        self.blur.add_widget(about)
-        self.blur.add_widget(clean_mode)
-        self.blur.add_widget(commission)
-        self.blur.add_widget(pins)
-        self.add_widget(self.blur)
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        self.add_widget(back_main)
+        scroll_layout.add_widget(heat_sensor)
+        scroll_layout.add_widget(train)
+        scroll_layout.add_widget(about)
+        scroll_layout.add_widget(clean_mode)
+        scroll_layout.add_widget(commission)
+        scroll_layout.add_widget(pins)
+        pref_scroll.add_widget(scroll_layout)
+        self.add_widget(pref_scroll)
         self.add_widget(seperator_line)
 
     def blur_screen(self,button):
@@ -1930,7 +1945,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.85),
                         markup=True)
         self.widgets['about_back_button']=about_back_button
         about_back_button.ref='about_back'
