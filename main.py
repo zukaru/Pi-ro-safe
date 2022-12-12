@@ -448,7 +448,7 @@ class ControlGrid(Screen):
         version_info=RoundedButton(text=current_language['version_info'],
                 markup=True,
                 background_normal='',
-                background_color=(255/255, 121/255, 0/255,.5),
+                background_color=(245/250, 216/250, 41/250,.5),
                 size_hint =(.18, .1),
                 pos_hint = {'x':.5, 'y':.015},)
         version_info.ref='version_info'
@@ -500,7 +500,7 @@ class ControlGrid(Screen):
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.7},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['english']=english
 
@@ -508,7 +508,7 @@ class ControlGrid(Screen):
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['spanish']=spanish
 
@@ -574,7 +574,7 @@ class ControlGrid(Screen):
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['about_back_button']=about_back_button
         about_back_button.ref='about_back'
@@ -672,7 +672,7 @@ class SettingsScreen(Screen):
                         size_hint =(.4, .1),
                         pos_hint = {'x':.06, 'y':.015},
                         background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
+                        background_color=(200/255, 200/255, 200/255,.9),
                         markup=True)
         self.widgets['back']=back
         back.ref='settings_back'
@@ -682,7 +682,7 @@ class SettingsScreen(Screen):
                         size_hint =(.9, .18),
                         pos_hint = {'x':.05, 'y':.78},
                         background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
+                        background_color=(200/255, 200/255, 200/255,.9),
                         markup=True)
         self.widgets['logs']=logs
         logs.ref='logs'
@@ -692,7 +692,7 @@ class SettingsScreen(Screen):
                         size_hint =(.9, .18),
                         pos_hint = {'x':.05, 'y':.51},
                         background_normal='',
-                        background_color=(180/255, 10/255, 10/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),#180/255, 10/255, 10/255,.9
                         markup=True)
         self.widgets['sys_report']=sys_report
         sys_report.ref='sys_report'
@@ -702,7 +702,7 @@ class SettingsScreen(Screen):
                         size_hint =(.9, .18),
                         pos_hint = {'x':.05, 'y':.24},
                         background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
+                        background_color=(200/255, 205/255, 200/255,.9),
                         markup=True)
         self.widgets['preferences']=preferences
         preferences.ref='preferences'
@@ -767,7 +767,7 @@ class ReportScreen(Screen):
         back_main=RoundedButton(text=current_language['report_back_main'],
                         size_hint =(.4, .1),
                         pos_hint = {'x':.52, 'y':.015},
-                        background_down='',
+                        background_normal='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
@@ -863,7 +863,7 @@ class DevicesScreen(Screen):
         back_main=RoundedButton(text=current_language['report_back_main'],
                         size_hint =(.4, .1),
                         pos_hint = {'x':.52, 'y':.015},
-                        background_down='',
+                        background_normal='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
@@ -1496,7 +1496,7 @@ class TrainScreen(Screen):
         back_main=RoundedButton(text=current_language['report_back_main'],
                         size_hint =(.4, .1),
                         pos_hint = {'x':.52, 'y':.015},
-                        background_down='',
+                        background_normal='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
@@ -1571,8 +1571,8 @@ class PreferenceScreen(Screen):
         back_main=RoundedButton(text=current_language['preferences_back_main'],
                         size_hint =(.4, .1),
                         pos_hint = {'x':.52, 'y':.015},
-                        background_down='',
-                        background_color=(245/250, 216/250, 41/250,.9),
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.9),#255/255, 121/255, 0/255,.85
                         markup=True)
         self.widgets['back_main']=back_main
         back_main.ref='preferences_back_main'
@@ -1699,7 +1699,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.5},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.85),
                         markup=True)
         self.widgets['duration_1']=duration_1
         duration_1.ref='duration_1'
@@ -1708,7 +1708,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.3},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.85),
                         markup=True)
         self.widgets['duration_2']=duration_2
         duration_1.ref='duration_2'
@@ -1717,7 +1717,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.96, .125),
                         pos_hint = {'x':.02, 'y':.1},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.85),
                         markup=True)
         self.widgets['duration_3']=duration_3
         duration_1.ref='duration_3'
@@ -1776,7 +1776,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.85),
                         markup=True)
         self.widgets['continue_button']=continue_button
         continue_button.ref='continue_button'
@@ -1785,7 +1785,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.85),
                         markup=True)
         self.widgets['cancel_button']=cancel_button
         cancel_button.ref='cancel_button'
@@ -1824,7 +1824,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.9, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_normal='',
-                        background_color=(255/255, 121/255, 0/255,.85),
+                        background_color=(245/250, 216/250, 41/250,.85),
                         markup=True)
         self.widgets['disable_button']=disable_button
         disable_button.ref='disable_button'
@@ -2000,7 +2000,7 @@ class PinScreen(Screen):
         back_main=RoundedButton(text=current_language['pin_back_main'],
                         size_hint =(.4, .1),
                         pos_hint = {'x':.52, 'y':.015},
-                        background_down='',
+                        background_normal='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
@@ -2427,7 +2427,7 @@ class DocumentScreen(Screen):
         back_main=RoundedButton(text="[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
                         size_hint =(.4, .1),
                         pos_hint = {'x':.52, 'y':.015},
-                        background_down='',
+                        background_normal='',
                         background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
