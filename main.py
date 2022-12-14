@@ -115,7 +115,7 @@ class PinPop(Popup):
         title_color=[0, 0, 0, 1],
         title_size='38',
         title_align='center',
-        separator_color=[255/255, 121/255, 0/255,.5],
+        separator_color=[245/250, 216/250, 41/250,.5],
         **kwargs)
         self.widgets={}
         self.overlay_layout=FloatLayout()
@@ -2120,7 +2120,7 @@ class PinScreen(Screen):
             size_hint =(.35, .15),
             pos_hint = {'x':.2, 'y':.25},
             background_down='',
-            background_color=(200/250, 200/250, 200/250,.85),
+            background_color=(255/255, 100/255, 100/255,.85),
             markup=True)
         self.widgets['backspace']=backspace
         backspace.bind(on_release=self.backspace_func)
@@ -2129,7 +2129,7 @@ class PinScreen(Screen):
             size_hint =(.15, .75),
             pos_hint = {'x':.6, 'y':.25},
             background_down='',
-            background_color=(200/250, 200/250, 200/250,.85),
+            background_color=(100/255, 255/255, 100/255,.85),
             markup=True)
         self.widgets['enter']=enter
         enter.bind(on_release=self.enter_func)
@@ -2160,7 +2160,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['reset_confirm']=reset_confirm
         reset_confirm.ref='reset_confirm'
@@ -2169,7 +2169,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['reset_cancel']=reset_cancel
         reset_cancel.ref='reset_cancel'
@@ -2202,7 +2202,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['date_confirm']=date_confirm
         date_confirm.ref='date_confirm'
@@ -2211,7 +2211,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['date_cancel']=date_cancel
         date_cancel.ref='date_cancel'
@@ -2243,7 +2243,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['heat_override_confirm']=heat_override_confirm
         heat_override_confirm.ref='heat_override_confirm'
@@ -2252,7 +2252,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['heat_override_cancel']=heat_override_cancel
         heat_override_cancel.ref='heat_override_cancel'
@@ -2289,7 +2289,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.05, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['admin_confirm']=admin_confirm
         admin_confirm.ref='admin_confirm'
@@ -2298,7 +2298,7 @@ class PinScreen(Screen):
                         size_hint =(.35, .25),
                         pos_hint = {'x':.6, 'y':.05},
                         background_down='',
-                        background_color=(255/255, 121/255, 0/255,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['admin_cancel']=admin_cancel
         admin_cancel.ref='admin_cancel'
