@@ -1861,7 +1861,7 @@ class PreferenceScreen(Screen):
 
         disable_progress=CircularProgressBar()
         disable_progress._widget_size=200
-        disable_progress._progress_colour=(255/255, 121/255, 0/255,1)
+        disable_progress._progress_colour=(245/250, 216/250, 41/250,1)
         self.widgets['disable_progress']=disable_progress
 
         def light_button_func(button):
