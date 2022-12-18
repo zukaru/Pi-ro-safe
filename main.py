@@ -891,6 +891,8 @@ class DevicesScreen(Screen):
             # size_hint_x=1,
             size_hint =(.9, .80),
             pos_hint = {'center_x':.5, 'y':.18})
+        device_scroll.bar_color=(245/250, 216/250, 41/250,.75)
+        device_scroll.bar_inactive_color=(245/250, 216/250, 41/250,.55)
         self.widgets['device_scroll']=device_scroll
 
         overlay_menu=Popup(
@@ -1432,9 +1434,11 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
 
 
     def devices_back (self,button):
+        self.widgets['device_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='settings'
     def devices_back_main (self,button):
+        self.widgets['device_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
     def info_func (self,device,button):
@@ -1572,7 +1576,7 @@ class PreferenceScreen(Screen):
                         size_hint =(.4, .1),
                         pos_hint = {'x':.52, 'y':.015},
                         background_normal='',
-                        background_color=(245/250, 216/250, 41/250,.9),#255/255, 121/255, 0/255,.85
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['back_main']=back_main
         back_main.ref='preferences_back_main'
@@ -1599,9 +1603,9 @@ class PreferenceScreen(Screen):
 
         '''scroll layout changes size to fit children, so pos hints chnage all widgets, then sets the scroll layouts size to small, making
         all widgets stay the same size again'''
-
+        size=35
         heat_sensor=RoundedButton(text=current_language['heat_sensor'],
-                        size_hint =(1, .35),
+                        size_hint =(1, size),
                         #pos_hint = {'x':.01, 'y':.9},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1612,7 +1616,7 @@ class PreferenceScreen(Screen):
         heat_sensor.bind(on_release=self.blur_screen)
 
         train=RoundedButton(text=current_language['train'],
-                        size_hint =(1, .35),
+                        size_hint =(1, size),
                         pos_hint = {'x':.01, 'y':.6},
                         background_down='',
                         disabled=True,
@@ -1623,7 +1627,7 @@ class PreferenceScreen(Screen):
         train.bind(on_release=self.train_func)
 
         about=RoundedButton(text=current_language['about'],
-                        size_hint =(1, .35),
+                        size_hint =(1, size),
                         pos_hint = {'x':.01, 'y':.7},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1633,7 +1637,7 @@ class PreferenceScreen(Screen):
         about.bind(on_release=self.about_func)
 
         clean_mode=RoundedButton(text=current_language['clean_mode'],
-                        size_hint =(1, .35),
+                        size_hint =(1, size),
                         pos_hint = {'x':.01, 'y':.8},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1643,7 +1647,7 @@ class PreferenceScreen(Screen):
         clean_mode.bind(on_release=self.clean_mode_func)
 
         commission=RoundedButton(text=current_language['commission'],
-                        size_hint =(1, .35),
+                        size_hint =(1, size),
                         pos_hint = {'x':.01, 'y':.5},
                         background_down='',
                         disabled=True,
@@ -1654,7 +1658,7 @@ class PreferenceScreen(Screen):
         commission.bind(on_release=self.commission_func)
 
         pins=RoundedButton(text=current_language['pins'],
-                        size_hint =(1, .35),
+                        size_hint =(1, size),
                         pos_hint = {'x':.01, 'y':.4},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1972,9 +1976,11 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_menu'].open()
 
     def settings_back(self,button):
+        self.widgets['pref_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='settings'
     def settings_back_main(self,button):
+        self.widgets['pref_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='main'
     def heat_sensor_func(self,button):
