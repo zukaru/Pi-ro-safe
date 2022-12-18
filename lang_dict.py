@@ -32,7 +32,7 @@ Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""
     'preferences_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'preferences_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'heat_sensor' : "[size=32][b][color=#000000]  Heat Sensor [/color][/b][/size]",
-    'clean_mode' : "[size=32][b][color=#000000]  Maint. Override [/color][/b][/size]",
+    'clean_mode' : "[size=32][b][color=#000000]  Maintenance Override [/color][/b][/size]",
     'commission' : "[size=32][b][color=#000000]  Documents [/color][/b][/size]",
     'pins' : "[size=32][b][color=#000000]  Enter Pin [/color][/b][/size]",
     'heat_overlay' : "[size=30][color=#ffffff]Heat-Sensor Override Duration[/color][/size]",

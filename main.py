@@ -887,8 +887,8 @@ class DevicesScreen(Screen):
             bar_width=8,
             do_scroll_y=True,
             do_scroll_x=False,
-            size_hint_y=None,
-            size_hint_x=1,
+            # size_hint_y=None,
+            # size_hint_x=1,
             size_hint =(.9, .80),
             pos_hint = {'center_x':.5, 'y':.18})
         self.widgets['device_scroll']=device_scroll
@@ -975,7 +975,7 @@ class DevicesScreen(Screen):
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 100/255, 100/255,.85),
                         markup=True)
         self.widgets['info_back_button']=info_back_button
         info_back_button.ref='about_back'
@@ -1015,7 +1015,7 @@ class DevicesScreen(Screen):
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(245/250, 216/250, 41/250,.9),
                         markup=True)
         self.widgets['delete_back_button']=delete_back_button
         delete_back_button.ref='cancel_button'
@@ -1144,7 +1144,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 100/255, 100/255,.85),
                         markup=True)
         self.widgets['new_device_back_button']=new_device_back_button
         new_device_back_button.ref='about_back'
@@ -1155,7 +1155,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                         pos_hint = {'x':.55, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(100/255, 255/255, 100/255,.85),
                         markup=True)
         self.widgets['new_device_save_button']=new_device_save_button
         new_device_save_button.ref='save'
@@ -1306,7 +1306,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(255/255, 100/255, 100/255,.85),
                         markup=True)
         self.widgets['edit_device_back_button']=edit_device_back_button
         edit_device_back_button.ref='about_back'
@@ -1317,7 +1317,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                         pos_hint = {'x':.55, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(0/250, 159/250, 232/250,.9),
+                        background_color=(100/255, 255/255, 100/255,.85),
                         markup=True)
         self.widgets['edit_device_save_button']=edit_device_save_button
         edit_device_save_button.ref='save'
@@ -1584,15 +1584,25 @@ class PreferenceScreen(Screen):
             do_scroll_x=False,
             size_hint =(.9, .85),
             pos_hint = {'center_x':.5, 'y':.14})
+        pref_scroll.bar_color=(245/250, 216/250, 41/250,.75)
+        pref_scroll.bar_inactive_color=(245/250, 216/250, 41/250,.55)
         self.widgets['pref_scroll']=pref_scroll
 
-        scroll_layout=RelativeLayout(
-            size_hint_y=2.5,
-            size_hint_x=.95)
+        scroll_layout=EventpassGridLayout(
+            size_hint_y=1.5,
+            size_hint_x=.95,
+            cols=1,
+            padding=10,
+            spacing=(1,25))
+        self.widgets['scroll_layout']=scroll_layout
+        #scroll_layout.bind(minimum_height=scroll_layout.setter('height'))
+
+        '''scroll layout changes size to fit children, so pos hints chnage all widgets, then sets the scroll layouts size to small, making
+        all widgets stay the same size again'''
 
         heat_sensor=RoundedButton(text=current_language['heat_sensor'],
-                        size_hint =(1, .085),
-                        pos_hint = {'x':.01, 'y':.9},
+                        size_hint =(1, .35),
+                        #pos_hint = {'x':.01, 'y':.9},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
                         markup=True)
@@ -1602,7 +1612,7 @@ class PreferenceScreen(Screen):
         heat_sensor.bind(on_release=self.blur_screen)
 
         train=RoundedButton(text=current_language['train'],
-                        size_hint =(1, .085),
+                        size_hint =(1, .35),
                         pos_hint = {'x':.01, 'y':.6},
                         background_down='',
                         disabled=True,
@@ -1613,7 +1623,7 @@ class PreferenceScreen(Screen):
         train.bind(on_release=self.train_func)
 
         about=RoundedButton(text=current_language['about'],
-                        size_hint =(1, .085),
+                        size_hint =(1, .35),
                         pos_hint = {'x':.01, 'y':.7},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1623,7 +1633,7 @@ class PreferenceScreen(Screen):
         about.bind(on_release=self.about_func)
 
         clean_mode=RoundedButton(text=current_language['clean_mode'],
-                        size_hint =(1, .085),
+                        size_hint =(1, .35),
                         pos_hint = {'x':.01, 'y':.8},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1633,7 +1643,7 @@ class PreferenceScreen(Screen):
         clean_mode.bind(on_release=self.clean_mode_func)
 
         commission=RoundedButton(text=current_language['commission'],
-                        size_hint =(1, .085),
+                        size_hint =(1, .35),
                         pos_hint = {'x':.01, 'y':.5},
                         background_down='',
                         disabled=True,
@@ -1644,7 +1654,7 @@ class PreferenceScreen(Screen):
         commission.bind(on_release=self.commission_func)
 
         pins=RoundedButton(text=current_language['pins'],
-                        size_hint =(1, .085),
+                        size_hint =(1, .35),
                         pos_hint = {'x':.01, 'y':.4},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
