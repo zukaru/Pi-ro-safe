@@ -71,8 +71,8 @@ if os.name == 'nt':
     generic_image=r'media\patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
     language_image=r'media\language_icon-1.png'
     settings_icon=r'media\tiny gear.png'
-    trouble_icon=r'media\trouble icon.png'
-    trouble_icon_dull=r'media\trouble icon dull.png'
+    trouble_icon=r'media\trouble icon_high_res.png'
+    trouble_icon_dull=r'media\trouble icon_dull_high_res.png'
     logo=r'media\qt=q_95.png'
     report_current=r'media\report.jpg'
     report_original=r'media\report.jpg'
@@ -92,8 +92,8 @@ if os.name == 'posix':
     generic_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
     language_image=r'media/language_icon-1.png'
     settings_icon=r'media/tiny gear.png'
-    trouble_icon=r'media/trouble icon.png'
-    trouble_icon_dull=r'media/trouble icon dull.png'
+    trouble_icon=r'media/trouble icon_high_res.png'
+    trouble_icon_dull=r'media/trouble icon_dull_high_res.png'
     logo=r'media/qt=q_95.png'
     report_current=r'media/report.jpg'
     report_original=r'media/report.jpg'
@@ -432,7 +432,7 @@ class ControlGrid(Screen):
         trouble_button.bind(on_press=self.open_trouble)
         trouble_button.color=(1,1,1,.15)
 
-        language_button=IconButton(source=r'media/New Piskel-1.png.png', allow_stretch=True, keep_ratio=True)
+        language_button=IconButton(source=r'media/higer_res_thick.png', allow_stretch=True, keep_ratio=True)
         language_button.size_hint =(.10, .10)
         language_button.pos_hint = {'x':.75, 'y':.02}
         self.widgets['language_button']=language_button
@@ -782,14 +782,12 @@ class ReportScreen(Screen):
         self.widgets['date_label']=date_label
 
         report_image=Image(
-            source=report_current
-            )
+            source=report_current)
         self.widgets['report_image']=report_image
 
         scroll_layout=RelativeLayout(
             size_hint_y=2.5,
-            size_hint_x=.95
-        )
+            size_hint_x=.95)
 
         report_scroll=ScrollView(
             bar_width=8,
@@ -797,8 +795,9 @@ class ReportScreen(Screen):
             do_scroll_x=False,
             size_hint_y=1,
             size_hint_x=.95,
-            pos_hint = {'center_x':.525, 'center_y':.5}
-            )
+            pos_hint = {'center_x':.525, 'center_y':.5})
+        report_scroll.bar_color=(245/250, 216/250, 41/250,.75)
+        report_scroll.bar_inactive_color=(245/250, 216/250, 41/250,.55)
         self.widgets['report_scroll']=report_scroll
 
         report_scatter = Scatter(
@@ -808,8 +807,7 @@ class ReportScreen(Screen):
             do_rotation=False,
             scale_min=1,
             scale_max=3,
-            auto_bring_to_front=False
-            )
+            auto_bring_to_front=False)
         self.widgets['report_scatter']=report_scatter
 
         seperator_line=Image(source=r'media/line_gray.png',
