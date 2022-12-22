@@ -2,8 +2,8 @@ import os,time,json
 import os.path
 
 class Mau():
-    color=(0/255, 170/255, 0/255,.85)
-    def __init__(self,name="default",pin=0,color=(0/255, 170/255, 0/255,.85)) -> None:
+    color=(0/255, 0/255, 0/255,.85)
+    def __init__(self,name="default",pin=0,color=(0/255, 0/255, 0/255,.85)) -> None:
         self.name=name
         self.type='Makeup Air Fan'
         self.pin=pin

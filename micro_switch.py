@@ -2,8 +2,8 @@ import os,time,json
 import os.path
 
 class MicroSwitch():
-    color=(255/255, 140/255, 25/255,.85)
-    def __init__(self,name="default",pin=0,color=(255/255, 140/255, 25/255,.85)) -> None:
+    color=(170/255, 0/255, 0/255,.85)
+    def __init__(self,name="default",pin=0,color=(170/255, 0/255, 0/255,.85)) -> None:
         self.name=name
         self.type='Micro'
         self.pin=pin

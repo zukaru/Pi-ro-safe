@@ -2,8 +2,8 @@ import os,time,json
 import os.path
 
 class HeatSensor():
-    color=(75/255, 0/255, 130/255,.85)
-    def __init__(self,name="default",pin=0,color=(75/255, 0/255, 130/255,.85)) -> None:
+    color=(0/255, 0/255, 0/255,.85)
+    def __init__(self,name="default",pin=0,color=(0/255, 0/255, 0/255,.85)) -> None:
         self.name=name
         self.type='heat'
         self.pin=pin

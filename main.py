@@ -61,6 +61,7 @@ from kivy.uix.spinner import Spinner
 from kivy.graphics import RoundedRectangle
 from kivy.uix.progressbar import ProgressBar
 from circle_progress_bar import CircularProgressBar
+from kivy.uix.filechooser import FileChooserIconView, FileChooserListView
 
 
 kivy.require('2.0.0')
@@ -280,6 +281,21 @@ class ScrollItemTemplate(Button):
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
+
+class RoundedScrollItemTemplate(RoundedButton):
+    def __init__(self,Item_tag,color=(245/250, 216/250, 41/250,.85),**kwargs):
+        if color==(245/250, 216/250, 41/250,.9):
+            text_color= '#000000'
+        else:
+            text_color= '#ffffff'
+        super(RoundedScrollItemTemplate,self).__init__(text=f'''[color={text_color}][size=24][b]{Item_tag}[/b][/size][/color]''',
+        markup=True,
+        size_hint_y=None,
+        size_hint_x=1,
+        background_down='',
+        background_color=color,
+        **kwargs)
+
 
 class DisplayLabel(Label):
     def __init__(self, **kwargs):
@@ -975,7 +991,7 @@ class DevicesScreen(Screen):
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(255/255, 100/255, 100/255,.85),
+                        background_color=(255/255, 50/255, 50/255,.85),
                         markup=True)
         self.widgets['info_back_button']=info_back_button
         info_back_button.ref='about_back'
@@ -1118,7 +1134,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                 self.name='default'
                 self.type='Exfan'
                 self.pin=0
-                self.color=(170/255, 0/255, 0/255,.85)
+                self.color=(0/255, 0/255, 0/255,.85)
                 self.run_time=0
                 self.device_types={
                     "Exfan":"exhaust.Exhaust",
@@ -1144,7 +1160,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(255/255, 100/255, 100/255,.85),
+                        background_color=(255/255, 50/255, 50/255,.85),
                         markup=True)
         self.widgets['new_device_back_button']=new_device_back_button
         new_device_back_button.ref='about_back'
@@ -1237,19 +1253,19 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
     def get_device_type_func(self,current_device,button,value):
         current_device.type=value
         if value=="Exfan":
-            current_device.color=(170/255, 0/255, 0/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="MAU":
-            current_device.color=(0/255, 0/255, 170/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Light":
-            current_device.color=(170/255, 170/255, 0/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Dry":
-            current_device.color=(170/255, 85/255, 0/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="GV":
-            current_device.color=(47/250, 247/250, 54/250,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Micro":
-            current_device.color=(255/255, 140/255, 25/255,.85)
+            current_device.color=(170/255, 0/255, 0/255,.85)
         elif value=="Heat":
-            current_device.color=(75/255, 0/255, 130/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Light Switch":
             current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Fans Switch":
@@ -1306,7 +1322,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
                         pos_hint = {'x':.05, 'y':.025},
                         background_normal='',
                         background_down='',
-                        background_color=(255/255, 100/255, 100/255,.85),
+                        background_color=(255/255, 50/255, 50/255,.85),
                         markup=True)
         self.widgets['edit_device_back_button']=edit_device_back_button
         edit_device_back_button.ref='about_back'
@@ -1410,19 +1426,19 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
     def edit_device_type_func(self,current_device,button,value):
         current_device.type=value
         if value=="Exfan":
-            current_device.color=(170/255, 0/255, 0/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="MAU":
-            current_device.color=(0/255, 0/255, 170/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Light":
-            current_device.color=(170/255, 170/255, 0/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Dry":
-            current_device.color=(170/255, 85/255, 0/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="GV":
-            current_device.color=(47/250, 247/250, 54/250,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Micro":
-            current_device.color=(255/255, 140/255, 25/255,.85)
+            current_device.color=(170/255, 0/255, 0/255,.85)
         elif value=="Heat":
-            current_device.color=(75/255, 0/255, 130/255,.85)
+            current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Light Switch":
             current_device.color=(0/255, 0/255, 0/255,.85)
         elif value=="Fans Switch":
@@ -1447,14 +1463,16 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
         if logic.devices:
             self.widgets['device_layout'].clear_widgets()
             for i in logic.devices:
-                device=ScrollItemTemplate(i.name,color=i.color)
+                device=RoundedScrollItemTemplate(i.name,color=i.color)
                 self.widgets['device_layout'].add_widget(device)
                 device.bind(on_release=partial(self.info_func,i))
         else:
             print("main.py aggregate_devices(): no devices")
             self.widgets['device_layout'].clear_widgets()
             self.widgets['device_layout'].add_widget(self.widgets['device_details'])
-        new_device=ScrollItemTemplate('Add Device +')
+        new_device=RoundedScrollItemTemplate(
+                        '[/color][color=#000000]Add Device +',
+                        color=(200/250, 200/250, 200/250,.85))
         self.widgets['device_layout'].add_widget(new_device)
         new_device.bind(on_release=self.new_device_func)
 
@@ -1591,19 +1609,16 @@ class PreferenceScreen(Screen):
         self.widgets['pref_scroll']=pref_scroll
 
         scroll_layout=EventpassGridLayout(
-            size_hint_y=1.5,
+            size_hint_y=1.75,
             size_hint_x=.95,
             cols=1,
             padding=10,
-            spacing=(1,25))
+            spacing=(1,40))
         self.widgets['scroll_layout']=scroll_layout
-        #scroll_layout.bind(minimum_height=scroll_layout.setter('height'))
+        scroll_layout.bind(minimum_height=scroll_layout.setter('height'))
 
-        '''scroll layout changes size to fit children, so pos hints chnage all widgets, then sets the scroll layouts size to small, making
-        all widgets stay the same size again'''
-        size=35
         heat_sensor=RoundedButton(text=current_language['heat_sensor'],
-                        size_hint =(1, size),
+                        size_hint =(1, 1),
                         #pos_hint = {'x':.01, 'y':.9},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1614,7 +1629,7 @@ class PreferenceScreen(Screen):
         heat_sensor.bind(on_release=self.blur_screen)
 
         train=RoundedButton(text=current_language['train'],
-                        size_hint =(1, size),
+                        size_hint =(1, 1),
                         pos_hint = {'x':.01, 'y':.6},
                         background_down='',
                         disabled=True,
@@ -1625,7 +1640,7 @@ class PreferenceScreen(Screen):
         train.bind(on_release=self.train_func)
 
         about=RoundedButton(text=current_language['about'],
-                        size_hint =(1, size),
+                        size_hint =(1, 1),
                         pos_hint = {'x':.01, 'y':.7},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1635,7 +1650,7 @@ class PreferenceScreen(Screen):
         about.bind(on_release=self.about_func)
 
         clean_mode=RoundedButton(text=current_language['clean_mode'],
-                        size_hint =(1, size),
+                        size_hint =(1, 1),
                         pos_hint = {'x':.01, 'y':.8},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
@@ -1645,7 +1660,7 @@ class PreferenceScreen(Screen):
         clean_mode.bind(on_release=self.clean_mode_func)
 
         commission=RoundedButton(text=current_language['commission'],
-                        size_hint =(1, size),
+                        size_hint =(1, 1),
                         pos_hint = {'x':.01, 'y':.5},
                         background_down='',
                         disabled=True,
@@ -1656,7 +1671,7 @@ class PreferenceScreen(Screen):
         commission.bind(on_release=self.commission_func)
 
         pins=RoundedButton(text=current_language['pins'],
-                        size_hint =(1, size),
+                        size_hint =(1, 1),
                         pos_hint = {'x':.01, 'y':.4},
                         background_down='',
                         background_color=(200/250, 200/250, 200/250,.9),
