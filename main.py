@@ -282,7 +282,7 @@ class ScrollItemTemplate(Button):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
 
-class RoundedScrollItemTemplate(RoundedButton):
+class RoundedScrollItemTemplate(RoundedButton): 
     def __init__(self,Item_tag,color=(245/250, 216/250, 41/250,.85),**kwargs):
         if color==(245/250, 216/250, 41/250,.9):
             text_color= '#000000'
@@ -295,7 +295,6 @@ class RoundedScrollItemTemplate(RoundedButton):
         background_down='',
         background_color=color,
         **kwargs)
-
 
 class DisplayLabel(Label):
     def __init__(self, **kwargs):
@@ -793,8 +792,8 @@ class ReportScreen(Screen):
         date_label=DisplayLabel(
             text='',
             markup=True,
-            size_hint =(.135, .045),
-            pos_hint = {'center_x':.88, 'center_y':.865})
+            size_hint =(.14, .05),
+            pos_hint = {'center_x':.883, 'center_y':.843})
         self.widgets['date_label']=date_label
 
         report_image=Image(
