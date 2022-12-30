@@ -19,3 +19,6 @@ class Pindex:
 
     def p3141(pin_screen):
         pin_screen.widgets['admin_overlay'].open()
+
+    def p7331(pin_screen):
+        pin_screen.widgets['report_pending_overlay'].open()

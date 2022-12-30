@@ -796,6 +796,33 @@ class ReportScreen(Screen):
             pos_hint = {'center_x':.883, 'center_y':.843})
         self.widgets['date_label']=date_label
 
+        pending_watermark=Label(
+            text=current_language['pending_watermark'],
+            markup=True,
+            size_hint =(1,1),
+            pos_hint = {'center_x':.5, 'center_y':.75})
+        pending_watermark.opacity=.6
+        self.widgets['pending_watermark']=pending_watermark
+        pending_watermark.ref='pending_watermark'
+
+        pending_watermark2=Label(
+            text=current_language['pending_watermark'],
+            markup=True,
+            size_hint =(1,1),
+            pos_hint = {'center_x':.5, 'center_y':.5})
+        pending_watermark2.opacity=.6
+        self.widgets['pending_watermark2']=pending_watermark2
+        pending_watermark2.ref='pending_watermark'
+
+        pending_watermark3=Label(
+            text=current_language['pending_watermark'],
+            markup=True,
+            size_hint =(1,1),
+            pos_hint = {'center_x':.5, 'center_y':.25})
+        pending_watermark3.opacity=.6
+        self.widgets['pending_watermark3']=pending_watermark3
+        pending_watermark.ref='pending_watermark'
+
         report_image=Image(
             source=report_current)
         self.widgets['report_image']=report_image
@@ -803,6 +830,7 @@ class ReportScreen(Screen):
         scroll_layout=RelativeLayout(
             size_hint_y=2.5,
             size_hint_x=.95)
+        self.widgets['scroll_layout']=scroll_layout
 
         report_scroll=ScrollView(
             bar_width=8,
@@ -840,6 +868,21 @@ class ReportScreen(Screen):
         self.add_widget(back_main)
         self.add_widget(seperator_line)
 
+    def check_pending(self):
+        if App.get_running_app().report_pending==False:
+            if self.widgets['pending_watermark'] in self.widgets['scroll_layout'].children:
+                self.widgets['scroll_layout'].remove_widget(self.widgets['pending_watermark'])
+                self.widgets['scroll_layout'].remove_widget(self.widgets['pending_watermark2'])
+                self.widgets['scroll_layout'].remove_widget(self.widgets['pending_watermark3'])
+        else:
+            if self.widgets['pending_watermark'] not in self.widgets['scroll_layout'].children:
+                self.widgets['scroll_layout'].add_widget(self.widgets['pending_watermark'])
+                self.widgets['scroll_layout'].add_widget(self.widgets['pending_watermark2'])
+                self.widgets['scroll_layout'].add_widget(self.widgets['pending_watermark3'])
+
+
+    def on_enter(self):
+        self.check_pending()
     def on_pre_enter(self):
         self.date_setter()
     def Report_back (self,button):
@@ -1856,8 +1899,7 @@ class PreferenceScreen(Screen):
             text=current_language['override_overlay_warning_text'],
             markup=True,
             size_hint =(1,.6),
-            pos_hint = {'x':0, 'y':.4},
-        )
+            pos_hint = {'x':0, 'y':.4},)
         self.widgets['warning_text']=warning_text
         warning_text.ref='override_overlay_warning_text'
 
@@ -2340,6 +2382,57 @@ class PinScreen(Screen):
             self.widgets['admin_overlay'].dismiss()
         admin_cancel.bind(on_release=admin_cancel_func)
 
+        report_pending_overlay=PinPop('report_pending')
+        self.popups.append(report_pending_overlay)
+        self.widgets['report_pending_overlay']=report_pending_overlay
+        report_pending_overlay.ref='report_pending_overlay'
+        report_pending_overlay.widgets['overlay_layout']=report_pending_overlay.overlay_layout
+
+        report_pending_text=Label(
+            text=current_language['report_pending_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},)
+        self.widgets['report_pending_text']=report_pending_text
+        report_pending_text.ref='report_pending_text'
+
+        report_pending_confirm=RoundedButton(text=current_language['report_pending_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['report_pending_confirm']=report_pending_confirm
+        report_pending_confirm.ref='report_pending_confirm'
+
+        report_pending_cancel=RoundedButton(text=current_language['report_pending_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['report_pending_cancel']=report_pending_cancel
+        report_pending_cancel.ref='report_pending_cancel'
+
+        def report_pending_confirm_func(button):
+            if App.get_running_app().report_pending==True:
+                App.get_running_app().report_pending=False
+            else:
+                App.get_running_app().report_pending=True
+            report_pending_setter_func()
+            self.widgets['report_pending_overlay'].dismiss()
+        report_pending_confirm.bind(on_release=report_pending_confirm_func)
+
+        def report_pending_cancel_func(button):
+            self.widgets['report_pending_overlay'].dismiss()
+        report_pending_cancel.bind(on_release=report_pending_cancel_func)
+
+        def report_pending_setter_func():
+            config=App.get_running_app().config_
+            config.set('config','report_pending',f'{App.get_running_app().report_pending}')
+            with open('hood_control.ini','w') as configfile:
+                config.write(configfile)
+
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
@@ -2352,6 +2445,9 @@ class PinScreen(Screen):
         self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_text)
         self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_confirm)
         self.widgets['admin_overlay'].widgets['overlay_layout'].add_widget(admin_cancel)
+        self.widgets['report_pending_overlay'].widgets['overlay_layout'].add_widget(report_pending_text)
+        self.widgets['report_pending_overlay'].widgets['overlay_layout'].add_widget(report_pending_confirm)
+        self.widgets['report_pending_overlay'].widgets['overlay_layout'].add_widget(report_pending_cancel)
 
         seperator_line=Image(source=r'media/line_gray.png',
                     allow_stretch=True,
@@ -2781,6 +2877,7 @@ def listen(app_object,*args):
 class Hood_Control(App):
     def build(self):
         self.admin_mode_start=time.time()
+        self.report_pending=False#overwritten in settings_setter() from config file
         self.config_ = configparser.ConfigParser()
         self.config_.read(preferences_path)
         settings_setter(self.config_)
@@ -2809,6 +2906,8 @@ def settings_setter(config):
         logic.heat_sensor_timer=900
     elif heat_duration == '1800':
         logic.heat_sensor_timer=1800
+    report_status=config.getboolean('config','report_pending')
+    App.get_running_app().report_pending=report_status
 
 def language_setter(*args,config=None):
     def widget_walker(widget,current_language):

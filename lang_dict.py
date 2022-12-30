@@ -100,6 +100,12 @@ DISABLE for 3 seconds.
     'admin_text' : '[size=30][color=#000000] Enable Admin mode? [/color][/size]',
     'admin_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'admin_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'report_pending_overlay' : 'Report Pending',
+    'report_pending_text' : '''[size=30][color=#000000] Enable/Disable system report 
+ pending changes watermark? [/color][/size]''',
+    'report_pending_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'report_pending_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'pending_watermark' : '[size=100][b][color=#787878] Pending Updates [/color][/b][/size]'
 }
 
 spanish={
