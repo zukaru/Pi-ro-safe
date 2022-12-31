@@ -249,16 +249,19 @@ class trouble_template(Button):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
     def translate(self,current_language):
-        if self.link_text == None:
-            link_text=''
-        else:
-            link_text='\n'+str(current_language[self.link_text])
-        if self.trouble_text!='':
-            trouble_text=current_language[self.trouble_text]
-        else:
-            trouble_text=''
-        self.text=f'''[size=24][b]{current_language[self.trouble_tag]}[/b][/size]
-        [size=18][i]{trouble_text}[/i][/size][size=30][color=#de2500][i][ref={self.ref_tag}]{link_text}[/ref][/i][/color][/size]'''
+        try:
+            if self.link_text == None:
+                link_text=''
+            else:
+                link_text='\n'+str(current_language[self.link_text])
+            if self.trouble_text!='':
+                trouble_text=current_language[self.trouble_text]
+            else:
+                trouble_text=''
+            self.text=f'''[size=24][b]{current_language[self.trouble_tag]}[/b][/size]
+            [size=18][i]{trouble_text}[/i][/size][size=30][color=#de2500][i][ref={self.ref_tag}]{link_text}[/ref][/i][/color][/size]'''
+        except KeyError:
+                    print(f'main.py CLASS=trouble_template translate():  {self} has no entry in selected lanuage dict')
 
 class ScrollItemTemplate(Button):
     def __init__(self,Item_tag,Item_text='',link_text=None,ref_tag=None,color=(245/250, 216/250, 41/250,.85),**kwargs):
@@ -2919,7 +2922,10 @@ def language_setter(*args,config=None):
                 widget_walker(i,current_language)
         if hasattr(widget,'text') and hasattr(widget,'ref'):
             if widget.text!='':
-                widget.text=current_language[str(widget.ref)]
+                try:
+                    widget.text=current_language[str(widget.ref)]
+                except KeyError:
+                    print(f'main.py lanuguage_setter():  {widget} has no entry in selected lanuage dict')
     if config:
         global current_language
         lang_pref=config['preferences']['language']
