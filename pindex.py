@@ -22,3 +22,6 @@ class Pindex:
 
     def p7331(pin_screen):
         pin_screen.widgets['report_pending_overlay'].open()
+
+    def p8521(pin_screen):
+        pin_screen.widgets['mount_overlay'].open()

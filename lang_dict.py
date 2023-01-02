@@ -105,7 +105,12 @@ DISABLE for 3 seconds.
  pending changes watermark? [/color][/size]''',
     'report_pending_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'report_pending_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
-    'pending_watermark' : '[size=100][b][color=#787878] Pending Updates [/color][/b][/size]'
+    'pending_watermark' : '[size=100][b][color=#787878] Pending Updates [/color][/b][/size]',
+    'mount_overlay' : 'Mount Device',
+    'mount_text' : '''[size=30][color=#000000] Insert external storage device 
+    before pressing Continue [/color][/size]''',
+    'mount_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'mount_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]'
 }
 
 spanish={
