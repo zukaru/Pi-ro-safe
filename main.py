@@ -31,6 +31,7 @@ from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.pagelayout import PageLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from threading import Thread
 from kivy.uix.screenmanager import NoTransition
@@ -341,6 +342,20 @@ class ColorProgressBar(ProgressBar):
 
         with self.canvas.before:
             self.background=BorderImage
+
+class BoxLayoutColor(BoxLayout):
+    def __init__(self, **kwargs):
+        super(BoxLayoutColor,self).__init__(**kwargs)
+
+        with self.canvas.before:
+                Color(0, 0, 0, .98)
+                self.rect = Rectangle(size=self.size, pos=self.pos)
+
+        self.bind(size=self._update_rect, pos=self._update_rect)
+
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
 
 #<<<<<<<<<<>>>>>>>>>>#
 
@@ -2436,6 +2451,48 @@ class PinScreen(Screen):
             with open('hood_control.ini','w') as configfile:
                 config.write(configfile)
 
+        mount_overlay=PinPop('mount')
+        self.popups.append(mount_overlay)
+        self.widgets['mount_overlay']=mount_overlay
+        mount_overlay.ref='mount_overlay'
+        mount_overlay.widgets['overlay_layout']=mount_overlay.overlay_layout
+
+        mount_text=Label(
+            text=current_language['mount_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},)
+        self.widgets['mount_text']=mount_text
+        mount_text.ref='mount_text'
+
+        mount_confirm=RoundedButton(text=current_language['mount_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['mount_confirm']=mount_confirm
+        mount_confirm.ref='mount_confirm'
+
+        mount_cancel=RoundedButton(text=current_language['mount_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['mount_cancel']=mount_cancel
+        mount_cancel.ref='mount_cancel'
+
+        def mount_confirm_func(button):
+            self.widgets['mount_overlay'].dismiss()
+            self.parent.transition = SlideTransition(direction='left')
+            self.manager.current='mount'
+        mount_confirm.bind(on_release=mount_confirm_func)
+
+        def mount_cancel_func(button):
+            self.widgets['mount_overlay'].dismiss()
+        mount_cancel.bind(on_release=mount_cancel_func)
+
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
@@ -2451,6 +2508,9 @@ class PinScreen(Screen):
         self.widgets['report_pending_overlay'].widgets['overlay_layout'].add_widget(report_pending_text)
         self.widgets['report_pending_overlay'].widgets['overlay_layout'].add_widget(report_pending_confirm)
         self.widgets['report_pending_overlay'].widgets['overlay_layout'].add_widget(report_pending_cancel)
+        self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_text)
+        self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_confirm)
+        self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_cancel)
 
         seperator_line=Image(source=r'media/line_gray.png',
                     allow_stretch=True,
@@ -2735,6 +2795,73 @@ class TroubleScreen(Screen):
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='main'
 
+class MountScreen(Screen):
+    def __init__(self, **kw):
+        super(MountScreen,self).__init__(**kw)
+        self.widgets={}
+        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+
+        back=RoundedButton(text=current_language['preferences_back'],
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.06, 'y':.015},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['back']=back
+        back.ref='preferences_back'
+        back.bind(on_press=self.settings_back)
+
+        back_main=RoundedButton(text=current_language['preferences_back_main'],
+                        size_hint =(.4, .1),
+                        pos_hint = {'x':.52, 'y':.015},
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['back_main']=back_main
+        back_main.ref='preferences_back_main'
+        back_main.bind(on_press=self.settings_back_main)
+
+        file_selector_origin=FileChooserListView(
+            rootpath='/media/pi')
+
+        file_layout_origin=BoxLayoutColor(
+            orientation='vertical',
+            size_hint =(.4, .65),
+            pos_hint = {'center_x':.25, 'y':.35})
+
+        file_selector_dest=FileChooserListView(
+            dirselect=True,
+            rootpath='/home/pi/Pi-ro-safe/logs')
+
+        file_layout_dest=BoxLayoutColor(
+            orientation='vertical',
+            size_hint =(.4, .65),
+            pos_hint = {'center_x':.75, 'y':.35})
+
+
+
+        seperator_line=Image(source=r'media/line_gray.png',
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint =(.98, .001),
+            pos_hint = {'x':.01, 'y':.13})
+
+        file_layout_origin.add_widget(file_selector_origin)
+        file_layout_dest.add_widget(file_selector_dest)
+        self.add_widget(bg_image)
+        self.add_widget(file_layout_origin)
+        self.add_widget(file_layout_dest)
+        self.add_widget(back)
+        self.add_widget(back_main)
+        self.add_widget(seperator_line)
+
+    def settings_back(self,button):
+        self.parent.transition = SlideTransition(direction='right')
+        self.manager.current='pin'
+    def settings_back_main(self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        self.manager.current='main'
+
 def listen(app_object,*args):
     event_log=logic.fs.milo
     pass_flag=False
@@ -2886,6 +3013,7 @@ class Hood_Control(App):
         settings_setter(self.config_)
         Clock.schedule_once(partial(language_setter,config=self.config_))
         self.context_screen=ScreenManager()
+        self.context_screen.add_widget(MountScreen(name='mount'))
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
