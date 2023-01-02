@@ -153,9 +153,9 @@ if os.name == 'posix':
         return False
     def micro_switch_active():
         for i in (i for i in devices if isinstance(i,micro_switch.MicroSwitch)):
-            if GPIO.input(i.pin):
-                return False
-        return True
+            if not GPIO.input(i.pin):
+                return True
+        return False
     def fan_switch_on():
         for i in (i for i in devices if isinstance(i,switch_fans.SwitchFans)):
             if GPIO.input(i.pin):
