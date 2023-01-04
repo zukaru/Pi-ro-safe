@@ -110,7 +110,19 @@ DISABLE for 3 seconds.
     'mount_text' : '''[size=30][color=#000000] Insert external storage device 
     before pressing Continue [/color][/size]''',
     'mount_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
-    'mount_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]'
+    'mount_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'internal_label' : '[size=20][b][color=#ffffff]Internal Storage[/color][/b][/size]',
+    'external_label' : '[size=20][b][color=#ffffff]External Storage[/color][/b][/size]',
+    'instruction_label' : '''[size=20][b][color=#ffffff]                [u]Instructions\n[/size][/u][/b]
+[size=16]Data may be moved in either direction.
+If a file is selected as the destination
+it will be overwritten; A folder as the
+destination will copy into it.
+(e.g. make a copy unless the file exists
+already, than it will overwrite it)\n\n[/color][/size]''',
+'import_button' : "[size=30][b][color=#000000] Import [/color][/b][/size]",
+'export_button' : "[size=30][b][color=#000000] Export [/color][/b][/size]",
+'refresh_button' : "[size=30][b][color=#000000] Refresh [/color][/b][/size]"
 }
 
 spanish={

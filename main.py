@@ -1,5 +1,5 @@
-import os,json,time
-import traceback
+import os,json,time,shutil
+import traceback,errno
 from kivy.config import Config
 
 from exhaust import Exhaust
@@ -348,7 +348,21 @@ class BoxLayoutColor(BoxLayout):
         super(BoxLayoutColor,self).__init__(**kwargs)
 
         with self.canvas.before:
-                Color(0, 0, 0, .98)
+                Color(0,0,0,.95)
+                self.rect = Rectangle(size=self.size, pos=self.pos)
+
+        self.bind(size=self._update_rect, pos=self._update_rect)
+
+    def _update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
+
+class LabelColor(Label):
+    def __init__(self, **kwargs):
+        super(LabelColor,self).__init__(**kwargs)
+
+        with self.canvas.before:
+                Color(.1,.1,.1,.95)
                 self.rect = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_rect, pos=self._update_rect)
@@ -2821,24 +2835,79 @@ class MountScreen(Screen):
         back_main.ref='preferences_back_main'
         back_main.bind(on_press=self.settings_back_main)
 
-        file_selector_origin=FileChooserListView(
-            rootpath='/media/pi')
-
-        file_layout_origin=BoxLayoutColor(
-            orientation='vertical',
-            size_hint =(.4, .65),
-            pos_hint = {'center_x':.25, 'y':.35})
-
-        file_selector_dest=FileChooserListView(
+        file_selector_external=FileChooserIconView(
             dirselect=True,
-            rootpath='/home/pi/Pi-ro-safe/logs')
+            rootpath='/media/pi')
+        self.widgets['file_layout_external']=file_selector_external
 
-        file_layout_dest=BoxLayoutColor(
+        file_layout_external=BoxLayoutColor(
             orientation='vertical',
-            size_hint =(.4, .65),
-            pos_hint = {'center_x':.75, 'y':.35})
+            size_hint =(.4, .45),
+            pos_hint = {'center_x':.75, 'y':.5})
 
+        internal_label=Label(
+            text=current_language['internal_label'],
+            markup=True,
+            size_hint =(.4, .05),
+            pos_hint = {'center_x':.25, 'y':.95},)
+        self.widgets['internal_label']=internal_label
+        internal_label.ref='internal_label'
 
+        file_selector_internal=FileChooserIconView(
+            dirselect=True,
+            rootpath=('/home/pi/Pi-ro-safe/logs'))
+        self.widgets['file_layout_internal']=file_selector_internal
+
+        file_layout_internal=BoxLayoutColor(
+            orientation='vertical',
+            size_hint =(.4, .45),
+            pos_hint = {'center_x':.25, 'y':.5})
+
+        external_label=Label(
+            text=current_language['external_label'],
+            markup=True,
+            size_hint =(.4, .05),
+            pos_hint = {'center_x':.75, 'y':.95},)
+        self.widgets['external_label']=external_label
+        external_label.ref='external_label'
+
+        instruction_label=LabelColor(
+            text=current_language['instruction_label'],
+            markup=True,
+            size_hint =(.4, .35),
+            pos_hint = {'center_x':.25, 'y':.14},)
+        self.widgets['instruction_label']=instruction_label
+        instruction_label.ref='instruction_label'
+
+        import_button=RoundedButton(text=current_language['import_button'],
+            size_hint =(.4, .1),
+            pos_hint = {'center_x':.75, 'y':.39},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.9),
+            markup=True)
+        self.widgets['import_button']=import_button
+        import_button.ref='import_button'
+        import_button.bind(on_press=self.import_button_func)
+
+        export_button=RoundedButton(text=current_language['export_button'],
+            size_hint =(.4, .1),
+            pos_hint = {'center_x':.75, 'y':.265},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.9),
+            markup=True)
+        self.widgets['export_button']=export_button
+        export_button.ref='export_button'
+        export_button.bind(on_press=self.export_button_func)
+
+        refresh_button=RoundedButton(text=current_language['refresh_button'],
+            size_hint =(.4, .1),
+            pos_hint = {'center_x':.75, 'y':.14},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.9),
+            markup=True)
+        self.widgets['refresh_button']=refresh_button
+        refresh_button.ref='refresh_button'
+        refresh_button.bind(on_press=self.refresh_button_func)
 
         seperator_line=Image(source=r'media/line_gray.png',
             allow_stretch=True,
@@ -2846,14 +2915,20 @@ class MountScreen(Screen):
             size_hint =(.98, .001),
             pos_hint = {'x':.01, 'y':.13})
 
-        file_layout_origin.add_widget(file_selector_origin)
-        file_layout_dest.add_widget(file_selector_dest)
+        file_layout_external.add_widget(file_selector_external)
+        file_layout_internal.add_widget(file_selector_internal)
         self.add_widget(bg_image)
-        self.add_widget(file_layout_origin)
-        self.add_widget(file_layout_dest)
+        self.add_widget(internal_label)
+        self.add_widget(external_label)
+        self.add_widget(file_layout_external)
+        self.add_widget(file_layout_internal)
         self.add_widget(back)
         self.add_widget(back_main)
         self.add_widget(seperator_line)
+        self.add_widget(instruction_label)
+        self.add_widget(import_button)
+        self.add_widget(export_button)
+        self.add_widget(refresh_button)
 
     def settings_back(self,button):
         self.parent.transition = SlideTransition(direction='right')
@@ -2861,6 +2936,67 @@ class MountScreen(Screen):
     def settings_back_main(self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
+    def import_button_func(self,button):
+        try:
+            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+            src=self.widgets['file_layout_external'].selection[0]
+        except IndexError:
+            print('main.py MountScreen import_button_func(): src not selected')
+            return
+        if self.widgets['file_layout_internal'].selection:
+            #overwrite selection
+            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+            dst=self.widgets['file_layout_internal'].selection[0]
+        else:
+            #can copy to cwd(current working directory)
+            dst=self.widgets['file_layout_internal'].path
+
+        if os.path.isdir(src):
+            if os.path.isdir(dst):
+                dst=os.path.join(dst,os.path.basename(os.path.normpath(src)))
+            else:
+                print('main.py MountScreen import_button_func(): can not copy dir over file')
+                return
+        try:
+            shutil.copytree(src, dst,dirs_exist_ok=True)
+        except OSError as exc:
+            if exc.errno in (errno.ENOTDIR, errno.EINVAL):
+                shutil.copy(src, dst)
+            else: raise
+        self.refresh_button_func()
+    def export_button_func(self,*args):
+        try:
+            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+            src=self.widgets['file_layout_internal'].selection[0]
+        except IndexError:
+            print('main.py MountScreen export_button_func(): src not selected')
+            return
+        if self.widgets['file_layout_external'].selection:
+            #overwrite selection
+            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+            dst=self.widgets['file_layout_external'].selection[0]
+        else:
+            #can copy to cwd(current working directory)
+            dst=self.widgets['file_layout_external'].path
+
+        if os.path.isdir(src):
+            if os.path.isdir(dst):
+                dst=os.path.join(dst,os.path.basename(os.path.normpath(src)))
+            else:
+                print('main.py MountScreen export_button_func(): can not copy dir over file')
+                return
+        try:
+            shutil.copytree(src, dst,dirs_exist_ok=True)
+        except OSError as exc:
+            if exc.errno in (errno.ENOTDIR, errno.EINVAL):
+                shutil.copy(src, dst)
+            else: raise
+        self.refresh_button_func()
+    def refresh_button_func(self,*args):
+        self.widgets['file_layout_external']._update_files()
+        self.widgets['file_layout_internal']._update_files()
+        self.widgets['file_layout_external'].selection=[]
+        self.widgets['file_layout_internal'].selection=[]
 
 def listen(app_object,*args):
     event_log=logic.fs.milo
@@ -3013,7 +3149,6 @@ class Hood_Control(App):
         settings_setter(self.config_)
         Clock.schedule_once(partial(language_setter,config=self.config_))
         self.context_screen=ScreenManager()
-        self.context_screen.add_widget(MountScreen(name='mount'))
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
@@ -3024,6 +3159,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(PinScreen(name='pin'))
         self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
+        self.context_screen.add_widget(MountScreen(name='mount'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)
