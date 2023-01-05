@@ -2880,8 +2880,8 @@ class MountScreen(Screen):
         instruction_label.ref='instruction_label'
 
         import_button=RoundedButton(text=current_language['import_button'],
-            size_hint =(.4, .1),
-            pos_hint = {'center_x':.75, 'y':.39},
+            size_hint =(.18, .1),
+            pos_hint = {'center_x':.65, 'y':.39},
             background_down='',
             background_color=(200/250, 200/250, 200/250,.9),
             markup=True)
@@ -2890,14 +2890,34 @@ class MountScreen(Screen):
         import_button.bind(on_press=self.import_button_func)
 
         export_button=RoundedButton(text=current_language['export_button'],
-            size_hint =(.4, .1),
-            pos_hint = {'center_x':.75, 'y':.265},
+            size_hint =(.18, .1),
+            pos_hint = {'center_x':.85, 'y':.39},#265
             background_down='',
             background_color=(200/250, 200/250, 200/250,.9),
             markup=True)
         self.widgets['export_button']=export_button
         export_button.ref='export_button'
         export_button.bind(on_press=self.export_button_func)
+
+        rename_button=RoundedButton(text=current_language['rename_button'],
+            size_hint =(.18, .1),
+            pos_hint = {'center_x':.65, 'y':.265},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.9),
+            markup=True)
+        self.widgets['rename_button']=rename_button
+        rename_button.ref='rename_button'
+        rename_button.bind(on_press=self.rename_button_func)
+
+        del_button=RoundedButton(text=current_language['del_button'],
+            size_hint =(.18, .1),
+            pos_hint = {'center_x':.85, 'y':.265},
+            background_down='',
+            background_color=(200/250, 200/250, 200/250,.9),
+            markup=True)
+        self.widgets['del_button']=del_button
+        del_button.ref='del_button'
+        del_button.bind(on_press=self.del_button_func)
 
         refresh_button=RoundedButton(text=current_language['refresh_button'],
             size_hint =(.4, .1),
@@ -2928,6 +2948,8 @@ class MountScreen(Screen):
         self.add_widget(instruction_label)
         self.add_widget(import_button)
         self.add_widget(export_button)
+        self.add_widget(rename_button)
+        self.add_widget(del_button)
         self.add_widget(refresh_button)
 
     def settings_back(self,button):
@@ -2992,6 +3014,10 @@ class MountScreen(Screen):
                 shutil.copy(src, dst)
             else: raise
         self.refresh_button_func()
+    def rename_button_func(self,*args):
+        pass
+    def del_button_func(self,*args):
+        pass
     def refresh_button_func(self,*args):
         self.widgets['file_layout_external']._update_files()
         self.widgets['file_layout_internal']._update_files()
@@ -3149,6 +3175,7 @@ class Hood_Control(App):
         settings_setter(self.config_)
         Clock.schedule_once(partial(language_setter,config=self.config_))
         self.context_screen=ScreenManager()
+        self.context_screen.add_widget(MountScreen(name='mount'))
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
@@ -3159,7 +3186,6 @@ class Hood_Control(App):
         self.context_screen.add_widget(PinScreen(name='pin'))
         self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
-        self.context_screen.add_widget(MountScreen(name='mount'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)

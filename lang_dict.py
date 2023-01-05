@@ -122,6 +122,8 @@ destination will copy into it.
 already, than it will overwrite it)\n\n[/color][/size]''',
 'import_button' : "[size=30][b][color=#000000] Import [/color][/b][/size]",
 'export_button' : "[size=30][b][color=#000000] Export [/color][/b][/size]",
+'rename_button' : "[size=30][b][color=#000000] Rename [/color][/b][/size]",
+'del_button' : "[size=30][b][color=#000000] Delete [/color][/b][/size]",
 'refresh_button' : "[size=30][b][color=#000000] Refresh [/color][/b][/size]"
 }
 
