@@ -3061,6 +3061,7 @@ class MountScreen(Screen):
                     shutil.copy(src, dst)
                 else: raise
             self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
         continue_button.bind(on_release=continue_button_func)
 
         def cancel_button_func(button):
@@ -3167,6 +3168,7 @@ class MountScreen(Screen):
                     shutil.copy(src, dst)
                 else: raise
             self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
         continue_button.bind(on_release=continue_button_func)
 
         def cancel_button_func(button):
