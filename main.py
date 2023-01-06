@@ -1883,8 +1883,7 @@ class PreferenceScreen(Screen):
             text=current_language['maint_overlay_warning_text'],
             markup=True,
             size_hint =(1,.6),
-            pos_hint = {'x':0, 'y':.4},
-        )
+            pos_hint = {'x':0, 'y':.4},)
         self.widgets['warning_text']=warning_text
         warning_text.ref='maint_overlay_warning_text'
 
@@ -2812,6 +2811,9 @@ class TroubleScreen(Screen):
 class MountScreen(Screen):
     def __init__(self, **kw):
         super(MountScreen,self).__init__(**kw)
+        self.rename_text=''
+        self.internal_path=r'/home/pi/Pi-ro-safe/logs'
+        self.external_path=r'/media/pi'
         self.widgets={}
         bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
 
@@ -2837,8 +2839,8 @@ class MountScreen(Screen):
 
         file_selector_external=FileChooserIconView(
             dirselect=True,
-            rootpath='/media/pi')
-        self.widgets['file_layout_external']=file_selector_external
+            rootpath=self.external_path)
+        self.widgets['file_selector_external']=file_selector_external
 
         file_layout_external=BoxLayoutColor(
             orientation='vertical',
@@ -2855,8 +2857,8 @@ class MountScreen(Screen):
 
         file_selector_internal=FileChooserIconView(
             dirselect=True,
-            rootpath=('/home/pi/Pi-ro-safe/logs'))
-        self.widgets['file_layout_internal']=file_selector_internal
+            rootpath=(self.internal_path))
+        self.widgets['file_selector_internal']=file_selector_internal
 
         file_layout_internal=BoxLayoutColor(
             orientation='vertical',
@@ -2880,8 +2882,8 @@ class MountScreen(Screen):
         instruction_label.ref='instruction_label'
 
         import_button=RoundedButton(text=current_language['import_button'],
-            size_hint =(.18, .1),
-            pos_hint = {'center_x':.65, 'y':.39},
+            size_hint =(.19, .1),
+            pos_hint = {'center_x':.645, 'y':.39},
             background_down='',
             background_color=(200/250, 200/250, 200/250,.9),
             markup=True)
@@ -2890,8 +2892,8 @@ class MountScreen(Screen):
         import_button.bind(on_press=self.import_button_func)
 
         export_button=RoundedButton(text=current_language['export_button'],
-            size_hint =(.18, .1),
-            pos_hint = {'center_x':.85, 'y':.39},#265
+            size_hint =(.19, .1),
+            pos_hint = {'center_x':.855, 'y':.39},
             background_down='',
             background_color=(200/250, 200/250, 200/250,.9),
             markup=True)
@@ -2900,8 +2902,8 @@ class MountScreen(Screen):
         export_button.bind(on_press=self.export_button_func)
 
         rename_button=RoundedButton(text=current_language['rename_button'],
-            size_hint =(.18, .1),
-            pos_hint = {'center_x':.65, 'y':.265},
+            size_hint =(.19, .1),
+            pos_hint = {'center_x':.645, 'y':.265},
             background_down='',
             background_color=(200/250, 200/250, 200/250,.9),
             markup=True)
@@ -2910,8 +2912,8 @@ class MountScreen(Screen):
         rename_button.bind(on_press=self.rename_button_func)
 
         del_button=RoundedButton(text=current_language['del_button'],
-            size_hint =(.18, .1),
-            pos_hint = {'center_x':.85, 'y':.265},
+            size_hint =(.19, .1),
+            pos_hint = {'center_x':.855, 'y':.265},
             background_down='',
             background_color=(200/250, 200/250, 200/250,.9),
             markup=True)
@@ -2929,6 +2931,19 @@ class MountScreen(Screen):
         refresh_button.ref='refresh_button'
         refresh_button.bind(on_press=self.refresh_button_func)
 
+        overlay_menu=Popup(
+            size_hint=(.8, .8),
+            background = 'atlas://data/images/defaulttheme/bubble',
+            title_color=[0, 0, 0, 1],
+            title_size='38',
+            title_align='center',
+            separator_color=[255/255, 0/255, 0/255, .5])
+        self.widgets['overlay_menu']=overlay_menu
+        overlay_menu.ref='heat_overlay'
+
+        overlay_layout=FloatLayout()
+        self.widgets['overlay_layout']=overlay_layout
+
         seperator_line=Image(source=r'media/line_gray.png',
             allow_stretch=True,
             keep_ratio=False,
@@ -2937,6 +2952,7 @@ class MountScreen(Screen):
 
         file_layout_external.add_widget(file_selector_external)
         file_layout_internal.add_widget(file_selector_internal)
+        overlay_menu.add_widget(overlay_layout)
         self.add_widget(bg_image)
         self.add_widget(internal_label)
         self.add_widget(external_label)
@@ -2952,6 +2968,253 @@ class MountScreen(Screen):
         self.add_widget(del_button)
         self.add_widget(refresh_button)
 
+    def del_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.85)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+        internal_selection=self.widgets['file_selector_internal'].selection[0] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_internal'].selection
+        external_selection=self.widgets['file_selector_external'].selection[0] if self.widgets['file_selector_external'].selection else self.widgets['file_selector_external'].selection
+        #ensure that only one selection is made
+        if bool(external_selection)^bool(internal_selection):
+            single_selection=True
+            selected_item_path=internal_selection if internal_selection else external_selection
+            selected_item=os.path.basename(internal_selection) if internal_selection else os.path.basename(external_selection)
+            view_port=self.widgets['file_selector_internal'] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_external']
+            if selected_item_path == view_port.path or selected_item_path == self.internal_path or selected_item_path == self.external_path:
+                #opening or closing a folder sets selection to cwd,
+                #although that is a single selection it is undesirable to
+                #delete the cwd so we treat it as unselected
+                single_selection=False
+        else:
+            #selected multiple files or no selection made
+            single_selection=False
+
+        del_text=Label(
+            text=current_language['del_text']+f'[size=26]{selected_item}?[/size]' if single_selection else current_language['del_text_fail'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},)
+        self.widgets['del_text']=del_text
+        del_text.ref='del_text' if single_selection else 'del_text_fail'
+
+        background_state='background_normal' if single_selection else 'background_down'
+        continue_button=RoundedButton(text=current_language['continue_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        **{f'{background_state}':''},#accessing **kwargs dict at the desired key based on single_slection value
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['continue_button']=continue_button
+        continue_button.ref='continue_button'
+        if single_selection:
+            continue_button.disabled=False
+        else:
+            continue_button.disabled=True
+
+        cancel_button=RoundedButton(text=current_language['cancel_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['cancel_button']=cancel_button
+        cancel_button.ref='cancel_button'
+
+        def continue_button_func(button):
+            if os.path.isdir(selected_item_path):
+                shutil.rmtree(selected_item_path)
+            else:
+                os.remove(selected_item_path)
+            self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
+        continue_button.bind(on_release=continue_button_func)
+
+        def cancel_button_func(button):
+            self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
+        cancel_button.bind(on_release=cancel_button_func)
+
+        self.widgets['overlay_layout'].add_widget(del_text)
+        self.widgets['overlay_layout'].add_widget(continue_button)
+        self.widgets['overlay_layout'].add_widget(cancel_button)
+        self.widgets['overlay_menu'].open()
+
+    def rename_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.85)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+        internal_selection=self.widgets['file_selector_internal'].selection[0] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_internal'].selection
+        external_selection=self.widgets['file_selector_external'].selection[0] if self.widgets['file_selector_external'].selection else self.widgets['file_selector_external'].selection
+        #ensure that only one selection is made
+        if bool(external_selection)^bool(internal_selection):
+            single_selection=True
+            selected_item_path=internal_selection if internal_selection else external_selection
+            selected_item=os.path.basename(internal_selection) if internal_selection else os.path.basename(external_selection)
+            view_port=self.widgets['file_selector_internal'] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_external']
+            if selected_item_path == view_port.path or selected_item_path == self.internal_path or selected_item_path == self.external_path:
+                #opening or closing a folder sets selection to cwd,
+                #although that is a single selection it is undesirable to
+                #rename the cwd so we treat it as unselected
+                single_selection=False
+        else:
+            #selected multiple files or no selection made
+            single_selection=False
+
+        rename_text=Label(
+            text=current_language['rename_text']+f'[size=26]{selected_item}?[/size]' if single_selection else current_language['rename_text_fail'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},)
+        self.widgets['rename_text']=rename_text
+        rename_text.ref='rename_text' if single_selection else 'rename_text_fail'
+
+        background_state='background_normal' if single_selection else 'background_down'
+        continue_button=RoundedButton(text=current_language['continue_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        **{f'{background_state}':''},#accessing **kwargs dict at the desired key based on single_slection value
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['continue_button']=continue_button
+        continue_button.ref='continue_button'
+        if single_selection:
+            continue_button.disabled=False
+        else:
+            continue_button.disabled=True
+
+        cancel_button=RoundedButton(text=current_language['cancel_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['cancel_button']=cancel_button
+        cancel_button.ref='cancel_button'
+
+        def continue_button_func(button):
+            self.rename_input_overlay()
+        continue_button.bind(on_release=continue_button_func)
+
+        def cancel_button_func(button):
+            self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
+        cancel_button.bind(on_release=cancel_button_func)
+
+        self.widgets['overlay_layout'].add_widget(rename_text)
+        self.widgets['overlay_layout'].add_widget(continue_button)
+        self.widgets['overlay_layout'].add_widget(cancel_button)
+        self.widgets['overlay_menu'].open()
+
+    def rename_input_overlay(self):
+        self.rename_text=''
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.85)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+        internal_selection=self.widgets['file_selector_internal'].selection[0] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_internal'].selection
+        external_selection=self.widgets['file_selector_external'].selection[0] if self.widgets['file_selector_external'].selection else self.widgets['file_selector_external'].selection
+        #ensure that only one selection is made
+        if bool(external_selection)^bool(internal_selection):
+            single_selection=True
+            selected_item_path=internal_selection if internal_selection else external_selection
+            selected_item=os.path.basename(internal_selection) if internal_selection else os.path.basename(external_selection)
+            view_port=self.widgets['file_selector_internal'] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_external']
+            if selected_item_path == view_port.path or selected_item_path == self.internal_path or selected_item_path == self.external_path:
+                #opening or closing a folder sets selection to cwd,
+                #although that is a single selection it is undesirable to
+                #rename the cwd so we treat it as unselected
+                single_selection=False
+        else:
+            #selected multiple files or no selection made
+            single_selection=False
+
+        rename_input_text=Label(
+            text=current_language['rename_input_text']+f'[size=26]{selected_item}[/size]' if single_selection else current_language['rename_input_text_fail'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.65},)
+        self.widgets['rename_input_text']=rename_input_text
+        rename_input_text.ref='rename_input_text' if single_selection else 'rename_input_text_fail'
+
+        rename_unique_text=Label(
+            text=current_language['rename_unique_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'center_x':.5, 'center_y':.5},)
+        self.widgets['rename_unique_text']=rename_unique_text
+        rename_unique_text.ref='rename_unique_text'
+
+        get_name=TextInput(multiline=False,
+                        focus=False,
+                        hint_text="Enter new file/folder name",
+                        font_size=26,
+                        size_hint =(.5, .1),
+                        pos_hint = {'center_x':.50, 'center_y':.65})
+        self.widgets['get_name']=get_name
+        get_name.bind(on_text_validate=partial(self.get_name_func))
+        get_name.bind(text=partial(self.get_name_func))
+
+        background_state='background_normal' if single_selection else 'background_down'
+        save_button=RoundedButton(text=current_language['save_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        **{f'{background_state}':''},#accessing **kwargs dict at the desired key based on single_slection value
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['save_button']=save_button
+        save_button.ref='save_button'
+        if single_selection:
+            save_button.disabled=False
+        else:
+            save_button.disabled=True
+
+        cancel_button=RoundedButton(text=current_language['cancel_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['cancel_button']=cancel_button
+        cancel_button.ref='cancel_button'
+
+        def save_button_func(path,button,*args):
+            if self.rename_text:
+                new_path=os.path.join(os.path.dirname(path),self.rename_text)
+                try:
+                    os.rename(path,new_path)
+                    self.refresh_button_func()
+                    self.widgets['overlay_menu'].dismiss()
+                except FileExistsError:
+                    if not self.widgets['rename_unique_text'].parent:
+                        self.widgets['overlay_layout'].add_widget(self.widgets['rename_unique_text'])
+                    self.widgets['get_name'].text=''
+            else:
+                if not self.widgets['rename_unique_text'].parent:
+                        self.widgets['overlay_layout'].add_widget(self.widgets['rename_unique_text'])
+
+        save_button.bind(on_release=partial(save_button_func,selected_item_path))
+
+        def cancel_button_func(button):
+            self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
+        cancel_button.bind(on_release=cancel_button_func)
+
+        self.widgets['overlay_layout'].add_widget(rename_input_text)
+        self.widgets['overlay_layout'].add_widget(get_name)
+        self.widgets['overlay_layout'].add_widget(save_button)
+        self.widgets['overlay_layout'].add_widget(cancel_button)
+
+    def get_name_func(self,button,*args):
+        self.rename_text=button.text
+
     def settings_back(self,button):
         self.parent.transition = SlideTransition(direction='right')
         self.manager.current='pin'
@@ -2961,17 +3224,17 @@ class MountScreen(Screen):
     def import_button_func(self,button):
         try:
             #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            src=self.widgets['file_layout_external'].selection[0]
+            src=self.widgets['file_selector_external'].selection[0]
         except IndexError:
             print('main.py MountScreen import_button_func(): src not selected')
             return
-        if self.widgets['file_layout_internal'].selection:
+        if self.widgets['file_selector_internal'].selection:
             #overwrite selection
             #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            dst=self.widgets['file_layout_internal'].selection[0]
+            dst=self.widgets['file_selector_internal'].selection[0]
         else:
             #can copy to cwd(current working directory)
-            dst=self.widgets['file_layout_internal'].path
+            dst=self.widgets['file_selector_internal'].path
 
         if os.path.isdir(src):
             if os.path.isdir(dst):
@@ -2989,17 +3252,17 @@ class MountScreen(Screen):
     def export_button_func(self,*args):
         try:
             #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            src=self.widgets['file_layout_internal'].selection[0]
+            src=self.widgets['file_selector_internal'].selection[0]
         except IndexError:
             print('main.py MountScreen export_button_func(): src not selected')
             return
-        if self.widgets['file_layout_external'].selection:
+        if self.widgets['file_selector_external'].selection:
             #overwrite selection
             #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            dst=self.widgets['file_layout_external'].selection[0]
+            dst=self.widgets['file_selector_external'].selection[0]
         else:
             #can copy to cwd(current working directory)
-            dst=self.widgets['file_layout_external'].path
+            dst=self.widgets['file_selector_external'].path
 
         if os.path.isdir(src):
             if os.path.isdir(dst):
@@ -3015,14 +3278,14 @@ class MountScreen(Screen):
             else: raise
         self.refresh_button_func()
     def rename_button_func(self,*args):
-        pass
+        self.rename_overlay()
     def del_button_func(self,*args):
-        pass
+        self.del_overlay()
     def refresh_button_func(self,*args):
-        self.widgets['file_layout_external']._update_files()
-        self.widgets['file_layout_internal']._update_files()
-        self.widgets['file_layout_external'].selection=[]
-        self.widgets['file_layout_internal'].selection=[]
+        self.widgets['file_selector_external']._update_files()
+        self.widgets['file_selector_internal']._update_files()
+        self.widgets['file_selector_external'].selection=[]
+        self.widgets['file_selector_internal'].selection=[]
 
 def listen(app_object,*args):
     event_log=logic.fs.milo
