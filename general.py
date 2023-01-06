@@ -1,3 +1,4 @@
+import os
 def Convert_time(n):
     day = int(n // (24 * 3600))
     n = n % (24 * 3600)
@@ -14,3 +15,10 @@ def Convert_time(n):
     d=f"{day} Day{d_plural}" if day else ""
     product=f"{d}{delimiter_1}{h}{delimiter_2}{m}" if day or hour or minutes else "Run time less than a minute"
     return product
+
+def file_or_dir(path):
+    if os.path.isdir(path):
+        return 'folder'
+    if os.path.isfile(path):
+        return 'file'
+    return ''

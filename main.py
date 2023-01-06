@@ -2968,6 +2968,218 @@ class MountScreen(Screen):
         self.add_widget(del_button)
         self.add_widget(refresh_button)
 
+    def import_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.85)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+        internal_selection=self.widgets['file_selector_internal'].selection[0] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_internal'].selection
+        external_selection=self.widgets['file_selector_external'].selection[0] if self.widgets['file_selector_external'].selection else self.widgets['file_selector_external'].selection
+        #ensure that only one selection is made
+        if external_selection:
+            #internal selection can be cwd, so with external selection we have double selection
+            double_selection=True
+        else:
+            #no external selection made
+            double_selection=False
+
+        if self.widgets['file_selector_internal'].selection:
+                #overwrite selection
+                #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+                dst_path=self.widgets['file_selector_internal'].selection[0]
+        else:
+            #can copy to cwd(current working directory)
+            dst_path=self.widgets['file_selector_internal'].path
+
+        import_text=Label(
+            text=current_language['import_text']+f'[size=26]{os.path.basename(external_selection)}({general.file_or_dir(external_selection)}) >> {os.path.basename(dst_path)}({general.file_or_dir(dst_path)})?[/size]' if double_selection else current_language['import_text_fail'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},)
+        self.widgets['import_text']=import_text
+        import_text.ref='import_text' if double_selection else 'import_text_fail'
+
+        import_unique_text=Label(
+            text='',
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'center_x':.5, 'center_y':.5},)
+        self.widgets['import_unique_text']=import_unique_text
+
+        background_state='background_normal' if double_selection else 'background_down'
+        continue_button=RoundedButton(text=current_language['continue_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        **{f'{background_state}':''},#accessing **kwargs dict at the desired key based on double_slection value
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['continue_button']=continue_button
+        continue_button.ref='continue_button'
+        if double_selection:
+            continue_button.disabled=False
+        else:
+            continue_button.disabled=True
+
+        cancel_button=RoundedButton(text=current_language['cancel_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['cancel_button']=cancel_button
+        cancel_button.ref='cancel_button'
+
+        def continue_button_func(button):
+            try:
+                #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+                src=self.widgets['file_selector_external'].selection[0]
+            except IndexError:
+                print('main.py MountScreen import_button_func(): src not selected')
+                self.widgets['import_unique_text'].text="[size=20][color=#ffffff]You must make a selection from external storage to import[/color][/size]"
+                return
+            if self.widgets['file_selector_internal'].selection:
+                #overwrite selection
+                #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+                dst=self.widgets['file_selector_internal'].selection[0]
+            else:
+                #can copy to cwd(current working directory)
+                dst=self.widgets['file_selector_internal'].path
+
+            if os.path.isdir(src):
+                if os.path.isdir(dst):
+                    dst=os.path.join(dst,os.path.basename(os.path.normpath(src)))
+                else:
+                    print('main.py MountScreen import_button_func(): can not copy dir over file')
+                    self.widgets['import_unique_text'].text="[size=20][color=#ffffff]Can not overwrite a file with a folder[/color][/size]"
+                    return
+            try:
+                shutil.copytree(src, dst,dirs_exist_ok=True)
+            except OSError as exc:
+                if exc.errno in (errno.ENOTDIR, errno.EINVAL):
+                    shutil.copy(src, dst)
+                else: raise
+            self.refresh_button_func()
+        continue_button.bind(on_release=continue_button_func)
+
+        def cancel_button_func(button):
+            self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
+        cancel_button.bind(on_release=cancel_button_func)
+
+        self.widgets['overlay_layout'].add_widget(import_text)
+        self.widgets['overlay_layout'].add_widget(import_unique_text)
+        self.widgets['overlay_layout'].add_widget(continue_button)
+        self.widgets['overlay_layout'].add_widget(cancel_button)
+        self.widgets['overlay_menu'].open()
+
+    def export_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.85)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+        internal_selection=self.widgets['file_selector_internal'].selection[0] if self.widgets['file_selector_internal'].selection else self.widgets['file_selector_internal'].selection
+        external_selection=self.widgets['file_selector_external'].selection[0] if self.widgets['file_selector_external'].selection else self.widgets['file_selector_external'].selection
+        #ensure that only one selection is made
+        if internal_selection:
+            #external selection can be cwd, so with internal selection we have double selection
+            double_selection=True
+        else:
+            #no internal selection made
+            double_selection=False
+
+        if self.widgets['file_selector_external'].selection:
+                #overwrite selection
+                #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+                dst_path=self.widgets['file_selector_external'].selection[0]
+        else:
+            #can copy to cwd(current working directory)
+            dst_path=self.widgets['file_selector_external'].path
+
+        export_text=Label(
+            text=current_language['export_text']+f'[size=26]{os.path.basename(internal_selection)}({general.file_or_dir(internal_selection)}) >> {os.path.basename(dst_path)}({general.file_or_dir(dst_path)})?[/size]' if double_selection else current_language['export_text_fail'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},)
+        self.widgets['export_text']=export_text
+        export_text.ref='export_text' if double_selection else 'export_text_fail'
+
+        export_unique_text=Label(
+            text='',
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'center_x':.5, 'center_y':.5},)
+        self.widgets['export_unique_text']=export_unique_text
+
+        background_state='background_normal' if double_selection else 'background_down'
+        continue_button=RoundedButton(text=current_language['continue_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        **{f'{background_state}':''},#accessing **kwargs dict at the desired key based on double_slection value
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['continue_button']=continue_button
+        continue_button.ref='continue_button'
+        if double_selection:
+            continue_button.disabled=False
+        else:
+            continue_button.disabled=True
+
+        cancel_button=RoundedButton(text=current_language['cancel_button'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.85),
+                        markup=True)
+        self.widgets['cancel_button']=cancel_button
+        cancel_button.ref='cancel_button'
+
+        def continue_button_func(button):
+            try:
+                #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+                src=self.widgets['file_selector_internal'].selection[0]
+            except IndexError:
+                print('main.py MountScreen export_button_func(): src not selected')
+                self.widgets['export_unique_text'].text="[size=20][color=#ffffff]You must make a selection from internal storage to export[/color][/size]"
+                return
+            if self.widgets['file_selector_external'].selection:
+                #overwrite selection
+                #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
+                dst=self.widgets['file_selector_external'].selection[0]
+            else:
+                #can copy to cwd(current working directory)
+                dst=self.widgets['file_selector_external'].path
+
+            if os.path.isdir(src):
+                if os.path.isdir(dst):
+                    dst=os.path.join(dst,os.path.basename(os.path.normpath(src)))
+                else:
+                    print('main.py MountScreen export_button_func(): can not copy dir over file')
+                    self.widgets['export_unique_text'].text="[size=20][color=#ffffff]Can not overwrite a file with a folder[/color][/size]"
+                    return
+            try:
+                shutil.copytree(src, dst,dirs_exist_ok=True)
+            except OSError as exc:
+                if exc.errno in (errno.ENOTDIR, errno.EINVAL):
+                    shutil.copy(src, dst)
+                else: raise
+            self.refresh_button_func()
+        continue_button.bind(on_release=continue_button_func)
+
+        def cancel_button_func(button):
+            self.refresh_button_func()
+            self.widgets['overlay_menu'].dismiss()
+        cancel_button.bind(on_release=cancel_button_func)
+
+        self.widgets['overlay_layout'].add_widget(export_text)
+        self.widgets['overlay_layout'].add_widget(export_unique_text)
+        self.widgets['overlay_layout'].add_widget(continue_button)
+        self.widgets['overlay_layout'].add_widget(cancel_button)
+        self.widgets['overlay_menu'].open()
+
     def del_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
         overlay_menu.background_color=(0,0,0,.85)
@@ -3222,61 +3434,9 @@ class MountScreen(Screen):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
     def import_button_func(self,button):
-        try:
-            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            src=self.widgets['file_selector_external'].selection[0]
-        except IndexError:
-            print('main.py MountScreen import_button_func(): src not selected')
-            return
-        if self.widgets['file_selector_internal'].selection:
-            #overwrite selection
-            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            dst=self.widgets['file_selector_internal'].selection[0]
-        else:
-            #can copy to cwd(current working directory)
-            dst=self.widgets['file_selector_internal'].path
-
-        if os.path.isdir(src):
-            if os.path.isdir(dst):
-                dst=os.path.join(dst,os.path.basename(os.path.normpath(src)))
-            else:
-                print('main.py MountScreen import_button_func(): can not copy dir over file')
-                return
-        try:
-            shutil.copytree(src, dst,dirs_exist_ok=True)
-        except OSError as exc:
-            if exc.errno in (errno.ENOTDIR, errno.EINVAL):
-                shutil.copy(src, dst)
-            else: raise
-        self.refresh_button_func()
+        self.import_overlay()
     def export_button_func(self,*args):
-        try:
-            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            src=self.widgets['file_selector_internal'].selection[0]
-        except IndexError:
-            print('main.py MountScreen export_button_func(): src not selected')
-            return
-        if self.widgets['file_selector_external'].selection:
-            #overwrite selection
-            #strip path out of returned list (multiple selection possible, hence a list to contain them, although not used here)
-            dst=self.widgets['file_selector_external'].selection[0]
-        else:
-            #can copy to cwd(current working directory)
-            dst=self.widgets['file_selector_external'].path
-
-        if os.path.isdir(src):
-            if os.path.isdir(dst):
-                dst=os.path.join(dst,os.path.basename(os.path.normpath(src)))
-            else:
-                print('main.py MountScreen export_button_func(): can not copy dir over file')
-                return
-        try:
-            shutil.copytree(src, dst,dirs_exist_ok=True)
-        except OSError as exc:
-            if exc.errno in (errno.ENOTDIR, errno.EINVAL):
-                shutil.copy(src, dst)
-            else: raise
-        self.refresh_button_func()
+        self.export_overlay()
     def rename_button_func(self,*args):
         self.rename_overlay()
     def del_button_func(self,*args):

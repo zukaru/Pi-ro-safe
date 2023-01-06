@@ -126,13 +126,17 @@ already, than it will overwrite it)\n\n[/color][/size]''',
 'del_button' : "[size=30][b][color=#000000] Delete [/color][/b][/size]",
 'refresh_button' : "[size=30][b][color=#000000] Refresh [/color][/b][/size]",
 'del_text' : "[size=26][color=#ffffff]Are you sure you want to permanently delete:\n\n>[/color][/size]",
-'del_text_fail' : "[size=30][color=#ffffff]      [b]Delete Error:[/b][/size][size=26]\n\nYou must make exactly\none selection to delete [/color][/size]",
+'del_text_fail' : "[size=30][color=#ffffff]       [b]Delete Error:[/b][/size][size=26]\n\nYou must make exactly\none selection to delete [/color][/size]",
 'rename_text' : "[size=26][color=#ffffff]Are you sure you want to rename:\n\n>[/color][/size]",
 'rename_text_fail' : "[size=30][color=#ffffff]      [b]Rename Error:[/b][/size][size=26]\n\nYou must make exactly\none selection to rename [/color][/size]",
 'rename_input_text' : "[size=26][color=#ffffff]Enter name for:\n>[/color][/size]",
 'rename_unique_text' : "[size=20][color=#ffffff]File/Folder name must be unique[/color][/size]",
 'rename_input_text_fail' : "[size=30][color=#ffffff]      [b]Rename Error:[/b][/size][size=26]\n\nYou must make exactly\none selection to rename [/color][/size]",
 'save_button' : "[size=30][b][color=#000000]  Save [/color][/b][/size]",
+'import_text' : "[size=26][color=#ffffff]Are you sure you want to import:\n\n[/color][/size]",
+'import_text_fail' : "[size=30][color=#ffffff]          [b]Import Error:[/b][/size][size=26]\n\nYou must make a selection\nfrom external storage to import [/color][/size]",
+'export_text' : "[size=26][color=#ffffff]Are you sure you want to export:\n\n[/color][/size]",
+'export_text_fail' : "[size=30][color=#ffffff]          [b]Export Error:[/b][/size][size=26]\n\nYou must make a selection\nfrom internal storage to export [/color][/size]",
 }
 
 spanish={
