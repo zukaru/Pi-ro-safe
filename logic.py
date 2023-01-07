@@ -1,5 +1,13 @@
 import os,time,json
-import mau,exhaust,light,drycontact,gas_valve,micro_switch,heat_sensor,switch_light,switch_fans
+import device_classes.mau as mau
+import device_classes.exhaust as exhaust
+import device_classes.light as light
+import device_classes.drycontact as drycontact
+import device_classes.gas_valve as gas_valve
+import device_classes.micro_switch as micro_switch
+import device_classes.heat_sensor as heat_sensor
+import device_classes.switch_light as switch_light
+import device_classes.switch_fans as switch_fans
 if os.name == 'nt':
     import RPi_test.GPIO as GPIO
 else:

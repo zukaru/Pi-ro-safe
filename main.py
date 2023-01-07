@@ -2,15 +2,15 @@ import os,json,time,shutil
 import traceback,errno
 from kivy.config import Config
 
-from exhaust import Exhaust
-from mau import Mau
-from light import Light
-from drycontact import DryContact
-from gas_valve import GasValve
-from micro_switch import MicroSwitch
-from switch_light import SwitchLight
-from switch_fans import SwitchFans
-from heat_sensor import HeatSensor
+from device_classes.exhaust import Exhaust
+from device_classes.mau import Mau
+from device_classes.light import Light
+from device_classes.drycontact import DryContact
+from device_classes.gas_valve import GasValve
+from device_classes.micro_switch import MicroSwitch
+from device_classes.switch_light import SwitchLight
+from device_classes.switch_fans import SwitchFans
+from device_classes.heat_sensor import HeatSensor
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
@@ -45,7 +45,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.graphics import Rectangle, Color, Line
 from kivy.properties import ListProperty
 import configparser
-import preferences
+import logs.configurations.preferences as preferences
 from kivy.uix.settings import SettingsWithNoMenu
 from kivy.uix.settings import SettingsWithSidebar
 from kivy.uix.effectwidget import EffectWidget
@@ -69,9 +69,9 @@ kivy.require('2.0.0')
 current_language=lang_dict.english
 
 if os.name == 'nt':
-    preferences_path='hood_control.ini'
+    preferences_path='logs/configurations/hood_control.ini'
 if os.name == 'posix':
-    preferences_path='/home/pi/Pi-ro-safe/hood_control.ini'
+    preferences_path='/home/pi/Pi-ro-safe/logs/configurations/hood_control.ini'
     Window.fullscreen = 'auto'
 
 background_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
@@ -545,7 +545,7 @@ class ControlGrid(Screen):
             config=App.get_running_app().config_
             current_language=lang_dict.english
             config.set('preferences','language','english')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
             language_setter()
             self.widgets['overlay_menu'].dismiss()
@@ -556,7 +556,7 @@ class ControlGrid(Screen):
             config=App.get_running_app().config_
             current_language=lang_dict.spanish
             config.set('preferences','language','spanish')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
             language_setter()
             self.widgets['overlay_menu'].dismiss()
@@ -1844,7 +1844,7 @@ class PreferenceScreen(Screen):
             config=App.get_running_app().config_
             logic.heat_sensor_timer=300
             config.set('preferences','heat_timer','300')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
         duration_1.bind(on_release=duration_1_func)
@@ -1853,7 +1853,7 @@ class PreferenceScreen(Screen):
             config=App.get_running_app().config_
             logic.heat_sensor_timer=900
             config.set('preferences','heat_timer','900')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
         duration_2.bind(on_release=duration_2_func)
@@ -1862,7 +1862,7 @@ class PreferenceScreen(Screen):
             config=App.get_running_app().config_
             logic.heat_sensor_timer=1800
             config.set('preferences','heat_timer','1800')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
             self.widgets['overlay_menu'].dismiss()
         duration_3.bind(on_release=duration_3_func)
@@ -2364,7 +2364,7 @@ class PinScreen(Screen):
             logic.heat_sensor_timer=10
             config=self.root.config_
             config.set('preferences','heat_timer','10')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
             print(self.widgets['heat_override_overlay'].widgets['overlay_layout'].children )
             self.widgets['heat_override_overlay'].dismiss()
@@ -2463,7 +2463,7 @@ class PinScreen(Screen):
         def report_pending_setter_func():
             config=App.get_running_app().config_
             config.set('config','report_pending',f'{App.get_running_app().report_pending}')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
 
         mount_overlay=PinPop('mount')
@@ -2617,7 +2617,7 @@ class PinScreen(Screen):
             day=self.pin[2:4]
             year=self.pin[4:8]
             config.set('documents','inspection_date',f'{month}-{day}-{year}')
-            with open('hood_control.ini','w') as configfile:
+            with open(preferences_path,'w') as configfile:
                 config.write(configfile)
         elif hasattr(pindex.Pindex,f'p{self.pin}'):
             eval(f'pindex.Pindex.p{self.pin}(self)')
