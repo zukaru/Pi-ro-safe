@@ -152,7 +152,10 @@ spanish={
     'quick' : "[size=50][b][color=#000000]  La Campana y Luces [/color][/b][/size]",
     'fans' : "[size=32][b][color=#000000] La Campana [/color][/b][/size]",
     'lights' : "[size=32][b][color=#000000] Los Luces [/color][/b][/size]",
-    'version_info' : '[size=22][color=#000000][i]-Versión 1.0.0-[/i][/color][/size]',
+    'version_info' : '''[size=16][color=#000000]      Hood Control[/size]
+[size=22][i]-Versión 1.0.0-[/i][/color][/size]''',
+    'version_info_white' : '''[size=16][color=#ffffff]      Hood Control[/size]
+[size=22][i]-Versión 1.0.0-[/i][/color][/size]''',
     'alert' : "[size=75][b][color=#000000]  Activación de Sistema [/color][/b][/size]",
     'alert_acknowledged' : "[size=32][b][color=#000000]Activación de Sistema\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]",
     'acknowledge' : "[size=32][b][color=#000000] Reconocer [/color][/b][/size]",
