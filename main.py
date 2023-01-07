@@ -43,7 +43,7 @@ from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.graphics import Rectangle, Color, Line
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty,StringProperty
 import configparser
 import logs.configurations.preferences as preferences
 from kivy.uix.settings import SettingsWithNoMenu
@@ -780,7 +780,9 @@ class ReportScreen(Screen):
         super(ReportScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
+
         bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
+        self.widgets['bg_image']=bg_image
 
         back=RoundedButton(text=current_language['report_back'],
                     size_hint =(.4, .1),
@@ -837,7 +839,8 @@ class ReportScreen(Screen):
         pending_watermark.ref='pending_watermark'
 
         report_image=Image(
-            source=report_current)
+            source=report_current,
+            nocache=True)
         self.widgets['report_image']=report_image
 
         no_report_info_title=Label(
@@ -888,6 +891,7 @@ class ReportScreen(Screen):
                     keep_ratio=False,
                     size_hint =(.98, .001),
                     pos_hint = {'x':.01, 'y':.13})
+        self.widgets['seperator_line']=seperator_line
 
         self.add_widget(bg_image)
         scroll_layout.add_widget(report_image)
@@ -919,6 +923,8 @@ class ReportScreen(Screen):
         self.check_pending()
     def on_pre_enter(self):
         self.date_setter()
+        self.widgets['report_image'].reload()
+        self.refresh_widget()
     def Report_back (self,button):
         self.widgets['report_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='up')
@@ -932,6 +938,17 @@ class ReportScreen(Screen):
         config=App.get_running_app().config_
         saved_date=config["documents"]["inspection_date"]
         report_date.text=f'[color=#000000]{saved_date}[/color]'
+    def refresh_widget(self):
+        self.clear_widgets()
+        self.add_widget(self.widgets['bg_image'])
+        if self.widgets['report_image'].texture:
+            self.add_widget(self.widgets['report_scroll'])
+        else:
+            self.add_widget(self.widgets['no_report_info'])
+            self.add_widget(self.widgets['no_report_info_title'])
+        self.add_widget(self.widgets['back'])
+        self.add_widget(self.widgets['back_main'])
+        self.add_widget(self.widgets['seperator_line'])
 
 class DevicesScreen(Screen):
     def __init__(self, **kw):
