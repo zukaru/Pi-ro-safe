@@ -70,44 +70,25 @@ current_language=lang_dict.english
 
 if os.name == 'nt':
     preferences_path='hood_control.ini'
-    generic_image=r'media\patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
-    language_image=r'media\language_icon-1.png'
-    settings_icon=r'media\tiny gear.png'
-    trouble_icon=r'media\trouble icon_high_res.png'
-    trouble_icon_dull=r'media\trouble icon_dull_high_res.png'
-    logo=r'media\qt=q_95.png'
-    report_current=r'media\report.jpg'
-    report_original=r'media\report.jpg'
-    left_arrow_image=r'media\left_arrow.png'
-    right_arrow_image=r'media\right_arrow.png'
-    stock_photo_test=r'media\download.jpeg'
-    qr_link =r'media\frame.png'
-    add_device_icon=r'media\icons8-edit-64.png'
-    add_device_down=r'media\icons8-edit-64_down.png'
-    delete_normal=r'media\delete_normal.png'
-    delete_down=r'media\delete_down.png'
-    reset_valve=r'media\redo.png'
-
 if os.name == 'posix':
     preferences_path='/home/pi/Pi-ro-safe/hood_control.ini'
     Window.fullscreen = 'auto'
-    generic_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
-    language_image=r'media/language_icon-1.png'
-    settings_icon=r'media/tiny gear.png'
-    trouble_icon=r'media/trouble icon_high_res.png'
-    trouble_icon_dull=r'media/trouble icon_dull_high_res.png'
-    logo=r'media/qt=q_95.png'
-    report_current=r'media/report.jpg'
-    report_original=r'media/report.jpg'
-    left_arrow_image=r'media/left_arrow.png'
-    right_arrow_image=r'media/right_arrow.png'
-    stock_photo_test=r'media/download.jpeg'
-    qr_link =r'media/frame.png'
-    add_device_icon=r'media/icons8-edit-64.png'
-    add_device_down=r'media/icons8-edit-64_down.png'
-    delete_normal=r'media/delete_normal.png'
-    delete_down=r'media/delete_down.png'
-    reset_valve=r'media/redo.png'
+
+background_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
+language_image=r'media/higer_res_thick.png'
+trouble_icon=r'media/trouble icon_high_res.png'
+trouble_icon_dull=r'media/trouble icon_dull_high_res.png'
+logo=r'media/qt=q_95.png'
+report_current=r'logs/sys_report/report.jpg'
+report_original=r'logs/sys_report/original_report.jpg'
+qr_link =r'media/frame.png'
+add_device_icon=r'media/icons8-edit-64.png'
+add_device_down=r'media/icons8-edit-64_down.png'
+delete_normal=r'media/delete_normal.png'
+delete_down=r'media/delete_down.png'
+reset_valve=r'media/redo.png'
+gray_seperator_line=r'media/line_gray.png'
+settings_icon=r'media/menu_lines.png'
 
 class PinPop(Popup):
     def __init__(self,name, **kwargs):
@@ -426,7 +407,7 @@ class ControlGrid(Screen):
         super(ControlGrid, self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
         self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
@@ -459,13 +440,13 @@ class ControlGrid(Screen):
         self.widgets['settings_button']=settings_button
         settings_button.bind(on_press=self.open_settings)
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
                     pos_hint = {'x':.01, 'y':.13})
 
-        menu_icon=Image(source=r'media/menu_lines.png',
+        menu_icon=Image(source=settings_icon,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.135, .038),
@@ -479,7 +460,7 @@ class ControlGrid(Screen):
         trouble_button.bind(on_press=self.open_trouble)
         trouble_button.color=(1,1,1,.15)
 
-        language_button=IconButton(source=r'media/higer_res_thick.png', allow_stretch=True, keep_ratio=True)
+        language_button=IconButton(source=language_image, allow_stretch=True, keep_ratio=True)
         language_button.size_hint =(.10, .10)
         language_button.pos_hint = {'x':.75, 'y':.02}
         self.widgets['language_button']=language_button
@@ -667,7 +648,7 @@ class ActuationScreen(Screen):
         super(ActuationScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
         alert=RoundedButton(text=current_language['alert'],
                     size_hint =(.96, .45),
@@ -713,7 +694,7 @@ class SettingsScreen(Screen):
         super(SettingsScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['settings_back'],
                         size_hint =(.4, .1),
@@ -767,7 +748,7 @@ class SettingsScreen(Screen):
         overlay_layout=FloatLayout()
         self.widgets['overlay_layout']=overlay_layout
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -799,7 +780,7 @@ class ReportScreen(Screen):
         super(ReportScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['report_back'],
                     size_hint =(.4, .1),
@@ -859,6 +840,23 @@ class ReportScreen(Screen):
             source=report_current)
         self.widgets['report_image']=report_image
 
+        no_report_info_title=Label(
+            text=current_language['no_report_info_title'],
+            markup=True,
+            size_hint =(1,1),
+            pos_hint = {'center_x':.5, 'center_y':.85})
+        self.widgets['no_report_info_title']=no_report_info_title
+        no_report_info_title.ref='no_report_info_title'
+
+        no_report_info=LabelColor(
+            text=current_language['no_report_info'],
+            halign="center",
+            markup=True,
+            size_hint =(1,1),
+            pos_hint = {'center_x':.5, 'center_y':.5})
+        self.widgets['no_report_info']=no_report_info
+        no_report_info.ref='no_report_info'
+
         scroll_layout=RelativeLayout(
             size_hint_y=2.5,
             size_hint_x=.95)
@@ -885,7 +883,7 @@ class ReportScreen(Screen):
             auto_bring_to_front=False)
         self.widgets['report_scatter']=report_scatter
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -895,7 +893,11 @@ class ReportScreen(Screen):
         scroll_layout.add_widget(report_image)
         scroll_layout.add_widget(date_label)
         report_scroll.add_widget(scroll_layout)
-        self.add_widget(report_scroll)
+        if report_image.texture:
+            self.add_widget(report_scroll)
+        else:
+            self.add_widget(no_report_info)
+            self.add_widget(no_report_info_title)
         self.add_widget(back)
         self.add_widget(back_main)
         self.add_widget(seperator_line)
@@ -934,7 +936,7 @@ class ReportScreen(Screen):
 class DevicesScreen(Screen):
     def __init__(self, **kw):
         super(DevicesScreen,self).__init__(**kw)
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
         self.widgets={}
         self.ud={}
 
@@ -998,7 +1000,7 @@ class DevicesScreen(Screen):
 
         overlay_menu.add_widget(overlay_layout)
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -1574,7 +1576,7 @@ Only proceed if necessary; This action cannot be undone.[/color][/size]""",
 class TrainScreen(Screen):
     def __init__(self, **kw):
         super(TrainScreen,self).__init__(**kw)
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
         self.widgets={}
 
         back=RoundedButton(text=current_language['report_back'],
@@ -1622,7 +1624,7 @@ class TrainScreen(Screen):
             )
         self.widgets['train_scroll']=train_scroll
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -1649,7 +1651,7 @@ class PreferenceScreen(Screen):
         self.cols = 2
         self.widgets={}
         self.ud={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
         self.duration_flag=0
 
         back=RoundedButton(text=current_language['preferences_back'],
@@ -1769,7 +1771,7 @@ class PreferenceScreen(Screen):
         overlay_layout=FloatLayout()
         self.widgets['overlay_layout']=overlay_layout
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -2101,7 +2103,7 @@ class PinScreen(Screen):
         self.widgets={}
         self.popups=[]
         self.pin=''
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['pin_back'],
                     size_hint =(.4, .1),
@@ -2525,7 +2527,7 @@ class PinScreen(Screen):
         self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_confirm)
         self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_cancel)
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -2627,7 +2629,7 @@ class DocumentScreen(Screen):
         super(DocumentScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text="[size=50][b][color=#000000]  Back [/color][/b][/size]",
                     size_hint =(.4, .1),
@@ -2661,7 +2663,7 @@ class DocumentScreen(Screen):
 
         test2=Image(source=report_current)
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -2753,7 +2755,7 @@ class TroubleScreen(Screen):
         super(TroubleScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['trouble_back'],
                     size_hint =(.4, .1),
@@ -2794,7 +2796,7 @@ class TroubleScreen(Screen):
         trouble_layout.add_widget(trouble_details)
         trouble_scroll.add_widget(trouble_layout)
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,
                     keep_ratio=False,
                     size_hint =(.98, .001),
@@ -2815,7 +2817,7 @@ class MountScreen(Screen):
         self.internal_path=r'/home/pi/Pi-ro-safe/logs'
         self.external_path=r'/media/pi'
         self.widgets={}
-        bg_image = Image(source=generic_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
         back=RoundedButton(text=current_language['preferences_back'],
                         size_hint =(.4, .1),
@@ -2944,7 +2946,7 @@ class MountScreen(Screen):
         overlay_layout=FloatLayout()
         self.widgets['overlay_layout']=overlay_layout
 
-        seperator_line=Image(source=r'media/line_gray.png',
+        seperator_line=Image(source=gray_seperator_line,
             allow_stretch=True,
             keep_ratio=False,
             size_hint =(.98, .001),

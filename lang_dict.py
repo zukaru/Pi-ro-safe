@@ -29,6 +29,15 @@ Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""
     'about_back' : "[size=30][b][color=#000000]  Back [/color][/b][/size]",
     'report_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'report_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
+    'no_report_info_title' : "[color=#ffffff][size=30][b]System Report Not Found:[/color][/b][/size]",
+    'no_report_info' : '''[size=26][color=#ffffff]Unable to load report image. This error
+could be caused from a missing image file
+or from an improperly named report.jpg
+
+Check image file name from MountScreen or mount
+drive with current report from (PinScreen/MountScreen)
+
+Import into >>logs/sys_report/report.jpg[/color][/size]''',
     'preferences_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'preferences_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'heat_sensor' : "[size=32][b][color=#000000]  Heat Sensor [/color][/b][/size]",
