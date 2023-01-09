@@ -356,6 +356,7 @@ class LabelColor(Label):
 class ClockText(ButtonBehavior,LabelColor):
     def __init__(self, **kwargs):
         super(ClockText,self).__init__(**kwargs)
+        self.animated=False
         self.angle=0
         self.anim_lngth=2
         self.time_size=120
@@ -371,13 +372,15 @@ class ClockText(ButtonBehavior,LabelColor):
 
     def animate(self,*args):
         # if self.collide_point(*touch.pos):
-        if self.time_size<120:
+        if self.animated:
+            self.animated=False
             self.unrotate()
             self.unslide()
             self.text_unshrink()
             self.unmorph()
 
         else:
+            self.animated=True
             self.rotate()
             self.slide()
             self.text_shrink()
@@ -387,7 +390,7 @@ class ClockText(ButtonBehavior,LabelColor):
         anim=Animation(size_hint=(.05,.255),duration=self.anim_lngth/2)
         anim.start(self)
     def unmorph(self):
-        anim=Animation(size_hint=(.70,.22),duration=self.anim_lngth/2)
+        anim=Animation(size_hint=(.65,.22),duration=self.anim_lngth/2,t='in_quad')
         anim.start(self)
 
     def text_shrink(self):
@@ -505,7 +508,7 @@ class ControlGrid(Screen):
 
         clock_label=ClockText(
             markup=True,
-            size_hint =(.70,.22),
+            size_hint =(.65,.22),
             pos_hint = {'center_x':.5, 'center_y':.265},
             bg_color=(.2,.2,.2,.65))
         self.widgets['clock_label']=clock_label
