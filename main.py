@@ -370,21 +370,21 @@ class ClockText(ButtonBehavior,LabelColor):
         self.bind(center=self._update)
         self.bind(font_size=self._update)
 
-    def animate(self,*args):
-        # if self.collide_point(*touch.pos):
-        if self.animated:
-            self.animated=False
-            self.unrotate()
-            self.unslide()
-            self.text_unshrink()
-            self.unmorph()
+    def animate(self,instance,touch,*args):
+        if self.collide_point(*touch.pos):
+            if self.animated:
+                self.animated=False
+                self.unrotate()
+                self.unslide()
+                self.text_unshrink()
+                self.unmorph()
 
-        else:
-            self.animated=True
-            self.rotate()
-            self.slide()
-            self.text_shrink()
-            self.morph()
+            else:
+                self.animated=True
+                self.rotate()
+                self.slide()
+                self.text_shrink()
+                self.morph()
 
     def morph(self):
         anim=Animation(size_hint=(.05,.255),duration=self.anim_lngth/2)
