@@ -43,7 +43,7 @@ from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.graphics import Rectangle, Color, Line
-from kivy.properties import ListProperty,StringProperty
+from kivy.properties import ListProperty,StringProperty,NumericProperty
 import configparser
 import logs.configurations.preferences as preferences
 from kivy.uix.settings import SettingsWithNoMenu
@@ -63,7 +63,7 @@ from kivy.graphics import RoundedRectangle
 from kivy.uix.progressbar import ProgressBar
 from circle_progress_bar import CircularProgressBar
 from kivy.uix.filechooser import FileChooserIconView, FileChooserListView
-
+from kivy.graphics.context_instructions import PopMatrix,PushMatrix,Rotate,Scale
 
 kivy.require('2.0.0')
 current_language=lang_dict.english
@@ -338,37 +338,109 @@ class BoxLayoutColor(BoxLayout):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
-class LabelColor(Label):
-    def __init__(self, **kwargs):
+class LabelColor(Label): 
+    def __init__(self,bg_color= (.1,.1,.1,.95),**kwargs):
         super(LabelColor,self).__init__(**kwargs)
+        self.bg_color=bg_color
 
         with self.canvas.before:
-                Color(.1,.1,.1,.95)
-                self.rect = Rectangle(size=self.size, pos=self.pos)
+            self.colour=Color(*bg_color)
+            self.rect = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_rect, pos=self._update_rect)
 
-    def _update_rect(self, instance, value):
+    def _update_rect(self, instance, *args):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
+
+class ClockText(ButtonBehavior,LabelColor):
+    def __init__(self, **kwargs):
+        super(ClockText,self).__init__(**kwargs)
+        self.angle=0
+        self.anim_lngth=2
+        self.time_size=120
+        with self.canvas.before:
+            PushMatrix()
+            self.rotation = Rotate(angle=self.angle, origin=self.center)
+        with self.canvas.after:
+            PopMatrix()
+        self.blink_bool=True
+        self.bind(on_touch_up=self.animate)
+        self.bind(center=self._update)
+        self.bind(font_size=self._update)
+
+    def animate(self,*args):
+        # if self.collide_point(*touch.pos):
+        if self.time_size<120:
+            self.unrotate()
+            self.unslide()
+            self.text_unshrink()
+            self.unmorph()
+
+        else:
+            self.rotate()
+            self.slide()
+            self.text_shrink()
+            self.morph()
+
+    def morph(self):
+        anim=Animation(size_hint=(.05,.255),duration=self.anim_lngth/2)
+        anim.start(self)
+    def unmorph(self):
+        anim=Animation(size_hint=(.70,.22),duration=self.anim_lngth/2)
+        anim.start(self)
+
+    def text_shrink(self):
+        anim=Animation(time_size=35,duration=self.anim_lngth/2)
+        anim.start(self)
+    def text_unshrink(self):
+        anim=Animation(time_size=120,duration=self.anim_lngth/2)
+        anim.start(self)
+
+    def slide(self):
+        anim=Animation(pos_hint={'center_x':.05,'center_y':.265})
+        anim.start(self)
+    def unslide(self):
+        anim=Animation(pos_hint={'center_x':.5,'center_y':.265})
+        anim.start(self)
+
+    def rotate(self):
+        anim=Animation(angle=-90,duration=self.anim_lngth/2,t='in_quad')
+        anim.start(self.rotation)
+    def unrotate(self):
+        anim=Animation(angle=0,duration=self.anim_lngth/2,t='in_quad')
+        anim.start(self.rotation)
+
+    def blink(self):
+        self.blink_bool=not self.blink_bool
+        if self.blink_bool:
+            return '[color=#909090]:[/color]'
+        return ':'
+
+    def _update(self,*args):
+        self.rotation.origin=self.center
+        self.update()
+
+    def update(self, *args):
+        #12hour + zero(0) padded decimal minute + am/pm
+        self.text =f"[ref='time'][size={int(self.time_size)}][b][color=c0c0c0]{time.strftime('%I'+self.blink()+'%M'+' %p')}"
+
+
+class Messenger(LabelColor):
+    def __init__(self, **kwargs):
+        super(ClockText,self).__init__(**kwargs)
+
+    def blink(self):
+        pass
+
+    def update(self, *args):
+        print(args)
+        #12hour + zero(0) padded decimal minute + am/pm
+        self.text =f"[size={self.text_size}][b][color=c0c0c0]{time.strftime('%I'+':'+'%M'+' %p')}"
 
 #<<<<<<<<<<>>>>>>>>>>#
 
 class ControlGrid(Screen):
-    def quick_start(self,button):
-        if button.state == 'down':
-            print('all on by switch')
-            self.widgets['fans'].state='down'
-            self.fans_switch(self.widgets['fans'])
-            self.widgets['lights'].state='down'
-            self.lights_switch(self.widgets['lights'])
-        elif button.state == 'normal':
-            print('all off by switch')
-            self.widgets['fans'].state='normal'
-            self.fans_switch(self.widgets['fans'])
-            self.widgets['lights'].state='normal'
-            self.lights_switch(self.widgets['lights'])
-
     def fans_switch(self,button):
         if button.state == 'down':
             print('fans on by switch')
@@ -430,6 +502,13 @@ class ControlGrid(Screen):
         self.widgets['lights']=lights
         lights.ref='lights'
         lights.bind(on_press=self.lights_switch)
+
+        clock_label=ClockText(
+            markup=True,
+            size_hint =(.70,.22),
+            pos_hint = {'center_x':.5, 'center_y':.265},
+            bg_color=(.2,.2,.2,.65))
+        self.widgets['clock_label']=clock_label
 
         settings_button=RoundedButton(
                     size_hint =(.18, .1),
@@ -506,6 +585,7 @@ class ControlGrid(Screen):
         self.add_widget(language_button)
         self.add_widget(fs_logo)
         self.add_widget(version_info)
+        self.add_widget(clock_label)
 
     def open_settings(self,button):
         self.parent.transition = SlideTransition(direction='right')
@@ -3633,6 +3713,7 @@ class Hood_Control(App):
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)
+        Clock.schedule_interval(self.context_screen.get_screen('main').widgets['clock_label'].update, 1)
         return self.context_screen
 
 def settings_setter(config):
