@@ -654,13 +654,12 @@ class BigWheelClock(Carousel):
         if App.get_running_app().context_screen.has_screen('main'):
             w=App.get_running_app().context_screen.get_screen('main').widgets
             h=w['hour_wheel'].index+1
-            m=w['minute_wheel'].index+1
+            m=w['minute_wheel'].index
             p='pm' if w['ampm_wheel'].index % 2 else 'am'
-            print(f'{h}:{m}{p}')
         if os.name=='posix':
                 os.system(f'sudo date -s {h}:{m}{p}')
         else:
-            print('main.py BigWheelClock _set_sys_time(): time set')
+            print('main.py BigWheelClock _set_sys_time(): \n  >>time set: ',f'{h}:{str(m).zfill(2)}{p}')
 
     def _create_clock(self,*args):
         Clock.schedule_once(self._set_sys_time, 2)
@@ -689,7 +688,7 @@ class BigWheelClock(Carousel):
         elif cat =='minute':
             for index,i in enumerate(self.slides):
                 if index==m:
-                    self.index=index-1
+                    self.index=index
                     return
         elif cat =='ampm':
             for index,i in enumerate(self.slides):
@@ -1003,9 +1002,10 @@ class ControlGrid(Screen):
             loop=True)
         self.widgets['minute_wheel']=minute_wheel
 
-        for i in range(59):
+        for i in range(60):
+            i=str(i)
             _minute=Label(
-                text=f'[size=80][b][color=c0c0c0]{i+1}',
+                text=f'[size=80][b][color=c0c0c0]{i.zfill(2)}',
                 markup=True)
             minute_wheel.add_widget(_minute)
 
