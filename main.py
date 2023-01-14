@@ -372,6 +372,7 @@ class LabelColor(Label):
 class ClockText(ButtonBehavior,LabelColor):
     def __init__(self, **kwargs):
         super(ClockText,self).__init__(**kwargs)
+        self.clock_stack={}
         self.animated=False
         self.angle=0
         self.anim_lngth=2
@@ -390,19 +391,37 @@ class ClockText(ButtonBehavior,LabelColor):
         if self.collide_point(*touch.pos):
             if self.animated:
                 if self.time_size==35:
+                    self._delete_clock()
                     self.animated=False
                     self.unrotate()
                     self.unslide()
                     self.text_unshrink()
                     self.unmorph()
-
             else:
                 if self.time_size==120:
+                    self._create_clock()
                     self.animated=True
                     self.rotate()
                     self.slide()
                     self.text_shrink()
                     self.morph()
+
+    def _return(self,*args):
+        if self.time_size==35:
+            self.animated=False
+            self.unrotate()
+            self.unslide()
+            self.text_unshrink()
+            self.unmorph()
+            self.parent.widgets['widget_carousel'].fade_out()
+
+    def _create_clock(self,*args):
+        Clock.schedule_once(self._return,10)
+        self.clock_stack['event'] = self._return
+
+    def _delete_clock(self,*args):
+        if 'event' in self.clock_stack:
+            Clock.unschedule(self.clock_stack['event'])
 
     def morph(self):
         anim=Animation(size_hint=(.05,.255),duration=self.anim_lngth/2)
@@ -651,15 +670,16 @@ class BigWheelClock(Carousel):
         self.anim=Animation()
 
     def _set_sys_time(*args):
-        if App.get_running_app().context_screen.has_screen('main'):
-            w=App.get_running_app().context_screen.get_screen('main').widgets
-            h=w['hour_wheel'].index+1
-            m=w['minute_wheel'].index
-            p='pm' if w['ampm_wheel'].index % 2 else 'am'
-        if os.name=='posix':
-                os.system(f'sudo date -s {h}:{m}{p}')
-        else:
-            print('main.py BigWheelClock _set_sys_time(): \n  >>time set: ',f'{h}:{str(m).zfill(2)}{p}')
+        if Clock.get_boottime()>5:
+            if App.get_running_app().context_screen.has_screen('main'):
+                w=App.get_running_app().context_screen.get_screen('main').widgets
+                h=w['hour_wheel'].index+1
+                m=w['minute_wheel'].index
+                p='pm' if w['ampm_wheel'].index % 2 else 'am'
+                if os.name=='posix':
+                        os.system(f'sudo date -s {h}:{m}{p}')
+                else:
+                    print('main.py BigWheelClock _set_sys_time(): \n  >>time set: ',f'{h}:{str(m).zfill(2)}{p}')
 
     def _create_clock(self,*args):
         Clock.schedule_once(self._set_sys_time, 2)
@@ -875,6 +895,7 @@ class AnimatedCarousel(Carousel):
     def __init__(self, **kwargs):
         super(AnimatedCarousel,self).__init__(**kwargs)
         self.opacity=0
+        self.bind(on_touch_down=self.prevent__return)
 
     def fade_in(self):
         anim=Animation(opacity=1)
@@ -892,6 +913,12 @@ class AnimatedCarousel(Carousel):
     def on_touch_down(self, touch):
         if self.opacity==1:
             return super(AnimatedCarousel,self).on_touch_down(touch)
+
+    def prevent__return(self,instance,touch,*args):
+        if self.collide_point(*touch.pos):
+            self.parent.widgets['clock_label']._delete_clock()
+            self.parent.widgets['clock_label']._create_clock()
+
 
 
 #<<<<<<<<<<>>>>>>>>>>#
@@ -1108,9 +1135,6 @@ class ControlGrid(Screen):
         self.add_widget(fs_logo)
         self.add_widget(version_info)
         self.add_widget(clock_label)
-        Clock.schedule_once(partial(self.widgets['hour_wheel'].set_index,cat='hour'))
-        Clock.schedule_once(partial(self.widgets['minute_wheel'].set_index,cat='minute'))
-        Clock.schedule_once(partial(self.widgets['ampm_wheel'].set_index,cat='ampm'))
 
 
     def widget_fade(self,instance,touch,*args):
