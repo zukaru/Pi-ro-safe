@@ -64,6 +64,7 @@ from kivy.uix.progressbar import ProgressBar
 from circle_progress_bar import CircularProgressBar
 from kivy.uix.filechooser import FileChooserIconView, FileChooserListView
 from kivy.graphics.context_instructions import PopMatrix,PushMatrix,Rotate,Scale
+from kivy.uix.accordion import Accordion, AccordionItem
 
 kivy.require('2.0.0')
 current_language=lang_dict.english
@@ -338,6 +339,21 @@ class BoxLayoutColor(BoxLayout):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
+class RelativeLayoutColor(RelativeLayout):
+    def __init__(self,bg_color= (.1,.1,.1,.95),**kwargs):
+        super(RelativeLayoutColor,self).__init__(**kwargs)
+        self.bg_color=bg_color
+
+        with self.canvas.before:
+            self.colour=Color(*bg_color)
+            self.rect = Rectangle(size=self.size, pos=self.pos)
+
+        self.bind(size=self._update_rect, pos=self._update_rect)
+
+    def _update_rect(self, instance, *args):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
+
 class LabelColor(Label): 
     def __init__(self,bg_color= (.1,.1,.1,.95),**kwargs):
         super(LabelColor,self).__init__(**kwargs)
@@ -373,24 +389,26 @@ class ClockText(ButtonBehavior,LabelColor):
     def animate(self,instance,touch,*args):
         if self.collide_point(*touch.pos):
             if self.animated:
-                self.animated=False
-                self.unrotate()
-                self.unslide()
-                self.text_unshrink()
-                self.unmorph()
+                if self.time_size==35:
+                    self.animated=False
+                    self.unrotate()
+                    self.unslide()
+                    self.text_unshrink()
+                    self.unmorph()
 
             else:
-                self.animated=True
-                self.rotate()
-                self.slide()
-                self.text_shrink()
-                self.morph()
+                if self.time_size==120:
+                    self.animated=True
+                    self.rotate()
+                    self.slide()
+                    self.text_shrink()
+                    self.morph()
 
     def morph(self):
         anim=Animation(size_hint=(.05,.255),duration=self.anim_lngth/2)
         anim.start(self)
     def unmorph(self):
-        anim=Animation(size_hint=(.65,.22),duration=self.anim_lngth/2,t='in_quad')
+        anim=Animation(size_hint=(.475,.22),duration=self.anim_lngth/2,t='in_quad')
         anim.start(self)
 
     def text_shrink(self):
@@ -401,10 +419,10 @@ class ClockText(ButtonBehavior,LabelColor):
         anim.start(self)
 
     def slide(self):
-        anim=Animation(pos_hint={'center_x':.05,'center_y':.265})
+        anim=Animation(pos_hint={'center_x':.05,'center_y':.265},duration=self.anim_lngth/2)
         anim.start(self)
     def unslide(self):
-        anim=Animation(pos_hint={'center_x':.5,'center_y':.265})
+        anim=Animation(pos_hint={'center_x':.5,'center_y':.265},duration=self.anim_lngth/2)
         anim.start(self)
 
     def rotate(self):
@@ -428,7 +446,6 @@ class ClockText(ButtonBehavior,LabelColor):
         #12hour + zero(0) padded decimal minute + am/pm
         self.text =f"[ref='time'][size={int(self.time_size)}][b][color=c0c0c0]{time.strftime('%I'+self.blink()+'%M'+' %p')}"
 
-
 class Messenger(LabelColor):
     def __init__(self, **kwargs):
         super(ClockText,self).__init__(**kwargs)
@@ -440,6 +457,426 @@ class Messenger(LabelColor):
         print(args)
         #12hour + zero(0) padded decimal minute + am/pm
         self.text =f"[size={self.text_size}][b][color=c0c0c0]{time.strftime('%I'+':'+'%M'+' %p')}"
+
+class BigWheel(Carousel):
+    def __init__(self,y_reduction=35, **kwargs):
+        super(BigWheel,self).__init__(**kwargs)
+        self.y_reduction=y_reduction
+        self.anim=Animation()
+
+    def on_index(self,*args):
+        super(BigWheel,self).on_index()
+        self.anim.cancel_all(self)
+
+    def _position_visible_slides(self, *args):
+        slides, index = self.slides, self.index
+        no_of_slides = len(slides) - 1
+        if not slides:
+            return
+        x, y, width, height = self.x, self.y, self.width, self.height
+        _offset, direction = self._offset, self.direction[0]
+        _prev, _next, _current = self._prev, self._next, self._current
+        get_slide_container = self.get_slide_container
+        last_slide = get_slide_container(slides[-1])
+        first_slide = get_slide_container(slides[0])
+        skip_next = False
+        _loop = self.loop
+
+        if direction in 'rl':
+            xoff = x + _offset
+            x_prev = {'l': xoff + width, 'r': xoff - width}
+            x_next = {'l': xoff - width, 'r': xoff + width}
+            if _prev:
+                _prev.pos = (x_prev[direction], y)
+            elif _loop and _next and index == 0:
+                # if first slide is moving to right with direction set to right
+                # or toward left with direction set to left
+                if ((_offset > 0 and direction == 'r') or
+                        (_offset < 0 and direction == 'l')):
+                    # put last_slide before first slide
+                    last_slide.pos = (x_prev[direction], y)
+                    skip_next = True
+            if _current:
+                _current.pos = (xoff, y)
+            if skip_next:
+                return
+            if _next:
+                _next.pos = (x_next[direction], y)
+            elif _loop and _prev and index == no_of_slides:
+                if ((_offset < 0 and direction == 'r') or
+                        (_offset > 0 and direction == 'l')):
+                    first_slide.pos = (x_next[direction], y)
+        if direction in 'tb':
+            yoff = y + _offset
+
+            y_prev = {'t': yoff - height, 'b': yoff + height}
+            y_next = {'t': yoff + height, 'b': yoff - height}
+            if _prev:
+                _prev.pos = (x, y_prev[direction]+self.y_reduction)
+            elif _loop and _next and index == 0:
+                if ((_offset > 0 and direction == 't') or
+                        (_offset < 0 and direction == 'b')):
+                    last_slide.pos = (x, y_prev[direction]+self.y_reduction)
+                    skip_next = True
+            if _current:
+                _current.pos = (x, yoff)
+            if skip_next:
+                return
+            if _next:
+                _next.pos = (x, y_next[direction]-self.y_reduction)
+            elif _loop and _prev and index == no_of_slides:
+                if ((_offset < 0 and direction == 't') or
+                        (_offset > 0 and direction == 'b')):
+                    first_slide.pos = (x, y_next[direction]-self.y_reduction)
+
+    def _insert_visible_slides(self, _next_slide=None, _prev_slide=None):
+        get_slide_container = self.get_slide_container
+
+        previous_slide = _prev_slide if _prev_slide else self.previous_slide
+        if previous_slide:
+            self._prev = get_slide_container(previous_slide)
+        else:
+            self._prev = None
+
+        current_slide = self.current_slide
+        if current_slide:
+            self._current = get_slide_container(current_slide)
+        else:
+            self._current = None
+
+        next_slide = _next_slide if _next_slide else self.next_slide
+        if next_slide:
+            self._next = get_slide_container(next_slide)
+        else:
+            self._next = None
+
+        if self._prev_equals_next:
+            setattr(self, '_prev' if self._prioritize_next else '_next', None)
+
+        super_remove = super(Carousel, self).remove_widget
+        for container in self.slides_container:
+            super_remove(container)
+
+        if self._prev and self._prev.parent is not self:
+            super(Carousel, self).add_widget(self._prev)
+        if self._next and self._next.parent is not self:
+            super(Carousel, self).add_widget(self._next)
+        if self._current:
+            super(Carousel, self).add_widget(self._current)
+
+    def on__offset(self, *args):
+        self._trigger_position_visible_slides()
+        # if reached full offset, switch index to next or prev
+        direction = self.direction[0]
+        _offset = self._offset
+        width = self.width
+        height = self.height
+        index = self.index
+        if self._skip_slide is not None or index is None:
+            return
+
+        # Move to next slide?
+        if (direction == 'r' and _offset <= -width) or \
+                (direction == 'l' and _offset >= width) or \
+                (direction == 't' and _offset-self.y_reduction <= - height) or \
+                (direction == 'b' and _offset >= height):
+            if self.next_slide:
+                self.index += 1
+
+        # Move to previous slide?
+        elif (direction == 'r' and _offset >= width) or \
+                (direction == 'l' and _offset <= -width) or \
+                (direction == 't' and _offset+self.y_reduction >= height) or \
+                (direction == 'b' and _offset <= -height):
+            if self.previous_slide:
+                self.index -= 1
+
+        elif self._prev_equals_next:
+            new_value = (_offset < 0) is (direction in 'rt')
+            if self._prioritize_next is not new_value:
+                self._prioritize_next = new_value
+                if new_value is (self._next is None):
+                    self._prev, self._next = self._next, self._prev
+
+    def _start_animation(self, *args, **kwargs):
+        # compute target offset for ease back, next or prev
+        new_offset = 0
+        direction = kwargs.get('direction', self.direction)[0]
+        is_horizontal = direction in 'rl'
+        extent = self.width if is_horizontal else self.height
+        min_move = kwargs.get('min_move', self.min_move)
+        _offset = kwargs.get('offset', self._offset)
+
+        if _offset < min_move * -extent:
+            new_offset = -extent
+        elif _offset > min_move * extent:
+            new_offset = extent
+
+        # if new_offset is 0, it wasnt enough to go next/prev
+        dur = self.anim_move_duration
+        if new_offset == 0:
+            dur = self.anim_cancel_duration
+
+        # detect edge cases if not looping
+        len_slides = len(self.slides)
+        index = self.index
+        if not self.loop or len_slides == 1:
+            is_first = (index == 0)
+            is_last = (index == len_slides - 1)
+            if direction in 'rt':
+                towards_prev = (new_offset > 0)
+                towards_next = (new_offset < 0)
+            else:
+                towards_prev = (new_offset < 0)
+                towards_next = (new_offset > 0)
+            if (is_first and towards_prev) or (is_last and towards_next):
+                new_offset = 0
+
+        self.anim = Animation(_offset=new_offset, d=dur, t=self.anim_type)
+        self.anim.cancel_all(self)
+
+        def _cmp(*l):
+            if self._skip_slide is not None:
+                self.index = self._skip_slide
+                self._skip_slide = None
+
+        self.anim.bind(on_complete=_cmp)
+        self.anim.start(self)
+
+class BigWheelClock(Carousel):
+    def __init__(self,y_reduction=35, **kwargs):
+        super(BigWheelClock,self).__init__(**kwargs)
+        self.y_reduction=y_reduction
+        self.anim=Animation()
+
+    def on_index(self,*args):
+        super(BigWheelClock,self).on_index()
+        self.anim.cancel_all(self)
+        if os.name=='posix':
+            if App.get_running_app().context_screen.has_screen('main'):
+                w=App.get_running_app().context_screen.get_screen('main').widgets
+                h=w['hour_wheel'].index+1
+                m=w['minute_wheel'].index+1
+                p='pm' if w['ampm_wheel'].index % 2 else 'am'
+                os.system(f'sudo date -s {h}:{m}{p}')
+
+    def set_index(self,cat=None,*args):
+        h=int(time.strftime('%I'))
+        m=int(time.strftime('%M'))
+        p=time.strftime('%p')
+        if cat=='hour':
+            for index,i in enumerate(self.slides):
+                if index==h:
+                    self.index=index-1
+                    return
+        elif cat =='minute':
+            for index,i in enumerate(self.slides):
+                if index==m:
+                    self.index=index-1
+                    return
+        elif cat =='ampm':
+            for index,i in enumerate(self.slides):
+                if i.text[-2:]==p:
+                    self.index=index
+                    return
+
+    def _position_visible_slides(self, *args):
+        slides, index = self.slides, self.index
+        no_of_slides = len(slides) - 1
+        if not slides:
+            return
+        x, y, width, height = self.x, self.y, self.width, self.height
+        _offset, direction = self._offset, self.direction[0]
+        _prev, _next, _current = self._prev, self._next, self._current
+        get_slide_container = self.get_slide_container
+        last_slide = get_slide_container(slides[-1])
+        first_slide = get_slide_container(slides[0])
+        skip_next = False
+        _loop = self.loop
+
+        if direction in 'rl':
+            xoff = x + _offset
+            x_prev = {'l': xoff + width, 'r': xoff - width}
+            x_next = {'l': xoff - width, 'r': xoff + width}
+            if _prev:
+                _prev.pos = (x_prev[direction], y)
+            elif _loop and _next and index == 0:
+                # if first slide is moving to right with direction set to right
+                # or toward left with direction set to left
+                if ((_offset > 0 and direction == 'r') or
+                        (_offset < 0 and direction == 'l')):
+                    # put last_slide before first slide
+                    last_slide.pos = (x_prev[direction], y)
+                    skip_next = True
+            if _current:
+                _current.pos = (xoff, y)
+            if skip_next:
+                return
+            if _next:
+                _next.pos = (x_next[direction], y)
+            elif _loop and _prev and index == no_of_slides:
+                if ((_offset < 0 and direction == 'r') or
+                        (_offset > 0 and direction == 'l')):
+                    first_slide.pos = (x_next[direction], y)
+        if direction in 'tb':
+            yoff = y + _offset
+
+            y_prev = {'t': yoff - height, 'b': yoff + height}
+            y_next = {'t': yoff + height, 'b': yoff - height}
+            if _prev:
+                _prev.pos = (x, y_prev[direction]+self.y_reduction)
+            elif _loop and _next and index == 0:
+                if ((_offset > 0 and direction == 't') or
+                        (_offset < 0 and direction == 'b')):
+                    last_slide.pos = (x, y_prev[direction]+self.y_reduction)
+                    skip_next = True
+            if _current:
+                _current.pos = (x, yoff)
+            if skip_next:
+                return
+            if _next:
+                _next.pos = (x, y_next[direction]-self.y_reduction)
+            elif _loop and _prev and index == no_of_slides:
+                if ((_offset < 0 and direction == 't') or
+                        (_offset > 0 and direction == 'b')):
+                    first_slide.pos = (x, y_next[direction]-self.y_reduction)
+
+    def _insert_visible_slides(self, _next_slide=None, _prev_slide=None):
+        get_slide_container = self.get_slide_container
+
+        previous_slide = _prev_slide if _prev_slide else self.previous_slide
+        if previous_slide:
+            self._prev = get_slide_container(previous_slide)
+        else:
+            self._prev = None
+
+        current_slide = self.current_slide
+        if current_slide:
+            self._current = get_slide_container(current_slide)
+        else:
+            self._current = None
+
+        next_slide = _next_slide if _next_slide else self.next_slide
+        if next_slide:
+            self._next = get_slide_container(next_slide)
+        else:
+            self._next = None
+
+        if self._prev_equals_next:
+            setattr(self, '_prev' if self._prioritize_next else '_next', None)
+
+        super_remove = super(Carousel, self).remove_widget
+        for container in self.slides_container:
+            super_remove(container)
+
+        if self._prev and self._prev.parent is not self:
+            super(Carousel, self).add_widget(self._prev)
+        if self._next and self._next.parent is not self:
+            super(Carousel, self).add_widget(self._next)
+        if self._current:
+            super(Carousel, self).add_widget(self._current)
+
+    def on__offset(self, *args):
+        self._trigger_position_visible_slides()
+        # if reached full offset, switch index to next or prev
+        direction = self.direction[0]
+        _offset = self._offset
+        width = self.width
+        height = self.height
+        index = self.index
+        if self._skip_slide is not None or index is None:
+            return
+
+        # Move to next slide?
+        if (direction == 'r' and _offset <= -width) or \
+                (direction == 'l' and _offset >= width) or \
+                (direction == 't' and _offset-self.y_reduction <= - height) or \
+                (direction == 'b' and _offset >= height):
+            if self.next_slide:
+                self.index += 1
+
+        # Move to previous slide?
+        elif (direction == 'r' and _offset >= width) or \
+                (direction == 'l' and _offset <= -width) or \
+                (direction == 't' and _offset+self.y_reduction >= height) or \
+                (direction == 'b' and _offset <= -height):
+            if self.previous_slide:
+                self.index -= 1
+
+        elif self._prev_equals_next:
+            new_value = (_offset < 0) is (direction in 'rt')
+            if self._prioritize_next is not new_value:
+                self._prioritize_next = new_value
+                if new_value is (self._next is None):
+                    self._prev, self._next = self._next, self._prev
+
+    def _start_animation(self, *args, **kwargs):
+        # compute target offset for ease back, next or prev
+        new_offset = 0
+        direction = kwargs.get('direction', self.direction)[0]
+        is_horizontal = direction in 'rl'
+        extent = self.width if is_horizontal else self.height
+        min_move = kwargs.get('min_move', self.min_move)
+        _offset = kwargs.get('offset', self._offset)
+
+        if _offset < min_move * -extent:
+            new_offset = -extent
+        elif _offset > min_move * extent:
+            new_offset = extent
+
+        # if new_offset is 0, it wasnt enough to go next/prev
+        dur = self.anim_move_duration
+        if new_offset == 0:
+            dur = self.anim_cancel_duration
+
+        # detect edge cases if not looping
+        len_slides = len(self.slides)
+        index = self.index
+        if not self.loop or len_slides == 1:
+            is_first = (index == 0)
+            is_last = (index == len_slides - 1)
+            if direction in 'rt':
+                towards_prev = (new_offset > 0)
+                towards_next = (new_offset < 0)
+            else:
+                towards_prev = (new_offset < 0)
+                towards_next = (new_offset > 0)
+            if (is_first and towards_prev) or (is_last and towards_next):
+                new_offset = 0
+
+        self.anim = Animation(_offset=new_offset, d=dur, t=self.anim_type)
+        self.anim.cancel_all(self)
+
+        def _cmp(*l):
+            if self._skip_slide is not None:
+                self.index = self._skip_slide
+                self._skip_slide = None
+
+        self.anim.bind(on_complete=_cmp)
+        self.anim.start(self)
+
+class AnimatedCarousel(Carousel):
+    def __init__(self, **kwargs):
+        super(AnimatedCarousel,self).__init__(**kwargs)
+        self.opacity=0
+
+    def fade_in(self):
+        anim=Animation(opacity=1)
+        anim.start(self)
+
+    def fade_out(self):
+        anim=Animation(opacity=0)
+        anim.bind(on_complete=partial(self.rm_parent,instance=self))
+        anim.start(self)
+
+    def rm_parent(*args,instance=None):
+        if instance.parent:
+            instance.parent.remove_widget(instance)
+
+    def on_touch_down(self, touch):
+        if self.opacity==1:
+            return super(AnimatedCarousel,self).on_touch_down(touch)
+
 
 #<<<<<<<<<<>>>>>>>>>>#
 
@@ -453,7 +890,7 @@ class ControlGrid(Screen):
             print('fans off by switch')
             logic.fs.moli['exhaust']=0
             logic.fs.moli['mau']=0
-    
+
     def lights_switch(self,button):
         if button.state == 'down':
             print('lights on by switch')
@@ -508,10 +945,68 @@ class ControlGrid(Screen):
 
         clock_label=ClockText(
             markup=True,
-            size_hint =(.65,.22),
+            size_hint =(.475,.22),
             pos_hint = {'center_x':.5, 'center_y':.265},
             bg_color=(.2,.2,.2,.65))
         self.widgets['clock_label']=clock_label
+        clock_label.bind(on_touch_up=self.widget_fade)
+
+        widget_carousel=AnimatedCarousel(
+            size_hint =(.475,.22),
+            pos_hint = {'center_x':.5, 'center_y':.265},
+            loop=True,
+            ignore_perpendicular_swipes=True)
+        self.widgets['widget_carousel']=widget_carousel
+
+        clock_set_layout=RelativeLayoutColor(bg_color= (.1,.1,.1,.85))
+
+        hour_wheel=BigWheelClock(
+            size_hint =(.25, .9),
+            pos_hint = {'x':.0, 'center_y':.5},
+            direction='top',
+            loop=True)
+        self.widgets['hour_wheel']=hour_wheel
+
+        for i in range(12):
+            _hour=Label(
+                text=f'[size=80][b][color=c0c0c0]{i+1}',
+                markup=True,)
+            hour_wheel.add_widget(_hour)
+
+        delimiter_dots=Label(
+            size_hint =(.25, .9),
+            pos_hint = {'x':.2, 'center_y':.5},
+            text=f'[size=80][b][color=c0c0c0]:',
+            markup=True)
+
+        minute_wheel=BigWheelClock(
+            size_hint =(.25, .9),
+            pos_hint = {'x':.4, 'center_y':.5},
+            direction='top',
+            loop=True)
+        self.widgets['minute_wheel']=minute_wheel
+
+        for i in range(59):
+            _minute=Label(
+                text=f'[size=80][b][color=c0c0c0]{i+1}',
+                markup=True)
+            minute_wheel.add_widget(_minute)
+
+        ampm_wheel=BigWheelClock(
+            size_hint =(.25, .9),
+            pos_hint = {'x':.7, 'center_y':.5},
+            direction='top',
+            loop=True,
+            y_reduction=40)
+        self.widgets['ampm_wheel']=ampm_wheel
+
+        for i in ['AM','PM','AM','PM']:
+            _ampm=Label(
+                text=f'[size=60][b][color=c0c0c0]{i}',
+                markup=True)
+            ampm_wheel.add_widget(_ampm)
+
+        messenger_button=LabelColor(bg_color=(.1,.0,.1,.95))
 
         settings_button=RoundedButton(
                     size_hint =(.18, .1),
@@ -578,6 +1073,13 @@ class ControlGrid(Screen):
         self.widgets['overlay_layout']=overlay_layout
 
         overlay_menu.add_widget(overlay_layout)
+        clock_set_layout.add_widget(hour_wheel)
+        clock_set_layout.add_widget(delimiter_dots)
+        clock_set_layout.add_widget(minute_wheel)
+        clock_set_layout.add_widget(ampm_wheel)
+        widget_carousel.add_widget(clock_set_layout)
+        widget_carousel.add_widget(messenger_button)
+
         self.add_widget(bg_image)
         self.add_widget(fans)
         self.add_widget(lights)
@@ -590,6 +1092,17 @@ class ControlGrid(Screen):
         self.add_widget(version_info)
         self.add_widget(clock_label)
 
+
+    def widget_fade(self,instance,touch,*args):
+        if self.widgets['clock_label'].collide_point(*touch.pos):
+            if self.widgets['widget_carousel'] not in self.children:
+                self.add_widget(self.widgets['widget_carousel'],-2)
+                self.widgets['widget_carousel'].fade_in()
+                self.widgets['hour_wheel'].set_index(cat='hour')
+                self.widgets['minute_wheel'].set_index(cat='minute')
+                self.widgets['ampm_wheel'].set_index(cat='ampm')
+            else:
+                self.widgets['widget_carousel'].fade_out()
     def open_settings(self,button):
         self.parent.transition = SlideTransition(direction='right')
         self.manager.current='settings'
@@ -2914,8 +3427,12 @@ class MountScreen(Screen):
     def __init__(self, **kw):
         super(MountScreen,self).__init__(**kw)
         self.rename_text=''
-        self.internal_path=r'/home/pi/Pi-ro-safe/logs'
-        self.external_path=r'/media/pi'
+        if os.name=='nt':
+            self.internal_path=r'logs'
+            self.external_path=r'logs'
+        else:
+            self.internal_path=r'/home/pi/Pi-ro-safe/logs'
+            self.external_path=r'/media/pi'
         self.widgets={}
         bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
