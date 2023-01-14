@@ -702,6 +702,7 @@ class BigWheelClock(Carousel):
         p=time.strftime('%p')
         if cat=='hour':
             for index,i in enumerate(self.slides):
+                index+=1
                 if index==h:
                     self.index=index-1
                     return
