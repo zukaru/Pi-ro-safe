@@ -644,23 +644,40 @@ class BigWheel(Carousel):
         self.anim.start(self)
 
 class BigWheelClock(Carousel):
+    clock_stack={}
     def __init__(self,y_reduction=35, **kwargs):
         super(BigWheelClock,self).__init__(**kwargs)
         self.y_reduction=y_reduction
         self.anim=Animation()
 
+    def _set_sys_time(*args):
+        if App.get_running_app().context_screen.has_screen('main'):
+            w=App.get_running_app().context_screen.get_screen('main').widgets
+            h=w['hour_wheel'].index+1
+            m=w['minute_wheel'].index+1
+            p='pm' if w['ampm_wheel'].index % 2 else 'am'
+            print(f'{h}:{m}{p}')
+        if os.name=='posix':
+                os.system(f'sudo date -s {h}:{m}{p}')
+        else:
+            print('main.py BigWheelClock _set_sys_time(): time set')
+
+    def _create_clock(self,*args):
+        Clock.schedule_once(self._set_sys_time, 2)
+        self.clock_stack['event'] = self._set_sys_time
+
+    def _delete_clock(self,*args):
+        if 'event' in self.clock_stack:
+            Clock.unschedule(self.clock_stack['event'])
+
     def on_index(self,*args):
         super(BigWheelClock,self).on_index()
         self.anim.cancel_all(self)
-        if os.name=='posix':
-            if App.get_running_app().context_screen.has_screen('main'):
-                w=App.get_running_app().context_screen.get_screen('main').widgets
-                h=w['hour_wheel'].index+1
-                m=w['minute_wheel'].index+1
-                p='pm' if w['ampm_wheel'].index % 2 else 'am'
-                os.system(f'sudo date -s {h}:{m}{p}')
+        self._delete_clock()#if timer exists, restart it
+        self._create_clock()#start timer to call self._set_sys_time()
 
-    def set_index(self,cat=None,*args):
+
+    def set_index(self,*args,cat=None):
         h=int(time.strftime('%I'))
         m=int(time.strftime('%M'))
         p=time.strftime('%p')
@@ -1091,6 +1108,9 @@ class ControlGrid(Screen):
         self.add_widget(fs_logo)
         self.add_widget(version_info)
         self.add_widget(clock_label)
+        Clock.schedule_once(partial(self.widgets['hour_wheel'].set_index,cat='hour'))
+        Clock.schedule_once(partial(self.widgets['minute_wheel'].set_index,cat='minute'))
+        Clock.schedule_once(partial(self.widgets['ampm_wheel'].set_index,cat='ampm'))
 
 
     def widget_fade(self,instance,touch,*args):
