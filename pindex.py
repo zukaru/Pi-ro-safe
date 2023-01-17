@@ -2,11 +2,11 @@ import os
 
 class Pindex:
 
-    def p123456(pin_screen):
+    def p12345(pin_screen):
         print("that's the password on my luggage!")
 
     def p2022(pin_screen):
-        print('updating report date')
+        pass
 
     def p4321(pin_screen):
         pin_screen.widgets['reset_overlay'].open()
