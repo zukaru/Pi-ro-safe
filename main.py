@@ -354,13 +354,15 @@ class RelativeLayoutColor(RelativeLayout):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
-class LabelColor(Label): 
+class LabelColor(Label):
+    alpha_value=NumericProperty(0)
     def __init__(self,bg_color= (.1,.1,.1,.95),**kwargs):
         super(LabelColor,self).__init__(**kwargs)
         self.bg_color=bg_color
+        self.alpha_value=bg_color[3]
 
         with self.canvas.before:
-            self.colour=Color(*bg_color)
+            Color(bg_color[0],bg_color[1],bg_color[2],self.alpha_value)
             self.rect = Rectangle(size=self.size, pos=self.pos)
 
         self.bind(size=self._update_rect, pos=self._update_rect)
@@ -369,13 +371,17 @@ class LabelColor(Label):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
+    def on_alpha_value(self, instance, *args):
+        with self.canvas.before:
+            Color(self.bg_color[0],self.bg_color[1],self.bg_color[2],self.alpha_value)
+
 class ClockText(ButtonBehavior,LabelColor):
     def __init__(self, **kwargs):
         super(ClockText,self).__init__(**kwargs)
         self.clock_stack={}
         self.animated=False
         self.angle=0
-        self.anim_lngth=2
+        self.anim_lngth=1
         self.time_size=120
         with self.canvas.before:
             PushMatrix()
@@ -465,17 +471,75 @@ class ClockText(ButtonBehavior,LabelColor):
         #12hour + zero(0) padded decimal minute + am/pm
         self.text =f"[ref='time'][size={int(self.time_size)}][b][color=c0c0c0]{time.strftime('%I'+self.blink()+'%M'+' %p')}"
 
-class Messenger(LabelColor):
+class Messenger(ButtonBehavior,FloatLayout,LabelColor):
     def __init__(self, **kwargs):
-        super(ClockText,self).__init__(**kwargs)
+        super(Messenger,self).__init__(**kwargs)
+        self.bind(on_release=self.switch_gate)
+        self.anim_d=.25
+        self.place_holder=Label()
 
-    def blink(self):
-        pass
+    def switch_gate(self,*args):
+        if self.pos_hint=={'center_x':.5,'center_y':.55}:
+            self.redock()
+        elif self.size_hint==[1,1]:
+            self.undock()
 
-    def update(self, *args):
-        print(args)
-        #12hour + zero(0) padded decimal minute + am/pm
-        self.text =f"[size={self.text_size}][b][color=c0c0c0]{time.strftime('%I'+':'+'%M'+' %p')}"
+    def undock(self,*args):
+        self.size_hint =(.475,.22)
+        self.pos_hint = {'center_x':.5, 'center_y':.265}
+        self.switch_parent()
+        self.expand()
+        self.align_center()
+        self.opaque()
+
+    def redock(self,*args):
+        self.contract()
+        self.align_bottom()
+
+    def switch_parent(self,*args):
+        main_screen=App.get_running_app().context_screen.get_screen('main')
+        widget_carousel=main_screen.widgets['widget_carousel']
+        if self.parent==main_screen:
+            if self.place_holder.parent:
+                self.place_holder.parent.parent.remove_widget(self.place_holder)
+            self.parent.remove_widget(self)
+            widget_carousel.add_widget(self)
+            widget_carousel.index=-1
+        elif self.parent.parent==widget_carousel:
+            self.parent.parent.remove_widget(self)
+            main_screen.add_widget(self)
+            if not self.place_holder.parent:
+                widget_carousel.add_widget(self.place_holder)
+                widget_carousel.index=-1
+        else:
+            print('main.py Messenger switch_parent(): Messenger object has no parent')
+
+    def expand(self,*args):
+        anim=Animation(size_hint=(.9,.8),d=self.anim_d,t='in_back')
+        anim.start(self)
+
+
+    def contract(self,*args):
+        anim=Animation(size_hint=(.475,.22),d=self.anim_d,t='in_back')
+        anim.bind(on_complete=self.switch_parent)
+        anim.start(self)
+
+    def fill_slide(self,*args):
+        self.size_hint =(1,1)
+        self.pos_hint = {'center_x':.5, 'center_y':.5}
+
+    def align_center(self,*args):
+        anim=Animation(pos_hint={'center_x':.5,'center_y':.55},d=self.anim_d)
+        anim.start(self)
+
+    def align_bottom(self,*args):
+        anim=Animation(pos_hint={'center_x':.5,'center_y':.265},d=self.anim_d,t='in_back')
+        anim.bind(on_complete=self.fill_slide)
+        anim.start(self)
+
+    def opaque(self,*args):
+        anim=Animation(alpha_value=1,d=2)
+        anim.start(self)
 
 class BigWheel(Carousel):
     def __init__(self,y_reduction=35, **kwargs):
@@ -664,7 +728,7 @@ class BigWheel(Carousel):
 
 class BigWheelClock(Carousel):
     clock_stack={}
-    def __init__(self,y_reduction=35, **kwargs):
+    def __init__(self,y_reduction=40, **kwargs):
         super(BigWheelClock,self).__init__(**kwargs)
         self.y_reduction=y_reduction
         self.anim=Animation()
@@ -896,14 +960,15 @@ class AnimatedCarousel(Carousel):
     def __init__(self, **kwargs):
         super(AnimatedCarousel,self).__init__(**kwargs)
         self.opacity=0
+        self.anim_length=.5
         self.bind(on_touch_down=self.prevent__return)
 
     def fade_in(self):
-        anim=Animation(opacity=1)
+        anim=Animation(opacity=1,d=self.anim_length)
         anim.start(self)
 
     def fade_out(self):
-        anim=Animation(opacity=0)
+        anim=Animation(opacity=0,d=self.anim_length)
         anim.bind(on_complete=partial(self.rm_parent,instance=self))
         anim.start(self)
 
@@ -1042,7 +1107,7 @@ class ControlGrid(Screen):
             pos_hint = {'x':.7, 'center_y':.5},
             direction='top',
             loop=True,
-            y_reduction=40)
+            y_reduction=45)
         self.widgets['ampm_wheel']=ampm_wheel
 
         for i in ['AM','PM','AM','PM']:
@@ -1051,7 +1116,27 @@ class ControlGrid(Screen):
                 markup=True)
             ampm_wheel.add_widget(_ampm)
 
-        messenger_button=LabelColor(bg_color=(.1,.0,.1,.95))
+        messenger_button=Messenger(
+            bg_color=(.5,.5,.5,.3),
+            size_hint =(1,1),
+            pos_hint = {'center_x':.5, 'center_y':.5})
+
+        message_label=Label(
+            text=current_language['message_label'],
+            markup=True,
+            size_hint =(1,1),
+            pos_hint = {'center_x':.5, 'center_y':.5})
+        self.widgets['message_label']=message_label
+        message_label.ref='message_label'
+
+
+
+
+
+
+
+
+
 
         settings_button=RoundedButton(
                     size_hint =(.18, .1),
@@ -1123,6 +1208,7 @@ class ControlGrid(Screen):
         clock_set_layout.add_widget(minute_wheel)
         clock_set_layout.add_widget(ampm_wheel)
         widget_carousel.add_widget(clock_set_layout)
+        messenger_button.add_widget(message_label)
         widget_carousel.add_widget(messenger_button)
 
         self.add_widget(bg_image)
@@ -1136,12 +1222,16 @@ class ControlGrid(Screen):
         self.add_widget(fs_logo)
         self.add_widget(version_info)
         self.add_widget(clock_label)
+        # self.add_widget(widget_carousel)####
+        # self.add_widget(messenger_button)####
+        # widget_carousel.fade_in()####
 
 
     def widget_fade(self,instance,touch,*args):
         if self.widgets['clock_label'].collide_point(*touch.pos):
             if self.widgets['widget_carousel'] not in self.children:
                 self.add_widget(self.widgets['widget_carousel'],-2)
+                self.widgets['widget_carousel'].index=0
                 self.widgets['widget_carousel'].fade_in()
                 self.widgets['hour_wheel'].set_index(cat='hour')
                 self.widgets['minute_wheel'].set_index(cat='minute')
