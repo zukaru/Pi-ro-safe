@@ -12,6 +12,10 @@ from device_classes.switch_light import SwitchLight
 from device_classes.switch_fans import SwitchFans
 from device_classes.heat_sensor import HeatSensor
 
+from db_service import Db_service
+
+Db_service()
+
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
 import logic,lang_dict,pindex,general
