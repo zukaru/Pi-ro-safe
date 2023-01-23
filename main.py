@@ -766,7 +766,7 @@ class BigWheel(Carousel):
 
 class BigWheelClock(Carousel):
     clock_stack={}
-    def __init__(self,y_reduction=40, **kwargs):
+    def __init__(self,y_reduction=60, **kwargs):
         super(BigWheelClock,self).__init__(**kwargs)
         self.y_reduction=y_reduction
         self.anim=Animation()
@@ -1024,7 +1024,7 @@ class AnimatedCarousel(Carousel):
             self.parent.widgets['clock_label']._create_clock()
 
     def bounce(self,*args):
-        anim=Animation(_offset=-50,d=.5,t='out_quad')+Animation(_offset=0,d=.25,t='in_quad')
+        anim=Animation(_offset=-100,d=.5,t='out_quad')+Animation(_offset=0,d=.25,t='in_quad')
         anim.start(self)
 
     def bounce_progress(self,progress,*args):
@@ -1165,7 +1165,7 @@ class ControlGrid(Screen):
             pos_hint = {'x':.7, 'center_y':.5},
             direction='top',
             loop=True,
-            y_reduction=45)
+            y_reduction=70)
         self.widgets['ampm_wheel']=ampm_wheel
 
         for i in ['AM','PM','AM','PM']:
