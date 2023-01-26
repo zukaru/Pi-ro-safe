@@ -1,5 +1,7 @@
 import os,json,time,shutil
 import traceback,errno
+import asyncio
+import random
 from kivy.config import Config
 
 from device_classes.exhaust import Exhaust
@@ -14,7 +16,10 @@ from device_classes.heat_sensor import HeatSensor
 
 from db_service import Db_service
 
-Db_service()
+db_service = Db_service()
+
+# db_service.signUp("testing@gmail.com", "123456")
+db_service.authenticateUser("testing{}@gmail.com".format(random.randint(1, 999999)), "123456")
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy

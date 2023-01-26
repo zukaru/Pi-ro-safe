@@ -1,5 +1,6 @@
 import os,time,json
 import os.path
+import db_service
 
 class SwitchLight():
     color=(0/255, 0/255, 0/255,.85)
@@ -45,11 +46,13 @@ class SwitchLight():
         if self.state==0:
             self.state=1
             self.last_state_change=time.time()
+            db_service.db.child("fanOn").push(True)
 
     def off(self):
         if self.state==1:
             self.state=0
             self.last_state_change=time.time()
+            db_service.db.child("fanOn").push(False)
 
     def update(self,*args):
         now=time.time()
