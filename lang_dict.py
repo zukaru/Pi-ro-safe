@@ -146,8 +146,10 @@ already, than it will overwrite it)\n\n[/color][/size]''',
 'import_text_fail' : "[size=30][color=#ffffff]          [b]Import Error:[/b][/size][size=26]\n\nYou must make a selection\nfrom external storage to import [/color][/size]",
 'export_text' : "[size=26][color=#ffffff]Are you sure you want to export:\n\n[/color][/size]",
 'export_text_fail' : "[size=30][color=#ffffff]          [b]Export Error:[/b][/size][size=26]\n\nYou must make a selection\nfrom internal storage to export [/color][/size]",
-'message_label' : "[size=50][color=#ffffff][b]H e l l o",
-'message_title' : "[size=50][color=#333333][b]Message Center"
+'message_label' : "[size=50][color=#ffffff][b]Message Center",
+'message_title' : "[size=50][color=#ffffff][b]Message Center",
+'msg_scroll_title' : "[size=30][color=#ffffff][b][u]All Messages",
+'msg_back' : "[size=30][color=#000000][b]Close",
 }
 
 spanish={
