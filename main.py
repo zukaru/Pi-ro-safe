@@ -1,5 +1,6 @@
 import os,json,time,shutil,math,random
 import traceback,errno
+from datetime import datetime
 from kivy.config import Config
 
 from device_classes.exhaust import Exhaust
@@ -179,6 +180,29 @@ class RoundedButton(Button):
                 self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
 
 class RoundedToggleButton(ToggleButton):
+    '''RoundedToggleButton has two key differences from ToggleButton
+    
+     1- RoundedToggleButton stores background_color as self.bg_color;
+     it uses this to keep its round shape colored correctly.
+     
+     2- RoundedToggleButton toggles on_release.
+     this is accomplisehed by overwriting these methods:
+
+     def _do_press(self):
+        pass
+
+    def _do_release(self, *args):
+        pass
+
+    def on_release(self, *args):
+        if (not self.allow_no_selection and
+                self.group and self.state == 'down'):
+            return
+
+        self._release_group(self)
+        self.state = 'normal' if self.state == 'down' else 'down'
+        '''
+
     def __init__(self,**kwargs):
         super(RoundedToggleButton,self).__init__(**kwargs)
         self.bg_color=kwargs["background_color"]
@@ -205,6 +229,20 @@ class RoundedToggleButton(ToggleButton):
                 self.shape_color.rgba = self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3]
             else:
                 self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
+
+    def _do_press(self):
+        pass
+
+    def _do_release(self, *args):
+        pass
+
+    def on_release(self, *args):
+        if (not self.allow_no_selection and
+                self.group and self.state == 'down'):
+            return
+
+        self._release_group(self)
+        self.state = 'normal' if self.state == 'down' else 'down'
 
 class LayoutButton(FloatLayout,RoundedButton):
     pass
@@ -742,6 +780,10 @@ class Messenger(ButtonBehavior,FloatLayout,LabelColor):
 
         if cl.time_size!=120 or cl.opacity!=1:
             return
+        if len(messages.active_messages)<2:
+            return
+        if not App.get_running_app().config_.getboolean('preferences','evoke'):
+            return
         if random.randint(0,5)==0:
             cg.widget_fade()
             cl.fade()
@@ -1259,20 +1301,16 @@ class AnimatedCarousel(Carousel):
 class ControlGrid(Screen):
     def fans_switch(self,button):
         if button.state == 'down':
-            print('fans on by switch')
             logic.fs.moli['exhaust']=1
             logic.fs.moli['mau']=1
         elif button.state == 'normal':
-            print('fans off by switch')
             logic.fs.moli['exhaust']=0
             logic.fs.moli['mau']=0
 
     def lights_switch(self,button):
         if button.state == 'down':
-            print('lights on by switch')
             logic.fs.moli['lights']=1
         elif button.state == 'normal':
-            print('lights off by switch')
             logic.fs.moli['lights']=0
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
@@ -1487,6 +1525,8 @@ class ControlGrid(Screen):
 
 
     def widget_fade(self,*args):
+        if not (self.widgets['clock_label'].opacity==0 or self.widgets['clock_label'].opacity==1):
+            return
         if self.widgets['clock_label'].time_size==35 or self.widgets['clock_label'].time_size==120:
             if self.widgets['widget_carousel'] not in self.children:
                 self.update_msg_card()
@@ -2790,7 +2830,16 @@ class PreferenceScreen(Screen):
         self.widgets['heat_sensor']=heat_sensor
         heat_sensor.ref='heat_sensor'
         heat_sensor.bind(on_release=self.heat_sensor_func)
-        heat_sensor.bind(on_release=self.blur_screen)
+
+        msg_center=RoundedButton(text=current_language['msg_center'],
+                        size_hint =(1, 1),
+                        #pos_hint = {'x':.01, 'y':.9},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['msg_center']=msg_center
+        msg_center.ref='msg_center'
+        msg_center.bind(on_release=self.msg_center_func)
 
         train=RoundedButton(text=current_language['train'],
                         size_hint =(1, 1),
@@ -2871,21 +2920,15 @@ class PreferenceScreen(Screen):
         self.add_widget(back)
         self.add_widget(back_main)
         scroll_layout.add_widget(heat_sensor)
-        scroll_layout.add_widget(train)
-        scroll_layout.add_widget(about)
         scroll_layout.add_widget(clean_mode)
+        scroll_layout.add_widget(msg_center)
+        scroll_layout.add_widget(train)
         scroll_layout.add_widget(commission)
+        scroll_layout.add_widget(about)
         scroll_layout.add_widget(pins)
         pref_scroll.add_widget(scroll_layout)
         self.add_widget(pref_scroll)
         self.add_widget(seperator_line)
-
-    def blur_screen(self,button):
-        #self.blur.effects = [HorizontalBlurEffect(size=5.0),VerticalBlurEffect(size=5.0)]
-        pass
-
-    def unblur_screen(self,button):
-        self.blur.effects = [HorizontalBlurEffect(size=0),VerticalBlurEffect(size=0)]
 
     def heat_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
@@ -3042,12 +3085,6 @@ class PreferenceScreen(Screen):
         self.widgets['light_button']=light_button
         light_button.ref='lights'
 
-        # disable_progress=ProgressBar(
-        #     max=1000,
-        #     size_hint =(.8, .10),
-        #     pos_hint = {'x':.10, 'y':.27},)
-        # self.widgets['disable_progress']=disable_progress
-
         disable_progress=CircularProgressBar()
         disable_progress._widget_size=200
         disable_progress._progress_colour=(245/250, 216/250, 41/250,1)
@@ -3150,6 +3187,115 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_layout'].add_widget(about_back_button)
         self.widgets['overlay_menu'].open()
 
+    def msg_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.75)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+        config=App.get_running_app().config_
+
+        with overlay_menu.canvas.before:
+           overlay_menu.msg_lines=Line(rounded_rectangle=(100, 100, 200, 200, 10, 10, 10, 10, 100),group='msg')
+
+        def update_lines(*args):
+            x=int(overlay_menu.width*.2)
+            y=int(overlay_menu.height*.5)
+            width=int(overlay_menu.width*.25)
+            height=int(overlay_menu.height*.5)
+            overlay_menu.msg_lines.rounded_rectangle=(x, y, width, height, 10, 10, 10, 10, 100)
+        overlay_menu.bind(pos=update_lines, size=update_lines)
+
+        # canvas is drawn to before widgets pos and size are set by parent.
+        # update lines is bound to listen for changes to size and pos so it
+        # can be updated accordingly.
+        # however since the overlay is shared between different menus it does
+        # not update its pos again after the drawing instructions are cleared,
+        # this leads to the lines being drawn wrong again.
+        # we call update_lines() while adding our message widgets to the overlay
+        # to reposition the lines correctly before opening
+        update_lines()
+
+        def _swap_color(button,*args):
+            if button.state=='down':
+                button.bg_color=(245/250, 216/250, 41/250,.85)
+            if button.state=='normal':
+                button.bg_color=(.5,.5,.5,1)
+
+
+        overlay_title=Label(text=current_language['msg_overlay'],
+                        pos_hint = {'x':.0, 'y':.5},
+                        markup=True)
+        self.widgets['overlay_title']=overlay_title
+        overlay_title.ref='msg_overlay'
+
+        evoke_title=Label(text=current_language['evoke_title'],
+                        pos_hint = {'center_x':.2, 'center_y':.88},
+                        markup=True)
+        self.widgets['evoke_title']=evoke_title
+        evoke_title.ref='evoke_title'
+
+        msg_evoke_on=RoundedToggleButton(text=current_language['msg_evoke_on'],
+                        size_hint =(.2, .125),
+                        pos_hint = {'center_x':.2, 'y':.65},
+                        background_down='',
+                        background_color=(.5,.5,.5,.85),
+                        markup=True,
+                        group='evoke',
+                        allow_no_selection=False)
+        self.widgets['msg_evoke_on']=msg_evoke_on
+        msg_evoke_on.ref='msg_evoke_on'
+        msg_evoke_on.unbind(state=msg_evoke_on.color_swap)
+        msg_evoke_on.bind(state=_swap_color)
+        msg_evoke_on.bind(state=msg_evoke_on.color_swap)
+
+        msg_evoke_off=RoundedToggleButton(text=current_language['msg_evoke_off'],
+                        size_hint =(.2, .125),
+                        pos_hint = {'center_x':.2, 'y':.45},
+                        background_down='',
+                        background_color=(.5,.5,.5,.85),
+                        markup=True,
+                        group='evoke',
+                        allow_no_selection=False)
+        self.widgets['msg_evoke_off']=msg_evoke_off
+        msg_evoke_off.ref='msg_evoke_off'
+        msg_evoke_off.unbind(state=msg_evoke_off.color_swap)
+        msg_evoke_off.bind(state=_swap_color)
+        msg_evoke_off.bind(state=msg_evoke_off.color_swap)
+
+        is_evoke=config.getboolean('preferences','evoke')
+        if is_evoke:
+            msg_evoke_on.state='down'
+            _swap_color(msg_evoke_off)
+        else:
+            msg_evoke_off.state='down'
+            _swap_color(msg_evoke_on)
+
+
+        def msg_evoke_on_func(button):
+            config.set('preferences','evoke','True')
+            with open(preferences_path,'w') as configfile:
+                config.write(configfile)
+        msg_evoke_on.bind(on_release=msg_evoke_on_func)
+
+        def msg_evoke_off_func(button):
+            config.set('preferences','evoke','False')
+            with open(preferences_path,'w') as configfile:
+                config.write(configfile)
+        msg_evoke_off.bind(on_release=msg_evoke_off_func)
+
+
+        def on_dismiss(self,*args):
+            overlay_menu.canvas.before.remove_group("msg")
+
+        self.widgets['overlay_layout'].add_widget(overlay_title)
+        self.widgets['overlay_layout'].add_widget(evoke_title)
+        self.widgets['overlay_layout'].add_widget(msg_evoke_on)
+        self.widgets['overlay_layout'].add_widget(msg_evoke_off)
+        overlay_menu.bind(on_dismiss=on_dismiss)
+        overlay_menu.open()
+
     def settings_back(self,button):
         self.widgets['pref_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='down')
@@ -3161,6 +3307,8 @@ class PreferenceScreen(Screen):
     def heat_sensor_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.heat_overlay()
+    def msg_center_func(self,button):
+        self.msg_overlay()
     def train_func (self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='train'
@@ -3366,7 +3514,6 @@ class PinScreen(Screen):
         reset_cancel.ref='reset_cancel'
 
         def reset_confirm_func(button):
-            print(self.widgets['reset_overlay'].widgets['overlay_layout'].children)
             if os.name=='posix':
                 os.system("sudo reboot")
         reset_confirm.bind(on_release=reset_confirm_func)
@@ -3454,7 +3601,6 @@ class PinScreen(Screen):
             config.set('preferences','heat_timer','10')
             with open(preferences_path,'w') as configfile:
                 config.write(configfile)
-            print(self.widgets['heat_override_overlay'].widgets['overlay_layout'].children )
             self.widgets['heat_override_overlay'].dismiss()
         heat_override_confirm.bind(on_release=heat_override_confirm_func)
 
@@ -3705,6 +3851,9 @@ class PinScreen(Screen):
             day=self.pin[2:4]
             year=self.pin[4:8]
             config.set('documents','inspection_date',f'{month}-{day}-{year}')
+            timestamp=datetime.now()
+            timestamp=timestamp.replace(day=1,month=int(month),year=int(year))
+            config.set('timestamps','System Inspection',f'{timestamp }')
             with open(preferences_path,'w') as configfile:
                 config.write(configfile)
         elif hasattr(pindex.Pindex,f'p{self.pin}'):
@@ -4709,6 +4858,8 @@ class Hood_Control(App):
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)
         Clock.schedule_interval(self.context_screen.get_screen('main').widgets['clock_label'].update, 1)
+        Clock.schedule_once(messages.refresh_active_messages)
+        Clock.schedule_interval(messages.refresh_active_messages,10)
         return self.context_screen
 
 def settings_setter(config):
