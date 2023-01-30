@@ -2,6 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python
 
 ### Python ###
+
+firebase_private_credentials.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

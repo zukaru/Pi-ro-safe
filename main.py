@@ -19,7 +19,10 @@ from db_service import Db_service
 db_service = Db_service()
 
 # db_service.signUp("testing@gmail.com", "123456")
-db_service.authenticateUser("testing{}@gmail.com".format(random.randint(1, 999999)), "123456")
+db_service.authUser("testing{}@gmail.com".format(random.randint(1, 10)), "123456")
+# db_service.getFSSRList()
+reportList = db_service.getFSSRList()
+print(reportList)
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy

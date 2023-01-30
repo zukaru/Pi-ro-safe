@@ -9,7 +9,8 @@ config = {
         "storageBucket": "pyrosafe-472f3.appspot.com",
         "messagingSenderId": "930622732610",
         "appId": "1:930622732610:web:5cbb23878bb4c664c4b0db",
-        "databaseURL": "https://pyrosafe-472f3-default-rtdb.firebaseio.com/"
+        "databaseURL": "https://pyrosafe-472f3-default-rtdb.firebaseio.com/",
+        "serviceAccount":"firebase_private_credentials.json"
         }
 
 
@@ -19,6 +20,8 @@ class Db_service():
 
     def __init__(self) -> None:
         self.FSR = "FSR"
+
+        self.FSSRList = []
 
         # Init firebase instance
         firebase = Firebase.initialize_app(config)
@@ -34,19 +37,37 @@ class Db_service():
 
 
     # Will try signing in. If user is not found, will try creating an account.
-    def authenticateUser(self, email, pwd):
-        res = self.auth.create_user_with_email_and_password(email, pwd)
-        print(res)
-        
+    def authUser(self, email, pwd):
+        try:
+            self.user = self.auth.sign_in_with_email_and_password(email, pwd)
+        except Exception as e:
+            print(e)
+            self.user = self.auth.create_user_with_email_and_password(email, pwd)
 
-    def signUp(self, email, pwd):
-        res = self.auth.create_user_with_email_and_password(email, pwd)
-        print(res.error.message)
+    
+    def list_files_handler():
+        pass
+        
         
 
     # Get list of fire suppression system reports saved in storage bucket
     def getFSSRList(self):
-         self.sb.list_files()
+        localReports = []
+        reports = self.sb.list_files()
+        for report in reports:
+            print(report.public_url)
+            localReports.append(report)
+        return localReports.copy()
+            
+
+
+
+
+    def stream_handler(message):
+        print(message["event"]) # put
+        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+        
 
     
     # No need to add reports from devices?
