@@ -1,7 +1,8 @@
-import os,json,time,shutil
+import os,json,time,shutil,math,random
 import traceback,errno
 import asyncio
 import random
+from datetime import datetime
 from kivy.config import Config
 
 from device_classes.exhaust import Exhaust
@@ -23,6 +24,7 @@ db_service.authUser("testing{}@gmail.com".format(random.randint(1, 10)), "123456
 # db_service.getFSSRList()
 reportList = db_service.getFSSRList()
 print(reportList)
+from messages import messages
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 import kivy
@@ -55,7 +57,7 @@ from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.graphics import Rectangle, Color, Line
-from kivy.properties import ListProperty,StringProperty,NumericProperty
+from kivy.properties import ListProperty,StringProperty,NumericProperty,ColorProperty
 import configparser
 import logs.configurations.preferences as preferences
 from kivy.uix.settings import SettingsWithNoMenu
@@ -88,6 +90,7 @@ if os.name == 'posix':
     Window.fullscreen = 'auto'
 
 background_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
+msg_icon_image=r'media/msg_icon.png'
 language_image=r'media/higer_res_thick.png'
 trouble_icon=r'media/trouble icon_high_res.png'
 trouble_icon_dull=r'media/trouble icon_dull_high_res.png'
@@ -132,18 +135,30 @@ class ScatterImage(Image,Scatter):
         return super(ScatterImage, self).on_touch_up(touch)
 
 class OutlineScroll(ScrollView):
-    def __init__(self, **kwargs):
+    def __init__(self,bg_color=(0,0,0,1), **kwargs):
         super(OutlineScroll,self).__init__(**kwargs)
         self.bind(pos=self.update_rect)
         self.bind(size=self.update_rect)
         with self.canvas.before:
-                    Color(0,0,0,.85)
+                    Color(*bg_color)
                     self.rect = Rectangle(pos=self.center,size=(self.width,self.height))
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = (self.size[0], self.size[1])
 
 class IconButton(ButtonBehavior, Image):
+    #uncomment block of code to see hit boxes for your button
+
+    # def __init__(self, **kwargs):
+    #     super(IconButton,self).__init__(**kwargs)
+    #     with self.canvas.before:
+    #             self.colour = Color(0,0,0,1)
+    #             self.rect = Rectangle(size=self.size, pos=self.pos)
+    #     self.bind(size=self._update_rect, pos=self._update_rect)
+
+    # def _update_rect(self, instance, *args):
+    #     self.rect.pos = instance.pos
+    #     self.rect.size = instance.size
     pass
 
 class RoundedButton(Button):
@@ -176,6 +191,29 @@ class RoundedButton(Button):
                 self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
 
 class RoundedToggleButton(ToggleButton):
+    '''RoundedToggleButton has two key differences from ToggleButton
+    
+     1- RoundedToggleButton stores background_color as self.bg_color;
+     it uses this to keep its round shape colored correctly.
+     
+     2- RoundedToggleButton toggles on_release.
+     this is accomplisehed by overwriting these methods:
+
+     def _do_press(self):
+        pass
+
+    def _do_release(self, *args):
+        pass
+
+    def on_release(self, *args):
+        if (not self.allow_no_selection and
+                self.group and self.state == 'down'):
+            return
+
+        self._release_group(self)
+        self.state = 'normal' if self.state == 'down' else 'down'
+        '''
+
     def __init__(self,**kwargs):
         super(RoundedToggleButton,self).__init__(**kwargs)
         self.bg_color=kwargs["background_color"]
@@ -202,6 +240,20 @@ class RoundedToggleButton(ToggleButton):
                 self.shape_color.rgba = self.bg_color[0], self.bg_color[1], self.bg_color[2], self.bg_color[3]
             else:
                 self.shape_color.rgba = self.bg_color[0]*.5, self.bg_color[1]*.5, self.bg_color[2]*.5, self.bg_color[3]
+
+    def _do_press(self):
+        pass
+
+    def _do_release(self, *args):
+        pass
+
+    def on_release(self, *args):
+        if (not self.allow_no_selection and
+                self.group and self.state == 'down'):
+            return
+
+        self._release_group(self)
+        self.state = 'normal' if self.state == 'down' else 'down'
 
 class LayoutButton(FloatLayout,RoundedButton):
     pass
@@ -367,30 +419,36 @@ class RelativeLayoutColor(RelativeLayout):
         self.rect.size = instance.size
 
 class LabelColor(Label):
-    alpha_value=NumericProperty(0)
+    bg_color=ColorProperty()
     def __init__(self,bg_color= (.1,.1,.1,.95),**kwargs):
         super(LabelColor,self).__init__(**kwargs)
-        self.bg_color=bg_color
-        self.alpha_value=bg_color[3]
 
         with self.canvas.before:
-            Color(bg_color[0],bg_color[1],bg_color[2],self.alpha_value)
+            self.colour = Color(*bg_color)
             self.rect = Rectangle(size=self.size, pos=self.pos)
 
+        self.bg_color=bg_color
         self.bind(size=self._update_rect, pos=self._update_rect)
 
     def _update_rect(self, instance, *args):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
+    
+    def on_bg_color(self, *args):
+        self.colour.rgb=self.bg_color
 
-    def on_alpha_value(self, instance, *args):
-        with self.canvas.before:
-            Color(self.bg_color[0],self.bg_color[1],self.bg_color[2],self.alpha_value)
+    @property
+    def alpha_value(self):
+        return self.colour.rgba[3]
+    @alpha_value.setter
+    def alpha_value(self,value):
+        self.colour.rgba[3]=value
 
 class ClockText(ButtonBehavior,LabelColor):
     def __init__(self, **kwargs):
         super(ClockText,self).__init__(**kwargs)
         self.clock_stack={}
+        self.anim_length=.5
         self.animated=False
         self.angle=0
         self.anim_lngth=1
@@ -401,30 +459,34 @@ class ClockText(ButtonBehavior,LabelColor):
         with self.canvas.after:
             PopMatrix()
         self.blink_bool=True
-        self.bind(on_touch_up=self.animate)
+        self.bind(on_release=self.animate)
         self.bind(center=self._update)
         self.bind(font_size=self._update)
 
-    def animate(self,instance,touch,*args):
-        if self.collide_point(*touch.pos):
-            if self.animated:
-                if self.time_size==35:
-                    self._delete_clock()
-                    self.animated=False
-                    self.unrotate()
-                    self.unslide()
-                    self.text_unshrink()
-                    self.unmorph()
-            else:
-                if self.time_size==120:
-                    self._create_clock()
-                    self.animated=True
-                    self.rotate()
-                    self.slide()
-                    self.text_shrink()
-                    self.morph()
+    def animate(self,*args):
+        if self.opacity!=1:
+            return
+        if self.animated:
+            if self.time_size==35:
+                self._delete_clock()
+                self.animated=False
+                self.unrotate()
+                self.unslide()
+                self.text_unshrink()
+                self.unmorph()
+        else:
+            if self.time_size==120:
+                self._create_clock()
+                self.animated=True
+                self.rotate()
+                self.slide()
+                self.text_shrink()
+                self.morph()
 
     def _return(self,*args):
+        if self.opacity==0:
+            self.fade_in()
+            self.parent.widgets['widget_carousel'].fade_out()
         if self.time_size==35:
             self.animated=False
             self.unrotate()
@@ -433,13 +495,20 @@ class ClockText(ButtonBehavior,LabelColor):
             self.unmorph()
             self.parent.widgets['widget_carousel'].fade_out()
 
+    def _bounce(self,*args):
+        App.get_running_app().context_screen.get_screen('main').widgets['widget_carousel'].bounce()
+
     def _create_clock(self,*args):
         Clock.schedule_once(self._return,10)
         self.clock_stack['event'] = self._return
+        Clock.schedule_once(self._bounce,4)
+        self.clock_stack['bounce'] = self._bounce
 
     def _delete_clock(self,*args):
         if 'event' in self.clock_stack:
             Clock.unschedule(self.clock_stack['event'])
+        if 'bounce' in self.clock_stack:
+            Clock.unschedule(self.clock_stack['bounce'])
 
     def morph(self):
         anim=Animation(size_hint=(.05,.255),duration=self.anim_lngth/2)
@@ -475,40 +544,84 @@ class ClockText(ButtonBehavior,LabelColor):
             return '[color=#909090]:[/color]'
         return ':'
 
+    def fade(self,*args):
+        if self.opacity==0:
+            self.fade_in()
+        elif self.opacity==1:
+            self.fade_out()
+
+    def fade_in(self):
+        self.add_parent()
+        anim=Animation(opacity=1,d=self.anim_length)
+        anim.start(self)
+
+    def fade_out(self):
+        anim=Animation(opacity=0,d=self.anim_length)
+        anim.bind(on_complete=partial(self.rm_parent,instance=self))
+        anim.start(self)
+
+    def rm_parent(*args,instance=None):
+        if instance.parent:
+            instance.parent.remove_widget(instance)
+
+    def add_parent(self):
+        if not self.parent:
+            App.get_running_app().context_screen.get_screen('main').add_widget(self)
+
     def _update(self,*args):
         self.rotation.origin=self.center
         self.update()
 
     def update(self, *args):
         #12hour + zero(0) padded decimal minute + am/pm
-        self.text =f"[ref='time'][size={int(self.time_size)}][b][color=c0c0c0]{time.strftime('%I'+self.blink()+'%M'+' %p')}"
+        self.text =f"[size={int(self.time_size)}][b][color=c0c0c0]{time.strftime('%I'+self.blink()+'%M'+' %p')}"
 
 class Messenger(ButtonBehavior,FloatLayout,LabelColor):
     def __init__(self, **kwargs):
         super(Messenger,self).__init__(**kwargs)
-        self.bind(on_release=self.switch_gate)
+        self.clock_stack={}
+        self.widgets={}
         self.anim_d=.25
         self.place_holder=Label()
-
-    def switch_gate(self,*args):
-        if self.pos_hint=={'center_x':.5,'center_y':.55}:
-            self.redock()
-        elif self.size_hint==[1,1]:
-            self.undock()
+        self.bind(on_release=self.undock)
 
     def undock(self,*args):
-        self.size_hint =(.475,.22)
-        self.pos_hint = {'center_x':.5, 'center_y':.265}
-        self.switch_parent()
-        self.expand()
-        self.align_center()
-        self.opaque()
+        if self.size_hint==[1,1]:
+            cg=App.get_running_app().context_screen.get_screen('main')
+            cgw=cg.widgets
+            cl=cgw['clock_label']
+            msg=cgw['messenger_button']
+            cl._delete_clock()
+            self.size_hint =(.475,.22)
+            self.pos_hint = {'center_x':.5, 'center_y':.265}
+            self.switch_parent()
+            self.expand()
+            self.align_center()
+            self.opaque()
+            self.darken()
+            msg.clear_widgets()
 
     def redock(self,*args):
-        self.contract()
-        self.align_bottom()
+        if self.pos_hint=={'center_x':.5,'center_y':.55}:
+            cg=App.get_running_app().context_screen.get_screen('main')
+            cgw=cg.widgets
+            cl=cgw['clock_label']
+            msg=cgw['messenger_button']
+            self.contract()
+            self.align_bottom()
+            self.unopaque()
+            self.lighten()
+            msg.clear_widgets()
+            if cl.opacity==1:
+                cl._create_clock()
+            else:
+                cl._return()
 
     def switch_parent(self,*args):
+        cg=App.get_running_app().context_screen.get_screen('main')
+        cgw=cg.widgets
+        cl=cgw['clock_label']
+        msg=cgw['messenger_button']
         main_screen=App.get_running_app().context_screen.get_screen('main')
         widget_carousel=main_screen.widgets['widget_carousel']
         if self.parent==main_screen:
@@ -517,6 +630,7 @@ class Messenger(ButtonBehavior,FloatLayout,LabelColor):
             self.parent.remove_widget(self)
             widget_carousel.add_widget(self)
             widget_carousel.index=-1
+            msg.add_widget(cgw['message_label'])
         elif self.parent.parent==widget_carousel:
             self.parent.parent.remove_widget(self)
             main_screen.add_widget(self)
@@ -530,7 +644,6 @@ class Messenger(ButtonBehavior,FloatLayout,LabelColor):
         anim=Animation(size_hint=(.9,.8),d=self.anim_d,t='in_back')
         anim.start(self)
 
-
     def contract(self,*args):
         anim=Animation(size_hint=(.475,.22),d=self.anim_d,t='in_back')
         anim.bind(on_complete=self.switch_parent)
@@ -542,6 +655,7 @@ class Messenger(ButtonBehavior,FloatLayout,LabelColor):
 
     def align_center(self,*args):
         anim=Animation(pos_hint={'center_x':.5,'center_y':.55},d=self.anim_d)
+        anim.bind(on_complete=self.populate_widgets)
         anim.start(self)
 
     def align_bottom(self,*args):
@@ -550,8 +664,156 @@ class Messenger(ButtonBehavior,FloatLayout,LabelColor):
         anim.start(self)
 
     def opaque(self,*args):
-        anim=Animation(alpha_value=1,d=2)
+        anim=Animation(alpha_value=.85,d=self.anim_d)
         anim.start(self)
+
+    def unopaque(self,*args):
+        anim=Animation(alpha_value=.3,d=self.anim_d)
+        anim.start(self)
+
+    def darken(self,*args):
+        anim=Animation(bg_color=[0,0,0,.85],d=self.anim_d)
+        anim.start(self)
+
+    def lighten(self,*args):
+        anim=Animation(bg_color=[.7,.7,.7,.3],d=self.anim_d)
+        anim.start(self)
+
+    def populate_widgets(self,*args):
+        scroll_color=(.4,.4,.4,.85)
+        yellow=(245/250, 216/250, 41/250,.9)
+
+        cg=App.get_running_app().context_screen.get_screen('main')
+        cgw=cg.widgets
+
+        msg_back=RoundedButton(text=current_language['msg_back'],
+            size_hint =(.4, .1),
+            pos_hint = {'x':.06, 'y':.015},
+            background_normal='',
+            background_color=yellow,
+            markup=True)
+        self.widgets['msg_back']=msg_back
+        msg_back.ref='msg_back'
+        msg_back.bind(on_release=self.redock)
+
+        msg_seperator_line=Image(
+            source=gray_seperator_line,
+            allow_stretch=True,
+            keep_ratio=False,
+            color=(.5,.5,.5,1),
+            size_hint =(.5, .001),
+            pos_hint = {'x':.01, 'y':.87})
+        self.widgets['msg_seperator_line']=msg_seperator_line
+
+        message_title=Label(
+            text=current_language['message_title'],
+            markup=True,
+            size_hint =(1,1),
+            pos_hint = {'center_x':.25, 'center_y':.95})
+        self.widgets['message_title']=message_title
+        message_title.ref='message_title'
+
+        msg_scroll=OutlineScroll(
+            size_hint =(.4,.8),
+            pos_hint = {'center_x':.75, 'center_y':.45},
+            bg_color=scroll_color,
+            bar_width=8,
+            bar_color=yellow,
+            do_scroll_y=True,
+            do_scroll_x=False)
+
+        scroll_layout = GridLayout(
+            cols=1,
+            spacing=10,
+            size_hint_y=None,
+            padding=5)
+        # Make sure the height is such that there is something to scroll.
+        scroll_layout.bind(minimum_height=scroll_layout.setter('height'))
+        for i in messages.active_messages:
+            btn = RoundedButton(
+                background_normal='',
+                background_color=(.1,.1,.1,1),
+                text=i.name,
+                size_hint_y=None,
+                height=40)
+            btn.bind(on_release=partial(self.load_selected_msg,i))
+            scroll_layout.add_widget(btn)
+
+        msg_scroll_title=LabelColor(
+            bg_color=scroll_color,
+            text=current_language['msg_scroll_title'],
+            markup=True,
+            size_hint =(.4,.1),
+            pos_hint = {'center_x':.75, 'center_y':.9})
+        self.widgets['msg_scroll_title']=msg_scroll_title
+        msg_scroll_title.ref='msg_scroll_title'
+
+        self.load_selected_msg(messages.active_messages[0])
+
+        msg_scroll.add_widget(scroll_layout)
+
+        self.add_widget(msg_back)
+        self.add_widget(msg_seperator_line)
+        self.add_widget(message_title)
+        self.add_widget(msg_scroll)
+        self.add_widget(msg_scroll_title)
+
+    def load_selected_msg(self,message,*args):
+        try:
+            self.remove_widget(self.widgets['selected_msg_title'])
+            self.remove_widget(self.widgets['selected_msg_body'])
+        except KeyError:
+            pass
+        selected_msg_title=Label(
+            text=f'[size=26][color=#ffffff][b][i][u]{message.title}',
+            markup=True,
+            halign='center',
+            size_hint =(.4,.1),
+            pos_hint = {'center_x':.25, 'center_y':.8})
+        self.widgets['selected_msg_title']=selected_msg_title
+        selected_msg_title.ref='selected_msg_title'
+        self.add_widget(selected_msg_title)
+
+        selected_msg_body=Label(
+            text=f'[size=20][color=#ffffff]{message.body}',
+            markup=True,
+            halign='center',
+            size_hint =(.4,.1),
+            pos_hint = {'center_x':.25, 'center_y':.5})
+        self.widgets['selected_msg_body']=selected_msg_body
+        selected_msg_body.ref='selected_msg_body'
+        self.add_widget(selected_msg_body)
+
+    def evoke(self,*args):
+        cg=App.get_running_app().context_screen.get_screen('main')
+        wc=cg.widgets['widget_carousel']
+        cl=cg.widgets['clock_label']
+
+        if cl.time_size!=120 or cl.opacity!=1:
+            return
+        if len(messages.active_messages)<2:
+            return
+        if not App.get_running_app().config_.getboolean('preferences','evoke'):
+            return
+        if random.randint(0,5)==0:
+            cg.widget_fade()
+            cl.fade()
+            Clock.schedule_once(cg.widget_fade,5)
+            self.clock_stack['widget_fade']=cg.widget_fade
+            Clock.schedule_once(cl.fade,5)
+            self.clock_stack['fade']=cl.fade
+            if wc.opacity==0:
+                cg.widgets['widget_carousel'].index=1
+
+    def _delete_clock(self,*args):
+        if 'widget_fade' in self.clock_stack:
+            Clock.unschedule(self.clock_stack['widget_fade'])
+        if 'fade' in self.clock_stack:
+            Clock.unschedule(self.clock_stack['fade'])
+
+    def on_touch_down(self, touch):
+        self._delete_clock()
+        return super().on_touch_down(touch)
 
 class BigWheel(Carousel):
     def __init__(self,y_reduction=35, **kwargs):
@@ -740,10 +1002,26 @@ class BigWheel(Carousel):
 
 class BigWheelClock(Carousel):
     clock_stack={}
-    def __init__(self,y_reduction=40, **kwargs):
+    def __init__(self,y_reduction=60, **kwargs):
         super(BigWheelClock,self).__init__(**kwargs)
         self.y_reduction=y_reduction
         self.anim=Animation()
+
+    def on_touch_move(self, touch):
+        cl=App.get_running_app().context_screen.get_screen('main').widgets['clock_label']
+        cl._delete_clock()
+        cl._create_clock()
+        return super().on_touch_move(touch)
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            touch.grab(self)
+        return super().on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        if touch.grab_current is self:
+            touch.ungrab(self)
+        return super().on_touch_up(touch)
 
     def _set_sys_time(*args):
         if Clock.get_boottime()>5:
@@ -973,14 +1251,29 @@ class AnimatedCarousel(Carousel):
         super(AnimatedCarousel,self).__init__(**kwargs)
         self.opacity=0
         self.anim_length=.5
-        self.bind(on_touch_down=self.prevent__return)
+
+    def on_touch_move(self, touch):
+        cl=App.get_running_app().context_screen.get_screen('main').widgets['clock_label']
+        cl._delete_clock()
+        cl._create_clock()
+        return super().on_touch_move(touch)
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            touch.grab(self)
+        return super().on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        if touch.grab_current is self:
+            touch.ungrab(self)
+        return super().on_touch_up(touch)
 
     def fade_in(self):
         anim=Animation(opacity=1,d=self.anim_length)
         anim.start(self)
 
     def fade_out(self):
-        anim=Animation(opacity=0,d=self.anim_length)
+        anim=Animation(opacity=0,d=self.anim_length/2)
         anim.bind(on_complete=partial(self.rm_parent,instance=self))
         anim.start(self)
 
@@ -989,35 +1282,46 @@ class AnimatedCarousel(Carousel):
             instance.parent.remove_widget(instance)
 
     def on_touch_down(self, touch):
-        if self.opacity==1:
+        if self.opacity==1 and self._offset==0:
             return super(AnimatedCarousel,self).on_touch_down(touch)
 
-    def prevent__return(self,instance,touch,*args):
-        if self.collide_point(*touch.pos):
-            self.parent.widgets['clock_label']._delete_clock()
-            self.parent.widgets['clock_label']._create_clock()
+    def bounce(self,*args):
+        anim=Animation(_offset=-100,d=.5,t='out_quad')+Animation(_offset=0,d=.25,t='in_quad')
+        anim.start(self)
 
-
+    def bounce_progress(self,progress,*args):
+        def out(progress):
+            p = 1.-progress / 1.
+            # if p < (.25 / 2.75):
+            #     return -7.5625 * p * p + progress
+            if p < (1.0 / 2.75):
+                return 7.5625 * p * p + (progress-p)
+            if p < (2.0 / 2.75):
+                p -= (1.5 / 2.75)
+                return 7.5625 * p * p + .75 
+            elif p < (2.5 / 2.75):
+                p -= (2.25 / 2.75)
+                return 7.5625 * p * p + .9375
+            else:
+                p -= (2.625 / 2.75)
+                return 7.5625 * p * p + .984375
+        return 1.0-out(progress)
 
 #<<<<<<<<<<>>>>>>>>>>#
 
 class ControlGrid(Screen):
     def fans_switch(self,button):
         if button.state == 'down':
-            print('fans on by switch')
             logic.fs.moli['exhaust']=1
             logic.fs.moli['mau']=1
         elif button.state == 'normal':
-            print('fans off by switch')
             logic.fs.moli['exhaust']=0
             logic.fs.moli['mau']=0
 
     def lights_switch(self,button):
         if button.state == 'down':
-            print('lights on by switch')
             logic.fs.moli['lights']=1
         elif button.state == 'normal':
-            print('lights off by switch')
             logic.fs.moli['lights']=0
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
@@ -1070,7 +1374,7 @@ class ControlGrid(Screen):
             pos_hint = {'center_x':.5, 'center_y':.265},
             bg_color=(.2,.2,.2,.65))
         self.widgets['clock_label']=clock_label
-        clock_label.bind(on_touch_up=self.widget_fade)
+        clock_label.bind(on_release=self.widget_fade)
 
         widget_carousel=AnimatedCarousel(
             size_hint =(.475,.22),
@@ -1119,7 +1423,7 @@ class ControlGrid(Screen):
             pos_hint = {'x':.7, 'center_y':.5},
             direction='top',
             loop=True,
-            y_reduction=45)
+            y_reduction=70)
         self.widgets['ampm_wheel']=ampm_wheel
 
         for i in ['AM','PM','AM','PM']:
@@ -1129,26 +1433,23 @@ class ControlGrid(Screen):
             ampm_wheel.add_widget(_ampm)
 
         messenger_button=Messenger(
-            bg_color=(.5,.5,.5,.3),
+            bg_color=(.7,.7,.7,.3),
             size_hint =(1,1),
             pos_hint = {'center_x':.5, 'center_y':.5})
+        self.widgets['messenger_button']=messenger_button
+        fans.bind(on_press=self.widgets['messenger_button'].evoke)
+        lights.bind(on_press=self.widgets['messenger_button'].evoke)
 
         message_label=Label(
             text=current_language['message_label'],
             markup=True,
             size_hint =(1,1),
-            pos_hint = {'center_x':.5, 'center_y':.5})
+            pos_hint = {'center_x':.5, 'center_y':.5},
+            halign='center',
+            valign='center')
+        message_label.bind(size=message_label.setter('text_size'))
         self.widgets['message_label']=message_label
         message_label.ref='message_label'
-
-
-
-
-
-
-
-
-
 
         settings_button=RoundedButton(
                     size_hint =(.18, .1),
@@ -1186,20 +1487,18 @@ class ControlGrid(Screen):
         language_button.bind(on_press=self.language_func)
         language_button.color=(1,1,1,.65)
 
+        msg_icon=IconButton(source=msg_icon_image, allow_stretch=True, keep_ratio=True)
+        msg_icon.size_hint =(.10, .10)
+        msg_icon.pos_hint = {'x':.61, 'y':.02}
+        self.widgets['msg_icon']=msg_icon
+        msg_icon.bind(on_press=self.msg_icon_func)
+        msg_icon.color=(1,1,1,.65)
+
         fs_logo=IconButton(source=logo,
-                size_hint_x=.25,
-                size_hint_y=.25,
+                size_hint_x=.2,
+                size_hint_y=.1,
                 pos_hint = {'x':.225, 'center_y':.07})
         fs_logo.bind(on_release=self.about_func)
-
-        version_info=RoundedButton(text=current_language['version_info'],
-                markup=True,
-                background_normal='',
-                background_color=(245/250, 216/250, 41/250,.5),
-                size_hint =(.18, .1),
-                pos_hint = {'x':.5, 'y':.015},)
-        version_info.ref='version_info'
-        version_info.bind(on_release=self.about_func)
 
         overlay_menu=Popup(
             size_hint=(.8, .8),
@@ -1231,17 +1530,17 @@ class ControlGrid(Screen):
         self.add_widget(menu_icon)
         self.add_widget(trouble_button)
         self.add_widget(language_button)
+        self.add_widget(msg_icon)
         self.add_widget(fs_logo)
-        self.add_widget(version_info)
         self.add_widget(clock_label)
-        # self.add_widget(widget_carousel)####
-        # self.add_widget(messenger_button)####
-        # widget_carousel.fade_in()####
 
 
-    def widget_fade(self,instance,touch,*args):
-        if self.widgets['clock_label'].collide_point(*touch.pos):
+    def widget_fade(self,*args):
+        if not (self.widgets['clock_label'].opacity==0 or self.widgets['clock_label'].opacity==1):
+            return
+        if self.widgets['clock_label'].time_size==35 or self.widgets['clock_label'].time_size==120:
             if self.widgets['widget_carousel'] not in self.children:
+                self.update_msg_card()
                 self.add_widget(self.widgets['widget_carousel'],-2)
                 self.widgets['widget_carousel'].index=0
                 self.widgets['widget_carousel'].fade_in()
@@ -1249,6 +1548,8 @@ class ControlGrid(Screen):
                 self.widgets['minute_wheel'].set_index(cat='minute')
                 self.widgets['ampm_wheel'].set_index(cat='ampm')
             else:
+                if self.widgets['widget_carousel'].opacity!=1:
+                    return
                 self.widgets['widget_carousel'].fade_out()
     def open_settings(self,button):
         self.parent.transition = SlideTransition(direction='right')
@@ -1258,6 +1559,19 @@ class ControlGrid(Screen):
         self.manager.current='trouble'
     def language_func (self,button):
         self.language_overlay()
+    def update_msg_card(self,*args):
+        self.widgets['message_label'].text=f'[size=50][color=#ffffff][b]{messages.active_messages[0].card}'
+    def msg_icon_func (self,button):
+        if self.widgets['clock_label'].opacity!=1:
+            return
+        if self.widgets['messenger_button'].pos_hint=={'center_x':.5,'center_y':.55}:
+            return
+        self.widget_fade()
+        if self.widgets['clock_label'].time_size==120:
+            self.widgets['widget_carousel'].index=1
+        self.widgets['clock_label'].animate()
+    def on_pre_leave(self, *args):
+        self.widgets['messenger_button'].redock()
 
     def language_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
@@ -1449,6 +1763,15 @@ class SettingsScreen(Screen):
         back.ref='settings_back'
         back.bind(on_press=self.settings_back)
 
+        version_info=RoundedButton(text=current_language['version_info'],
+                markup=True,
+                background_normal='',
+                background_color=(245/250, 216/250, 41/250,.5),
+                size_hint =(.18, .1),
+                pos_hint = {'x':.75, 'y':.015},)
+        version_info.ref='version_info'
+        version_info.bind(on_release=self.about_func)
+
         logs=RoundedButton(text=current_language['logs'],
                         size_hint =(.9, .18),
                         pos_hint = {'x':.05, 'y':.78},
@@ -1500,6 +1823,7 @@ class SettingsScreen(Screen):
         overlay_menu.add_widget(overlay_layout)
         self.add_widget(bg_image)
         self.add_widget(back)
+        self.add_widget(version_info)
         self.add_widget(logs)
         self.add_widget(sys_report)
         self.add_widget(preferences)
@@ -1517,6 +1841,61 @@ class SettingsScreen(Screen):
     def preferences_func (self,button):
         self.parent.transition = SlideTransition(direction='up')
         self.manager.current='preferences'
+
+    def about_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.75)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        about_text=Label(
+            text=current_language['about_overlay_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.4},)
+        self.widgets['about_text']=about_text
+        about_text.ref='about_overlay_text'
+
+        version_info=Label(text=current_language['version_info_white'],
+                markup=True,
+                pos_hint = {'x':-.05, 'center_y':.6})
+        version_info.ref='version_info'
+
+        about_qr=Image(source=qr_link,
+            allow_stretch=False,
+            keep_ratio=True,
+            size_hint =(.45,.45),
+            pos_hint = {'x':.6, 'y':.58})
+
+        qr_label=Label(text='[size=16][color=#ffffff]firesafeextinguisher.com[/color][/size]',
+                markup=True,
+                pos_hint = {'x':.33, 'center_y':.55})
+        qr_label.ref='qr_label'
+
+        about_back_button=RoundedButton(text=current_language['about_back'],
+                        size_hint =(.9, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_normal='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['about_back_button']=about_back_button
+        about_back_button.ref='about_back'
+
+        def about_overlay_close(button):
+            self.widgets['overlay_menu'].dismiss()
+        about_back_button.bind(on_press=about_overlay_close)
+
+        self.widgets['overlay_layout'].add_widget(about_text)
+        self.widgets['overlay_layout'].add_widget(version_info)
+        self.widgets['overlay_layout'].add_widget(about_qr)
+        self.widgets['overlay_layout'].add_widget(qr_label)
+        self.widgets['overlay_layout'].add_widget(about_back_button)
+        self.widgets['overlay_menu'].open()
+
+    def about_func (self,button):
+        self.about_overlay()
 
 class ReportScreen(Screen):
     def __init__(self, **kwargs):
@@ -2462,7 +2841,16 @@ class PreferenceScreen(Screen):
         self.widgets['heat_sensor']=heat_sensor
         heat_sensor.ref='heat_sensor'
         heat_sensor.bind(on_release=self.heat_sensor_func)
-        heat_sensor.bind(on_release=self.blur_screen)
+
+        msg_center=RoundedButton(text=current_language['msg_center'],
+                        size_hint =(1, 1),
+                        #pos_hint = {'x':.01, 'y':.9},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['msg_center']=msg_center
+        msg_center.ref='msg_center'
+        msg_center.bind(on_release=self.msg_center_func)
 
         train=RoundedButton(text=current_language['train'],
                         size_hint =(1, 1),
@@ -2543,21 +2931,15 @@ class PreferenceScreen(Screen):
         self.add_widget(back)
         self.add_widget(back_main)
         scroll_layout.add_widget(heat_sensor)
-        scroll_layout.add_widget(train)
-        scroll_layout.add_widget(about)
         scroll_layout.add_widget(clean_mode)
+        scroll_layout.add_widget(msg_center)
+        scroll_layout.add_widget(train)
         scroll_layout.add_widget(commission)
+        scroll_layout.add_widget(about)
         scroll_layout.add_widget(pins)
         pref_scroll.add_widget(scroll_layout)
         self.add_widget(pref_scroll)
         self.add_widget(seperator_line)
-
-    def blur_screen(self,button):
-        #self.blur.effects = [HorizontalBlurEffect(size=5.0),VerticalBlurEffect(size=5.0)]
-        pass
-
-    def unblur_screen(self,button):
-        self.blur.effects = [HorizontalBlurEffect(size=0),VerticalBlurEffect(size=0)]
 
     def heat_overlay(self):
         overlay_menu=self.widgets['overlay_menu']
@@ -2714,12 +3096,6 @@ class PreferenceScreen(Screen):
         self.widgets['light_button']=light_button
         light_button.ref='lights'
 
-        # disable_progress=ProgressBar(
-        #     max=1000,
-        #     size_hint =(.8, .10),
-        #     pos_hint = {'x':.10, 'y':.27},)
-        # self.widgets['disable_progress']=disable_progress
-
         disable_progress=CircularProgressBar()
         disable_progress._widget_size=200
         disable_progress._progress_colour=(245/250, 216/250, 41/250,1)
@@ -2822,6 +3198,115 @@ class PreferenceScreen(Screen):
         self.widgets['overlay_layout'].add_widget(about_back_button)
         self.widgets['overlay_menu'].open()
 
+    def msg_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.75)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+        config=App.get_running_app().config_
+
+        with overlay_menu.canvas.before:
+           overlay_menu.msg_lines=Line(rounded_rectangle=(100, 100, 200, 200, 10, 10, 10, 10, 100),group='msg')
+
+        def update_lines(*args):
+            x=int(overlay_menu.width*.2)
+            y=int(overlay_menu.height*.5)
+            width=int(overlay_menu.width*.25)
+            height=int(overlay_menu.height*.5)
+            overlay_menu.msg_lines.rounded_rectangle=(x, y, width, height, 10, 10, 10, 10, 100)
+        overlay_menu.bind(pos=update_lines, size=update_lines)
+
+        # canvas is drawn to before widgets pos and size are set by parent.
+        # update lines is bound to listen for changes to size and pos so it
+        # can be updated accordingly.
+        # however since the overlay is shared between different menus it does
+        # not update its pos again after the drawing instructions are cleared,
+        # this leads to the lines being drawn wrong again.
+        # we call update_lines() while adding our message widgets to the overlay
+        # to reposition the lines correctly before opening
+        update_lines()
+
+        def _swap_color(button,*args):
+            if button.state=='down':
+                button.bg_color=(245/250, 216/250, 41/250,.85)
+            if button.state=='normal':
+                button.bg_color=(.5,.5,.5,1)
+
+
+        overlay_title=Label(text=current_language['msg_overlay'],
+                        pos_hint = {'x':.0, 'y':.5},
+                        markup=True)
+        self.widgets['overlay_title']=overlay_title
+        overlay_title.ref='msg_overlay'
+
+        evoke_title=Label(text=current_language['evoke_title'],
+                        pos_hint = {'center_x':.2, 'center_y':.88},
+                        markup=True)
+        self.widgets['evoke_title']=evoke_title
+        evoke_title.ref='evoke_title'
+
+        msg_evoke_on=RoundedToggleButton(text=current_language['msg_evoke_on'],
+                        size_hint =(.2, .125),
+                        pos_hint = {'center_x':.2, 'y':.65},
+                        background_down='',
+                        background_color=(.5,.5,.5,.85),
+                        markup=True,
+                        group='evoke',
+                        allow_no_selection=False)
+        self.widgets['msg_evoke_on']=msg_evoke_on
+        msg_evoke_on.ref='msg_evoke_on'
+        msg_evoke_on.unbind(state=msg_evoke_on.color_swap)
+        msg_evoke_on.bind(state=_swap_color)
+        msg_evoke_on.bind(state=msg_evoke_on.color_swap)
+
+        msg_evoke_off=RoundedToggleButton(text=current_language['msg_evoke_off'],
+                        size_hint =(.2, .125),
+                        pos_hint = {'center_x':.2, 'y':.45},
+                        background_down='',
+                        background_color=(.5,.5,.5,.85),
+                        markup=True,
+                        group='evoke',
+                        allow_no_selection=False)
+        self.widgets['msg_evoke_off']=msg_evoke_off
+        msg_evoke_off.ref='msg_evoke_off'
+        msg_evoke_off.unbind(state=msg_evoke_off.color_swap)
+        msg_evoke_off.bind(state=_swap_color)
+        msg_evoke_off.bind(state=msg_evoke_off.color_swap)
+
+        is_evoke=config.getboolean('preferences','evoke')
+        if is_evoke:
+            msg_evoke_on.state='down'
+            _swap_color(msg_evoke_off)
+        else:
+            msg_evoke_off.state='down'
+            _swap_color(msg_evoke_on)
+
+
+        def msg_evoke_on_func(button):
+            config.set('preferences','evoke','True')
+            with open(preferences_path,'w') as configfile:
+                config.write(configfile)
+        msg_evoke_on.bind(on_release=msg_evoke_on_func)
+
+        def msg_evoke_off_func(button):
+            config.set('preferences','evoke','False')
+            with open(preferences_path,'w') as configfile:
+                config.write(configfile)
+        msg_evoke_off.bind(on_release=msg_evoke_off_func)
+
+
+        def on_dismiss(self,*args):
+            overlay_menu.canvas.before.remove_group("msg")
+
+        self.widgets['overlay_layout'].add_widget(overlay_title)
+        self.widgets['overlay_layout'].add_widget(evoke_title)
+        self.widgets['overlay_layout'].add_widget(msg_evoke_on)
+        self.widgets['overlay_layout'].add_widget(msg_evoke_off)
+        overlay_menu.bind(on_dismiss=on_dismiss)
+        overlay_menu.open()
+
     def settings_back(self,button):
         self.widgets['pref_scroll'].scroll_y=1
         self.parent.transition = SlideTransition(direction='down')
@@ -2833,6 +3318,8 @@ class PreferenceScreen(Screen):
     def heat_sensor_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.heat_overlay()
+    def msg_center_func(self,button):
+        self.msg_overlay()
     def train_func (self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='train'
@@ -3038,7 +3525,6 @@ class PinScreen(Screen):
         reset_cancel.ref='reset_cancel'
 
         def reset_confirm_func(button):
-            print(self.widgets['reset_overlay'].widgets['overlay_layout'].children)
             if os.name=='posix':
                 os.system("sudo reboot")
         reset_confirm.bind(on_release=reset_confirm_func)
@@ -3126,7 +3612,6 @@ class PinScreen(Screen):
             config.set('preferences','heat_timer','10')
             with open(preferences_path,'w') as configfile:
                 config.write(configfile)
-            print(self.widgets['heat_override_overlay'].widgets['overlay_layout'].children )
             self.widgets['heat_override_overlay'].dismiss()
         heat_override_confirm.bind(on_release=heat_override_confirm_func)
 
@@ -3377,6 +3862,9 @@ class PinScreen(Screen):
             day=self.pin[2:4]
             year=self.pin[4:8]
             config.set('documents','inspection_date',f'{month}-{day}-{year}')
+            timestamp=datetime.now()
+            timestamp=timestamp.replace(day=1,month=int(month),year=int(year))
+            config.set('timestamps','System Inspection',f'{timestamp }')
             with open(preferences_path,'w') as configfile:
                 config.write(configfile)
         elif hasattr(pindex.Pindex,f'p{self.pin}'):
@@ -4381,6 +4869,8 @@ class Hood_Control(App):
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)
         Clock.schedule_interval(self.context_screen.get_screen('main').widgets['clock_label'].update, 1)
+        Clock.schedule_once(messages.refresh_active_messages)
+        Clock.schedule_interval(messages.refresh_active_messages,10)
         return self.context_screen
 
 def settings_setter(config):

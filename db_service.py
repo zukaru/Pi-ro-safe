@@ -48,10 +48,20 @@ class Db_service():
     def list_files_handler():
         pass
         
+
+
+
+    def addReport(self, file):
+        self.sb.child(self["user"]).put(file, self["user"])
+
+    
+    def delReport(self, name):
+        self.sb.child(self["user"] + '/' + name)
+    
         
 
     # Get list of fire suppression system reports saved in storage bucket
-    def getFSSRList(self):
+    def getReportList(self):
         localReports = []
         reports = self.sb.list_files()
         for report in reports:

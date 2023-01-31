@@ -41,6 +41,7 @@ Import into >>logs/sys_report/report.jpg[/color][/size]''',
     'preferences_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'preferences_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'heat_sensor' : "[size=32][b][color=#000000]  Heat Sensor [/color][/b][/size]",
+    'msg_center' : "[size=32][b][color=#000000]  Message Center [/color][/b][/size]",
     'clean_mode' : "[size=32][b][color=#000000]  Maintenance Override [/color][/b][/size]",
     'commission' : "[size=32][b][color=#000000]  Documents [/color][/b][/size]",
     'pins' : "[size=32][b][color=#000000]  Enter Pin [/color][/b][/size]",
@@ -48,6 +49,10 @@ Import into >>logs/sys_report/report.jpg[/color][/size]''',
     'duration_1' : "[size=30][b][color=#000000]  5 Minutes [/color][/b][/size]",
     'duration_2' : "[size=30][b][color=#000000]  15 Minutes [/color][/b][/size]",
     'duration_3' : "[size=30][b][color=#000000]  30 Minutes [/color][/b][/size]",
+    'msg_overlay' : "[size=30][color=#ffffff][u]Message Center Settings[/color][/size]",
+    'evoke_title' : "[size=20][b][color=#ffffff]  Push Notifications [/color][/b][/size]",
+    'msg_evoke_on' : "[size=30][b][color=#000000]  On [/color][/b][/size]",
+    'msg_evoke_off' : "[size=30][b][color=#000000]  Off [/color][/b][/size]",
     'maint_overlay_warning_text' : """[size=30][color=#ffffff]Maintenance Override disables heat 
 sensors allowing neccessary maintenance 
 to take place safely.
@@ -146,7 +151,10 @@ already, than it will overwrite it)\n\n[/color][/size]''',
 'import_text_fail' : "[size=30][color=#ffffff]          [b]Import Error:[/b][/size][size=26]\n\nYou must make a selection\nfrom external storage to import [/color][/size]",
 'export_text' : "[size=26][color=#ffffff]Are you sure you want to export:\n\n[/color][/size]",
 'export_text_fail' : "[size=30][color=#ffffff]          [b]Export Error:[/b][/size][size=26]\n\nYou must make a selection\nfrom internal storage to export [/color][/size]",
-'message_label' : "[size=50][color=#ffffff][b]H e l l o"
+'message_label' : "[size=50][color=#ffffff][b]Message Center",
+'message_title' : "[size=50][color=#ffffff][b]Message Center",
+'msg_scroll_title' : "[size=30][color=#ffffff][b][u]All Messages",
+'msg_back' : "[size=30][color=#000000][b]Close",
 }
 
 spanish={
