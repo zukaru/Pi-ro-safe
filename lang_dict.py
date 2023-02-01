@@ -16,6 +16,7 @@ english={
     'preferences' : "[size=32][b][color=#000000]  Settings [/color][/b][/size]",
     'train' : "[size=32][b][color=#000000]  Training [/color][/b][/size]",
     'about' : "[size=32][b][color=#000000]  About [/color][/b][/size]",
+    'account' : "[size=32][b][color=#000000]  Account [/color][/b][/size]",
     'about_overlay_text' : """[size=20][color=#ffffff]Hood Control™ developed
 by Fire Safe Extinguisher Service.
 PO Box 1071, Murray, Kentucky

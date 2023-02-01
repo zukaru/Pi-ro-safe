@@ -83,7 +83,7 @@ msg_icon_image=r'media/msg_icon.png'
 language_image=r'media/higer_res_thick.png'
 trouble_icon=r'media/trouble icon_high_res.png'
 trouble_icon_dull=r'media/trouble icon_dull_high_res.png'
-logo=r'media/qt=q_95.png'
+logo=r'media/fs.png'
 report_current=r'logs/sys_report/report.jpg'
 report_original=r'logs/sys_report/original_report.jpg'
 qr_link =r'media/frame.png'
@@ -1483,7 +1483,7 @@ class ControlGrid(Screen):
         msg_icon.bind(on_press=self.msg_icon_func)
         msg_icon.color=(1,1,1,.65)
 
-        fs_logo=IconButton(source=r'media/fs.png',
+        fs_logo=IconButton(source=logo,
                 size_hint_x=.1,
                 size_hint_y=.1,
                 allow_stretch=True,
@@ -2816,11 +2816,11 @@ class PreferenceScreen(Screen):
         self.widgets['pref_scroll']=pref_scroll
 
         scroll_layout=EventpassGridLayout(
-            size_hint_y=1.75,
+            size_hint_y=1.8,
             size_hint_x=.95,
             cols=1,
             padding=10,
-            spacing=(1,40))
+            spacing=(1,35))
         self.widgets['scroll_layout']=scroll_layout
         scroll_layout.bind(minimum_height=scroll_layout.setter('height'))
 
@@ -2864,6 +2864,16 @@ class PreferenceScreen(Screen):
         self.widgets['about']=about
         about.ref='about'
         about.bind(on_release=self.about_func)
+
+        account=RoundedButton(text=current_language['account'],
+                        size_hint =(1, 1),
+                        pos_hint = {'x':.01, 'y':.7},
+                        background_down='',
+                        background_color=(200/250, 200/250, 200/250,.9),
+                        markup=True)
+        self.widgets['account']=account
+        account.ref='account'
+        account.bind(on_release=self.account_func)
 
         clean_mode=RoundedButton(text=current_language['clean_mode'],
                         size_hint =(1, 1),
@@ -2927,6 +2937,7 @@ class PreferenceScreen(Screen):
         scroll_layout.add_widget(msg_center)
         scroll_layout.add_widget(train)
         scroll_layout.add_widget(commission)
+        scroll_layout.add_widget(account)
         scroll_layout.add_widget(about)
         scroll_layout.add_widget(pins)
         pref_scroll.add_widget(scroll_layout)
@@ -3318,10 +3329,12 @@ class PreferenceScreen(Screen):
     def about_func (self,button):
         self.parent.transition = SlideTransition(direction='right')
         self.about_overlay()
+    def account_func (self,button):
+        self.parent.transition = SlideTransition(direction='left')
+        self.manager.current='account'
     def clean_mode_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.maint_overlay()
-        #self.manager.current='sys_report'
     def commission_func(self,button):
         self.parent.transition = SlideTransition(direction='left')
         self.manager.current='documents'
@@ -4695,6 +4708,54 @@ class MountScreen(Screen):
         self.widgets['file_selector_external'].selection=[]
         self.widgets['file_selector_internal'].selection=[]
 
+class AccountScreen(Screen):
+    def __init__(self, **kwargs):
+        super(AccountScreen,self).__init__(**kwargs)
+        self.cols = 2
+        self.widgets={}
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
+
+        back=RoundedButton(
+            text=current_language['settings_back'],
+            size_hint =(.4, .1),
+            pos_hint = {'x':.06, 'y':.015},
+            background_down='',
+            background_color=(200/255, 200/255, 200/255,.9),
+            markup=True)
+        self.widgets['back']=back
+        back.ref='settings_back'
+        back.bind(on_press=self.account_back)
+
+        back_main=RoundedButton(
+            text=current_language['preferences_back_main'],
+            size_hint =(.4, .1),
+            pos_hint = {'x':.52, 'y':.015},
+            background_normal='',
+            background_color=(245/250, 216/250, 41/250,.9),
+            markup=True)
+        self.widgets['back_main']=back_main
+        back_main.ref='preferences_back_main'
+        back_main.bind(on_press=self.account_back_main)
+
+        seperator_line=Image(
+            source=gray_seperator_line,
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint =(.98, .001),
+            pos_hint = {'x':.01, 'y':.13})
+
+        self.add_widget(bg_image)
+        self.add_widget(back)
+        self.add_widget(back_main)
+        self.add_widget(seperator_line)
+
+    def account_back (self,button):
+        self.parent.transition = SlideTransition(direction='right')
+        self.manager.current='preferences'
+    def account_back_main (self,button):
+        self.parent.transition = SlideTransition(direction='down')
+        self.manager.current='main'
+
 def listen(app_object,*args):
     event_log=logic.fs.milo
     pass_flag=False
@@ -4857,6 +4918,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         self.context_screen.add_widget(MountScreen(name='mount'))
+        self.context_screen.add_widget(AccountScreen(name='account'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)
