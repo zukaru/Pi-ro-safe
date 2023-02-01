@@ -22,7 +22,7 @@ db_service = Db_service()
 # db_service.signUp("testing@gmail.com", "123456")
 db_service.authUser("testing{}@gmail.com".format(random.randint(1, 10)), "123456")
 # db_service.getFSSRList()
-reportList = db_service.getFSSRList()
+reportList = db_service.getReportList()
 print(reportList)
 from messages import messages
 

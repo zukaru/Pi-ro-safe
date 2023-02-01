@@ -41,24 +41,23 @@ class Db_service():
         try:
             self.user = self.auth.sign_in_with_email_and_password(email, pwd)
         except Exception as e:
+            #Assumption is that any exception is from email not being found
+            #Should actually check error message to confirm email isn't found
             print(e)
             self.user = self.auth.create_user_with_email_and_password(email, pwd)
-
-    
-    def list_files_handler():
-        pass
-        
-
 
 
     def addReport(self, file):
         self.sb.child(self["user"]).put(file, self["user"])
 
+
+    def getReport(self, file):
+        self.sb.child(self["user"]).list_files()
+
     
     def delReport(self, name):
-        self.sb.child(self["user"] + '/' + name)
+        self.sb.child(self["user"] + '/' + name).delete()
     
-        
 
     # Get list of fire suppression system reports saved in storage bucket
     def getReportList(self):
