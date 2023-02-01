@@ -1464,29 +1464,32 @@ class ControlGrid(Screen):
 
         trouble_button=IconButton(source=trouble_icon_dull, allow_stretch=True, keep_ratio=True)
         trouble_button.size_hint =(.10, .10)
-        trouble_button.pos_hint = {'x':.89, 'y':.02}
+        trouble_button.pos_hint = {'x':.75, 'y':.02}
         self.widgets['trouble_button']=trouble_button
         trouble_button.bind(on_press=self.open_trouble)
         trouble_button.color=(1,1,1,.15)
 
         language_button=IconButton(source=language_image, allow_stretch=True, keep_ratio=True)
         language_button.size_hint =(.10, .10)
-        language_button.pos_hint = {'x':.75, 'y':.02}
+        language_button.pos_hint = {'x':.61, 'y':.02}
         self.widgets['language_button']=language_button
         language_button.bind(on_press=self.language_func)
         language_button.color=(1,1,1,.65)
 
         msg_icon=IconButton(source=msg_icon_image, allow_stretch=True, keep_ratio=True)
         msg_icon.size_hint =(.10, .10)
-        msg_icon.pos_hint = {'x':.61, 'y':.02}
+        msg_icon.pos_hint = {'x':.47, 'y':.02}
         self.widgets['msg_icon']=msg_icon
         msg_icon.bind(on_press=self.msg_icon_func)
         msg_icon.color=(1,1,1,.65)
 
-        fs_logo=IconButton(source=logo,
-                size_hint_x=.2,
+        fs_logo=IconButton(source=r'media/fs.png',
+                size_hint_x=.1,
                 size_hint_y=.1,
-                pos_hint = {'x':.225, 'center_y':.07})
+                allow_stretch=True,
+                keep_ratio=True,
+                pos_hint = {'x':.89, 'y':.02},
+                color=(.7,.7,.7))
         fs_logo.bind(on_release=self.about_func)
 
         overlay_menu=Popup(
