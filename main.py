@@ -37,6 +37,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.uix.image import Image
+from kivy.uix.videoplayer import Video
 from kivy.graphics import BorderImage
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -90,6 +91,7 @@ if os.name == 'posix':
     Window.fullscreen = 'auto'
 
 background_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
+background_video=r'media/fire_video.mp4'
 msg_icon_image=r'media/msg_icon.png'
 language_image=r'media/higer_res_thick.png'
 trouble_icon=r'media/trouble icon_high_res.png'
@@ -1344,7 +1346,8 @@ class ControlGrid(Screen):
         super(ControlGrid, self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
+        bg_image = Video(source=background_video, allow_stretch=True, keep_ratio=False, state='play', options = {'eos': 'loop'})
+        bg_image.color = [0.3,0.3,0.3,1]
         self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
@@ -1372,7 +1375,7 @@ class ControlGrid(Screen):
             markup=True,
             size_hint =(.475,.22),
             pos_hint = {'center_x':.5, 'center_y':.265},
-            bg_color=(.2,.2,.2,.65))
+            bg_color=(0,0,0,0))
         self.widgets['clock_label']=clock_label
         clock_label.bind(on_release=self.widget_fade)
 

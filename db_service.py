@@ -64,6 +64,8 @@ class Db_service():
         localReports = []
         reports = self.sb.list_files()
         for report in reports:
+            print(dir(report))
+            print(report.metadata)
             print(report.public_url)
             localReports.append(report)
         return localReports.copy()
