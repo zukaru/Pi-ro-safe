@@ -433,6 +433,36 @@ class LabelColor(Label):
     def alpha_value(self,value):
         self.colour.rgba[3]=value
 
+class RoundedLabelColor(Label):
+    bg_color=ColorProperty()
+    def __init__(self,bg_color= (.1,.1,.1,.95),**kwargs):
+        super(RoundedLabelColor,self).__init__(**kwargs)
+        self.bg_color=bg_color
+
+        with self.canvas.before:
+            self.shape_color = Color(*self.bg_color)
+            self.shape = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
+            self.bind(pos=self.update_shape, size=self.update_shape)
+
+    def update_shape(self, *args):
+        self.shape.pos = self.pos
+        self.shape.size = self.size
+
+class RoundedColorLayout(FloatLayout):
+    bg_color=ColorProperty()
+    def __init__(self,bg_color= (.1,.1,.1,.95),**kwargs):
+        super(RoundedColorLayout,self).__init__(**kwargs)
+        self.bg_color=bg_color
+
+        with self.canvas.before:
+            self.shape_color = Color(*self.bg_color)
+            self.shape = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
+            self.bind(pos=self.update_shape, size=self.update_shape)
+
+    def update_shape(self, *args):
+        self.shape.pos = self.pos
+        self.shape.size = self.size
+
 class ClockText(ButtonBehavior,LabelColor):
     def __init__(self, **kwargs):
         super(ClockText,self).__init__(**kwargs)
@@ -2869,11 +2899,12 @@ class PreferenceScreen(Screen):
                         size_hint =(1, 1),
                         pos_hint = {'x':.01, 'y':.7},
                         background_down='',
-                        background_color=(200/250, 200/250, 200/250,.9),
+                        background_color=(100/250, 100/250, 100/250,.9),#(200/250, 200/250, 200/250,.9),
                         markup=True)
         self.widgets['account']=account
         account.ref='account'
         account.bind(on_release=self.account_func)
+        account.disabled=True
 
         clean_mode=RoundedButton(text=current_language['clean_mode'],
                         size_hint =(1, 1),
@@ -4737,6 +4768,181 @@ class AccountScreen(Screen):
         back_main.ref='preferences_back_main'
         back_main.bind(on_press=self.account_back_main)
 
+        screen_name=Label(
+            text=current_language['screen_name'],
+            markup=True,
+            size_hint =(.4, .05),
+            pos_hint = {'center_x':.15, 'center_y':.925},)
+        self.widgets['screen_name']=screen_name
+        screen_name.ref='screen_name'
+
+        information_box=RoundedColorLayout(
+            bg_color=(0,0,0,.85),
+            size_hint =(.35, .25),
+            pos_hint = {'center_x':.225, 'center_y':.75},)
+        self.widgets['information_box']=information_box
+
+        information_title=Label(
+            text=current_language['information_title'],
+            markup=True,
+            size_hint =(.4, .05),
+            pos_hint = {'center_x':.5, 'center_y':.925},)
+        self.widgets['information_title']=information_title
+        information_title.ref='information_title'
+
+        information_seperator=Image(
+            source=gray_seperator_line,
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint =(.9, .005),
+            pos_hint = {'x':.05, 'y':.85})
+
+
+
+
+        details_box=RoundedColorLayout(
+            bg_color=(0,0,0,.85),
+            size_hint =(.35, .4),
+            pos_hint = {'center_x':.225, 'center_y':.4},)
+        self.widgets['details_box']=details_box
+
+        details_title=Label(
+            text=current_language['details_title'],
+            markup=True,
+            size_hint =(.4, .05),
+            pos_hint = {'center_x':.5, 'center_y':.925},)
+        self.widgets['details_title']=details_title
+        details_title.ref='details_title'
+
+        details_seperator=Image(
+            source=gray_seperator_line,
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint =(.9, .005),
+            pos_hint = {'x':.05, 'y':.85})
+
+
+
+        status_box=RoundedColorLayout(
+            bg_color=(0,0,0,.85),
+            size_hint =(.35, .675),
+            pos_hint = {'center_x':.6, 'center_y':.5375},)
+        self.widgets['status_box']=status_box
+
+        status_title=Label(
+            text=current_language['status_title'],
+            markup=True,
+            size_hint =(.4, .05),
+            pos_hint = {'center_x':.5, 'center_y':.925},)
+        self.widgets['status_title']=status_title
+        status_title.ref='status_title'
+
+        status_seperator=Image(
+            source=gray_seperator_line,
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint =(.9, .005),
+            pos_hint = {'x':.05, 'y':.85})
+
+        status_scroll=OutlineScroll(
+            size_hint =(.9,.75),
+            pos_hint = {'center_x':.5, 'center_y':.45},
+            bg_color=(1,1,1,.15),
+            bar_width=8,
+            bar_color=(245/250, 216/250, 41/250,.9),
+            do_scroll_y=True,
+            do_scroll_x=False)
+
+        status_scroll_layout = GridLayout(
+            cols=1,
+            spacing=10,
+            size_hint_y=None,
+            padding=5)
+
+        # Make sure the height is such that there is something to scroll.
+        status_scroll_layout.bind(minimum_height=status_scroll_layout.setter('height'))
+
+        for i in range(20):#status_request:
+            btn = RoundedButton(
+                background_normal='',
+                background_color=(.1,.1,.1,1),
+                text=str(i),
+                size_hint_y=None,
+                height=40)
+            # btn.bind(on_release=partial(self.load_selected_msg,i))
+            status_scroll_layout.add_widget(btn)
+
+
+        side_bar_box=RoundedColorLayout(
+            bg_color=(.5,.5,.5,.85),
+            size_hint =(.175, .675),
+            pos_hint = {'center_x':.9, 'center_y':.5375},)
+        self.widgets['status_box']=status_box
+
+        side_bar_reconnect=RoundedButton(
+            text=current_language['side_bar_reconnect'],
+            size_hint =(.9, .15),
+            pos_hint = {'center_x':.5, 'center_y':.875},
+            background_normal='',
+            background_color=(0,0,0,.9),
+            markup=True)
+        self.widgets['side_bar_reconnect']=side_bar_reconnect
+        side_bar_reconnect.ref='side_bar_reconnect'
+        # side_bar_reconnect.bind(on_press=self.side_bar_reconnect)
+
+        side_bar_unlink=RoundedButton(
+            text=current_language['side_bar_unlink'],
+            size_hint =(.9, .15),
+            pos_hint = {'center_x':.5, 'center_y':.6875},
+            background_normal='',
+            background_color=(0,0,0,.9),
+            markup=True)
+        self.widgets['side_bar_unlink']=side_bar_unlink
+        side_bar_unlink.ref='side_bar_unlink'
+        # side_bar_unlink.bind(on_press=self.side_bar_unlink)
+
+        side_bar_add=RoundedButton(
+            text=current_language['side_bar_add'],
+            size_hint =(.9, .15),
+            pos_hint = {'center_x':.5, 'center_y':.5},
+            background_normal='',
+            background_color=(0,0,0,.9),
+            markup=True)
+        self.widgets['side_bar_add']=side_bar_add
+        side_bar_add.ref='side_bar_add'
+        # side_bar_add.bind(on_press=self.side_bar_add)
+
+        side_bar_remove=RoundedButton(
+            text=current_language['side_bar_remove'],
+            size_hint =(.9, .15),
+            pos_hint = {'center_x':.5, 'center_y':.3125},
+            background_normal='',
+            background_color=(0,0,0,.9),
+            markup=True)
+        self.widgets['side_bar_remove']=side_bar_remove
+        side_bar_remove.ref='side_bar_remove'
+        # side_bar_remove.bind(on_press=self.side_bar_remove)
+
+        side_bar_refresh=RoundedButton(
+            text=current_language['side_bar_refresh'],
+            size_hint =(.9, .15),
+            pos_hint = {'center_x':.5, 'center_y':.125},
+            background_normal='',
+            background_color=(0,0,0,.9),
+            markup=True)
+        self.widgets['side_bar_refresh']=side_bar_refresh
+        side_bar_refresh.ref='side_bar_refresh'
+        # side_bar_refresh.bind(on_press=self.side_bar_refresh)
+
+
+
+
+        account_admin_hint=ExactLabel(text=f"[size=18][color=#ffffff]Enable Admin mode to edit fields[/size]",
+                color=(0,0,0,1),
+                pos_hint = {'center_x':.5, 'y':.14},
+                markup=True)
+        self.widgets['account_admin_hint']=account_admin_hint
+
         seperator_line=Image(
             source=gray_seperator_line,
             allow_stretch=True,
@@ -4744,10 +4950,34 @@ class AccountScreen(Screen):
             size_hint =(.98, .001),
             pos_hint = {'x':.01, 'y':.13})
 
+
+        information_box.add_widget(information_title)
+        information_box.add_widget(information_seperator)
+
+        details_box.add_widget(details_title)
+        details_box.add_widget(details_seperator)
+
+        status_box.add_widget(status_title)
+        status_box.add_widget(status_seperator)
+        status_box.add_widget(status_scroll)
+        status_scroll.add_widget(status_scroll_layout)
+
+        side_bar_box.add_widget(side_bar_reconnect)
+        side_bar_box.add_widget(side_bar_unlink)
+        side_bar_box.add_widget(side_bar_add)
+        side_bar_box.add_widget(side_bar_remove)
+        side_bar_box.add_widget(side_bar_refresh)
+
         self.add_widget(bg_image)
+        self.add_widget(screen_name)
         self.add_widget(back)
         self.add_widget(back_main)
         self.add_widget(seperator_line)
+        self.add_widget(account_admin_hint)
+        self.add_widget(information_box)
+        self.add_widget(details_box)
+        self.add_widget(status_box)
+        self.add_widget(side_bar_box)
 
     def account_back (self,button):
         self.parent.transition = SlideTransition(direction='right')
@@ -4755,6 +4985,15 @@ class AccountScreen(Screen):
     def account_back_main (self,button):
         self.parent.transition = SlideTransition(direction='down')
         self.manager.current='main'
+
+    def check_admin_mode(self,*args):
+        if App.get_running_app().admin_mode_start>time.time():
+            pass
+
+
+    def on_pre_enter(self, *args):
+        self.check_admin_mode()
+        return super().on_pre_enter(*args)
 
 def listen(app_object,*args):
     event_log=logic.fs.milo
@@ -4907,6 +5146,7 @@ class Hood_Control(App):
         settings_setter(self.config_)
         Clock.schedule_once(partial(language_setter,config=self.config_))
         self.context_screen=ScreenManager()
+        # self.context_screen.add_widget(AccountScreen(name='account'))
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))

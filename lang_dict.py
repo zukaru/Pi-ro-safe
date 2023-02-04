@@ -156,6 +156,16 @@ already, than it will overwrite it)\n\n[/color][/size]''',
 'message_title' : "[size=50][color=#ffffff][b]Message Center",
 'msg_scroll_title' : "[size=30][color=#ffffff][b][u]All Messages",
 'msg_back' : "[size=30][color=#000000][b]Close",
+'screen_name' : "[size=50][color=#ffffff][b][u][i]       Account       ",
+'information_title' : "[size=20][color=#ffffff][b]Credentials",
+'details_title' : "[size=20][color=#ffffff][b]Details",
+'status_title' : "[size=20][color=#ffffff][b]Status",
+'side_bar_unlink' : "[size=20][color=#ffffff][b]Unlink Account",
+'side_bar_reconnect' : "[size=20][color=#ffffff][b]Reconnect Account",
+'side_bar_add' : "[size=20][color=#ffffff][b]Add Device",
+'side_bar_remove' : "[size=20][color=#ffffff][b]Remove Device",
+'side_bar_refresh' : "[size=20][color=#ffffff][b]Refresh From Server",
+
 }
 
 spanish={
