@@ -45,7 +45,7 @@ from kivy.clock import Clock
 from functools import partial
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
-from kivy.graphics import Rectangle, Color, Line
+from kivy.graphics import Rectangle, Color, Line, Bezier
 from kivy.properties import ListProperty,StringProperty,NumericProperty,ColorProperty
 import configparser
 import logs.configurations.preferences as preferences
@@ -422,7 +422,7 @@ class LabelColor(Label):
     def _update_rect(self, instance, *args):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
-    
+
     def on_bg_color(self, *args):
         self.colour.rgb=self.bg_color
 
@@ -439,6 +439,7 @@ class RoundedLabelColor(Label):
         super(RoundedLabelColor,self).__init__(**kwargs)
         self.bg_color=bg_color
 
+
         with self.canvas.before:
             self.shape_color = Color(*self.bg_color)
             self.shape = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
@@ -447,6 +448,11 @@ class RoundedLabelColor(Label):
     def update_shape(self, *args):
         self.shape.pos = self.pos
         self.shape.size = self.size
+
+    def on_bg_color(self, *args):
+        #before __init__ is called the bg_color changes, so we wait untill __init__() to proceed
+        if hasattr(self,'shape_color'):
+            self.shape_color.rgb=self.bg_color
 
 class RoundedColorLayout(FloatLayout):
     bg_color=ColorProperty()
@@ -1701,72 +1707,366 @@ class ControlGrid(Screen):
         self.about_overlay()
 
 class ActuationScreen(Screen):
-
-    def acknowledgement(self,button):
-        print('actuation acknowledged')
-        self.anime.cancel_all(self.widgets['alert'])
-        self.widgets['alert'].background_color=(190/255, 10/255, 10/255,.9)
-        self.widgets['alert'].text=current_language['alert_acknowledged']
-
-
-    def reset_system(self,button):
-            print('system reset')
-            GPIO.heatsensor=0
-            GPIO.micro=0
-            self.widgets['alert'].text=current_language['alert']
-            self.anime.cancel_all(self.widgets['alert'])
-            self.pulse()
-            self.parent.transition = SlideTransition(direction='right')
-
-    def pulse(self):
-            self.anime = Animation(background_color=(249/250, 0/250, 0/250,1), duration=1.5)+Animation(background_color=(249/250, 200/250, 200/250,1), duration=.2)
-            self.anime.repeat = True
-            self.anime.start(self.widgets['alert'])
-
     def __init__(self, **kwargs):
         super(ActuationScreen,self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
         bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
 
-        alert=RoundedButton(text=current_language['alert'],
+        alert=RoundedLabelColor(text=current_language['alert'],
                     size_hint =(.96, .45),
                     pos_hint = {'x':.02, 'y':.5},
-                    background_normal='',
-                    background_down='',
-                    background_color=(190/250, 10/250, 10/250,.9),
+                    bg_color=(249/250, 25/250, 25/250,.85),
                     markup=True)
         self.widgets['alert']=alert
         alert.ref='alert'
 
-        acknowledge=RoundedButton(text=current_language['acknowledge'],
-                    size_hint =(.45, .40),
-                    pos_hint = {'x':.03, 'y':.05},
-                    background_normal='',
-                    background_down='',
-                    background_color=(255/255, 121/255, 0/255,.99),
-                    markup=True)
+        action_box=RoundedColorLayout(
+            bg_color=(.25,.25,.25,.85),
+            size_hint =(.35, .40),
+            pos_hint = {'x':.02, 'center_y':.25},)
+        self.widgets['action_box']=action_box
+
+        with action_box.canvas.before:
+           Color(.1,.1,.1,1)
+           action_box.msg_lines=Line(points=[100,100,100,100],width=1.5,group='action')
+
+        def update_action_box_lines(*args):
+            #vertical left section
+            x1=int(action_box.width*.025+action_box.x)
+            y1=int(action_box.height*.05+action_box.y)
+            x2=int(action_box.width*.025+action_box.x)
+            y2=int(action_box.height*.95+action_box.y)
+
+            #horizontal top section
+            x3=int(action_box.width*.025+action_box.x)
+            y3=int(action_box.height*.95+action_box.y)
+            x4=int(action_box.width*.975+action_box.x)
+            y4=int(action_box.height*.95+action_box.y)
+
+            #vertical right section
+            x5=int(action_box.width*.975+action_box.x)
+            y5=int(action_box.height*.95+action_box.y)
+            x6=int(action_box.width*.975+action_box.x)
+            y6=int(action_box.height*.05+action_box.y)
+
+            #horizontal bottom section
+            x7=int(action_box.width*.975+action_box.x)
+            y7=int(action_box.height*.05+action_box.y)
+            x8=int(action_box.width*.025+action_box.x)
+            y8=int(action_box.height*.05+action_box.y)
+
+            action_box.msg_lines.points=(x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,x8,y8)
+        action_box.bind(pos=update_action_box_lines, size=update_action_box_lines)
+
+        acknowledge=RoundedToggleButton(
+            text=current_language['acknowledge'],
+            size_hint =(.85, .20),
+            pos_hint = {'center_x':.5, 'center_y':.725},
+            # background_normal='',
+            background_down='',
+            background_color=(.1,.1,.1,.85),
+            markup=True)
         self.widgets['acknowledge']=acknowledge
         acknowledge.ref='acknowledge'
-        acknowledge.bind(on_release=self.acknowledgement)
+        acknowledge.bind(on_release=self.acknowledge_func)
 
+        service=RoundedButton(
+            text=current_language['service'],
+            size_hint =(.85, .20),
+            pos_hint = {'center_x':.5, 'center_y':.275},
+            # background_normal='',
+            background_down='',
+            background_color=(.1,.1,.1,.85),
+            markup=True)
+        self.widgets['service']=service
+        service.ref='service'
+        service.bind(on_release=self.service_func)
 
-        reset=RoundedButton(text=current_language['reset'],
-                    size_hint =(.45, .40),
-                    pos_hint = {'x':.52, 'y':.05},
-                    background_normal='',
-                    background_down='',
-                    background_color=(255/255, 121/255, 0/255,.99),
-                    markup=True)
-        self.widgets['reset']=reset
-        reset.ref='reset'
-        reset.bind(on_release=self.reset_system)
+        dialogue_box=RoundedColorLayout(
+            bg_color=(.1,.1,.1,.9),
+            size_hint =(.5, .40),
+            pos_hint = {'center_x':.7, 'center_y':.25},)
+        self.widgets['dialogue_box']=dialogue_box
+
+        with dialogue_box.canvas.before:
+           Color(.25,.25,.25,1)
+           dialogue_box.msg_lines=Line(points=[100,100,100,100],width=1.5,group='action')
+
+        def update_dialogue_box_lines(*args):
+            #vertical left section
+            x1=int(dialogue_box.width*.025+dialogue_box.x)
+            y1=int(dialogue_box.height*.05+dialogue_box.y)
+            x2=int(dialogue_box.width*.025+dialogue_box.x)
+            y2=int(dialogue_box.height*.75+dialogue_box.y)
+
+            #horizontal top section
+            x3=int(dialogue_box.width*.025+dialogue_box.x)
+            y3=int(dialogue_box.height*.75+dialogue_box.y)
+            x4=int(dialogue_box.width*.975+dialogue_box.x)
+            y4=int(dialogue_box.height*.75+dialogue_box.y)
+
+            #vertical right section
+            x5=int(dialogue_box.width*.975+dialogue_box.x)
+            y5=int(dialogue_box.height*.75+dialogue_box.y)
+            x6=int(dialogue_box.width*.975+dialogue_box.x)
+            y6=int(dialogue_box.height*.05+dialogue_box.y)
+
+            #horizontal bottom section
+            x7=int(dialogue_box.width*.975+dialogue_box.x)
+            y7=int(dialogue_box.height*.05+dialogue_box.y)
+            x8=int(dialogue_box.width*.025+dialogue_box.x)
+            y8=int(dialogue_box.height*.05+dialogue_box.y)
+
+            dialogue_box.msg_lines.points=(x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,x8,y8)
+        dialogue_box.bind(pos=update_dialogue_box_lines, size=update_dialogue_box_lines)
+
+        dialogue_title=RoundedLabelColor(
+            bg_color=(.25,.25,.25,.0),
+            size_hint =(.9, .2),
+            pos_hint = {'center_x':.5, 'center_y':.875},
+            text=current_language['acknowledge'],
+            markup=True)
+        self.widgets['dialogue_title']=dialogue_title
+        dialogue_title.ref='dialogue_title'
+
+        dialogue_body=RoundedLabelColor(
+            bg_color=(.25,.25,.25,.0),
+            size_hint =(.9, .5),
+            pos_hint = {'center_x':.5, 'center_y':.35},
+            text=current_language['acknowledge'],
+            markup=True)
+        self.widgets['dialogue_body']=dialogue_body
+        dialogue_body.ref='dialogue_body'
+
         self.pulse()
+
+        overlay_menu=Popup(
+            size_hint=(.8, .8),
+            background = 'atlas://data/images/defaulttheme/bubble',
+            title_color=[0, 0, 0, 1],
+            title_size='38',
+            title_align='center',
+            separator_color=[255/255, 0/255, 0/255, .5])
+        self.widgets['overlay_menu']=overlay_menu
+
+        overlay_layout=FloatLayout()
+        self.widgets['overlay_layout']=overlay_layout
+
+        overlay_menu.add_widget(overlay_layout)
 
         self.add_widget(bg_image)
         self.add_widget(alert)
-        self.add_widget(acknowledge)
-        self.add_widget(reset)
+        self.add_widget(action_box)
+        action_box.add_widget(acknowledge)
+        action_box.add_widget(service)
+        self.add_widget(dialogue_box)
+        dialogue_box.add_widget(dialogue_title)
+        dialogue_box.add_widget(dialogue_body)
+
+    def on_pre_enter(self,*args):
+        self.anime.cancel_all(self.widgets['alert'])
+        self.pulse()
+        self.widgets['acknowledge'].text=current_language['acknowledge']
+        self.widgets['acknowledge'].disabled=False
+        self.widgets['acknowledge'].state='normal'
+
+    def acknowledge_func(self,button):
+        print('actuation acknowledged')
+        self.anime.cancel_all(self.widgets['alert'])
+        self.widgets['alert'].bg_color=(249/250, 25/250, 25/250,.85)
+        # self.widgets['alert'].text=current_language['alert_acknowledged']
+        button.text="[size=28][color=#ffffff]Acknowledged"
+        button.disabled=True
+
+    def service_func(self,*args):
+        self.service_overlay()
+
+    def pulse(self):
+            self.anime = Animation(bg_color=(249/250, 200/250, 200/250,.85), duration=.2)+Animation(bg_color=(249/250, 0/250, 0/250,1), duration=1.5)
+            self.anime.repeat = True
+            self.anime.start(self.widgets['alert'])
+
+    def service_overlay(self):
+        overlay_menu=self.widgets['overlay_menu']
+        overlay_menu.background_color=(0,0,0,.8)
+        overlay_menu.title=''
+        overlay_menu.separator_height=0
+        overlay_menu.auto_dismiss=True
+        self.widgets['overlay_layout'].clear_widgets()
+
+        service_back_button=RoundedButton(
+            text=current_language['about_back'],
+            size_hint =(.9, .1),
+            pos_hint = {'x':.05, 'y':.05},
+            background_normal='',
+            background_color=(245/250, 216/250, 41/250,.9),
+            markup=True)
+        self.widgets['service_back_button']=service_back_button
+        service_back_button.ref='about_back'
+
+        service_enter_button=RoundedButton(
+            text=current_language['enter'],
+            size_hint =(.9, .1),
+            pos_hint = {'x':.05, 'y':.45},
+            background_normal='',
+            background_color=(.25,.25,.25,1),
+            markup=True)
+        self.widgets['service_enter_button']=service_enter_button
+        service_back_button.ref='enter'
+
+        pin_layout=FloatLayout(
+            size_hint =(.5, .25),
+            pos_hint = {'center_x':.5, 'center_y':.75})
+        self.widgets['pin_layout']=pin_layout
+
+        with pin_layout.canvas.before:
+           Color(.25,.25,.25,1)
+           pin_layout.box_lines=Line(points=[100,100,100,100],width=1.5,group='action')
+           pin_layout.divider_line1=Line(points=[100,100,100,100],width=1.5,group='action')
+           pin_layout.divider_line2=Line(points=[100,100,100,100],width=1.5,group='action')
+           pin_layout.divider_line3=Line(points=[100,100,100,100],width=1.5,group='action')
+
+        def update_pin_layout_lines(*args):
+            #vertical left section
+            x1=int(pin_layout.width*0+pin_layout.x)
+            y1=int(pin_layout.height*0+pin_layout.y)
+            x2=int(pin_layout.width*0+pin_layout.x)
+            y2=int(pin_layout.height*1+pin_layout.y)
+
+            #horizontal top section
+            x3=int(pin_layout.width*0+pin_layout.x)
+            y3=int(pin_layout.height*1+pin_layout.y)
+            x4=int(pin_layout.width*1+pin_layout.x)
+            y4=int(pin_layout.height*1+pin_layout.y)
+
+            #vertical right section
+            x5=int(pin_layout.width*1+pin_layout.x)
+            y5=int(pin_layout.height*1+pin_layout.y)
+            x6=int(pin_layout.width*1+pin_layout.x)
+            y6=int(pin_layout.height*0+pin_layout.y)
+
+            #horizontal bottom section
+            x7=int(pin_layout.width*1+pin_layout.x)
+            y7=int(pin_layout.height*0+pin_layout.y)
+            x8=int(pin_layout.width*0+pin_layout.x)
+            y8=int(pin_layout.height*0+pin_layout.y)
+
+            #divider lines
+            x9=int(pin_layout.width*.25+pin_layout.x)
+            y9=int(pin_layout.height*0+pin_layout.y)
+            x10=int(pin_layout.width*.25+pin_layout.x)
+            y10=int(pin_layout.height*1+pin_layout.y)
+
+            x11=int(pin_layout.width*.5+pin_layout.x)
+            y11=int(pin_layout.height*0+pin_layout.y)
+            x12=int(pin_layout.width*.5+pin_layout.x)
+            y12=int(pin_layout.height*1+pin_layout.y)
+
+            x13=int(pin_layout.width*.75+pin_layout.x)
+            y13=int(pin_layout.height*0+pin_layout.y)
+            x14=int(pin_layout.width*.75+pin_layout.x)
+            y14=int(pin_layout.height*1+pin_layout.y)
+
+            pin_layout.box_lines.points=(x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,x8,y8)
+            pin_layout.divider_line1.points=(x9,y9,x10,y10)
+            pin_layout.divider_line2.points=(x11,y11,x12,y12)
+            pin_layout.divider_line3.points=(x13,y13,x14,y14)
+        pin_layout.bind(pos=update_pin_layout_lines, size=update_pin_layout_lines)
+
+        pin_1=BigWheel(
+            size_hint =(.25, .975),
+            pos_hint = {'center_x':.125, 'center_y':.495},
+            direction='top',
+            loop=True,
+            y_reduction=60
+            )
+        self.widgets['pin_1']=pin_1
+
+        for i in range(10):
+            _digit=Label(
+                text=f'[size=80][b][color=c0c0c0]{i}',
+                markup=True,)
+            pin_1.add_widget(_digit)
+        
+        pin_2=BigWheel(
+            size_hint =(.25, .975),
+            pos_hint = {'center_x':.375, 'center_y':.495},
+            direction='top',
+            loop=True,
+            y_reduction=60
+            )
+        self.widgets['pin_2']=pin_2
+
+        for i in range(10):
+            _digit=Label(
+                text=f'[size=80][b][color=c0c0c0]{i}',
+                markup=True,)
+            pin_2.add_widget(_digit)
+
+        pin_3=BigWheel(
+            size_hint =(.25, .975),
+            pos_hint = {'center_x':.625, 'center_y':.495},
+            direction='top',
+            loop=True,
+            y_reduction=60
+            )
+        self.widgets['pin_3']=pin_3
+
+        for i in range(10):
+            _digit=Label(
+                text=f'[size=80][b][color=c0c0c0]{i}',
+                markup=True,)
+            pin_3.add_widget(_digit)
+
+        pin_4=BigWheel(
+            size_hint =(.25, .975),
+            pos_hint = {'center_x':.875, 'center_y':.495},
+            direction='top',
+            loop=True,
+            y_reduction=60
+            )
+        self.widgets['pin_4']=pin_4
+
+        for i in range(10):
+            _digit=Label(
+                text=f'[size=80][b][color=c0c0c0]{i}',
+                markup=True,)
+            pin_4.add_widget(_digit)
+
+        def service_overlay_close(button):
+            self.widgets['overlay_menu'].dismiss()
+        service_back_button.bind(on_release=service_overlay_close)
+
+        def return_to_actuationscreen(*args):
+            App.get_running_app().service_pin_entered=False
+
+        def service_enter_func(*args):
+            pin=''.join(
+                (str(pin_1.index),
+                str(pin_2.index),
+                str(pin_3.index),
+                str(pin_4.index)))
+            pin_1.index,pin_2.index,pin_3.index,pin_4.index=0,0,0,0
+            if pin!='1000':
+                return
+            App.get_running_app().service_pin_entered=True
+            self.parent.transition = SlideTransition(direction='right')
+            App.get_running_app().context_screen.current='main'
+            Clock.schedule_once(return_to_actuationscreen,300)
+            self.widgets['overlay_menu'].dismiss()
+
+        service_enter_button.bind(on_release=service_enter_func)
+
+        pin_layout.add_widget(pin_1)
+        pin_layout.add_widget(pin_2)
+        pin_layout.add_widget(pin_3)
+        pin_layout.add_widget(pin_4)
+
+        self.widgets['overlay_layout'].add_widget(pin_layout)
+        self.widgets['overlay_layout'].add_widget(service_enter_button)
+        self.widgets['overlay_layout'].add_widget(service_back_button)
+        self.widgets['overlay_menu'].open()
 
 class SettingsScreen(Screen):
     def __init__(self, **kwargs):
@@ -4850,6 +5150,7 @@ class AccountScreen(Screen):
             bg_color=(1,1,1,.15),
             bar_width=8,
             bar_color=(245/250, 216/250, 41/250,.9),
+            bar_inactive_color=(245/250, 216/250, 41/250,.35),
             do_scroll_y=True,
             do_scroll_x=False)
 
@@ -5033,7 +5334,9 @@ def listen(app_object,*args):
             pass
     #micro switch
         if event_log['micro_switch']==1:
-            if app_object.current!='alert':
+            if App.get_running_app().service_pin_entered:
+                pass
+            elif app_object.current!='alert':
                 app_object.transition = SlideTransition(direction='left')
                 app_object.current='alert'
                 app_object.get_screen('preferences').widgets['overlay_menu'].dismiss()
@@ -5045,10 +5348,9 @@ def listen(app_object,*args):
                     except KeyError:
                         print("main.listen()#micro switch: pop.dismiss() error")
 
-                logic.fs.moli['maint_override']=0
+            logic.fs.moli['maint_override']=0
         elif event_log['micro_switch']==0:
             if app_object.current=='alert':
-                app_object.get_screen('alert').reset_system(widgets['alert'])
                 app_object.transition = SlideTransition(direction='right')
                 app_object.current='main'
     #troubles
@@ -5139,6 +5441,7 @@ def listen(app_object,*args):
 
 class Hood_Control(App):
     def build(self):
+        self.service_pin_entered=False
         self.admin_mode_start=time.time()
         self.report_pending=False#overwritten in settings_setter() from config file
         self.config_ = configparser.ConfigParser()

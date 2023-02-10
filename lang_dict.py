@@ -8,7 +8,16 @@ english={
 [size=22][i]-Version 1.0.0-[/i][/color][/size]''',
     'alert' : "[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
     'alert_acknowledged' : "[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]",
-    'acknowledge' : "[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
+    'acknowledge' : "[size=28][color=#ffffff]Acknowledge",
+    'service' : "[size=28][color=#ffffff]Service",
+    'dialogue_title' : "[size=28][b][color=#ffffff]Information:",
+    'dialogue_body' : '''[size=20][color=#ffffff]The fire suppression system was
+activated through manual release or
+the auto-detection of a fire.
+All devices have been shut down and
+the exhaust fan(s) has been activated
+in accordance with applicable codes.
+''',
     'reset' : "[size=32][b][color=#000000] Reset [/color][/b][/size]",
     'settings_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'logs' : "[size=32][b][color=#000000]  Devices [/color][/b][/size]",
@@ -28,6 +37,7 @@ PO Box 1071, Murray, Kentucky
 \n\n\n
 Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""",
     'about_back' : "[size=30][b][color=#000000]  Back [/color][/b][/size]",
+    'enter' : "[size=30][b][color=#000000]Enter",
     'report_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'report_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'no_report_info_title' : "[color=#ffffff][size=30][b]System Report Not Found:[/color][/b][/size]",
