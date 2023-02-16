@@ -15,15 +15,17 @@ from device_classes.switch_light import SwitchLight
 from device_classes.switch_fans import SwitchFans
 from device_classes.heat_sensor import HeatSensor
 
+
 from db_service import Db_service
 
 db_service = Db_service()
 
-# db_service.signUp("testing@gmail.com", "123456")
 db_service.authUser("testing{}@gmail.com".format(random.randint(1, 10)), "123456")
-# db_service.getFSSRList()
-reportList = db_service.getReportList()
-print(reportList)
+
+
+db_service.getCurrentUser()
+
+db_service.getReportList()
 from messages import messages
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
@@ -91,6 +93,7 @@ if os.name == 'posix':
     Window.fullscreen = 'auto'
 
 background_image=r'media/patrick-tomasso-GXXYkSwndP4-unsplash.jpg'
+background_image2=r'media/fire_image.jpg'
 background_video=r'media/fire_video.mp4'
 msg_icon_image=r'media/msg_icon.png'
 language_image=r'media/higer_res_thick.png'
@@ -1376,8 +1379,10 @@ class ControlGrid(Screen):
         super(ControlGrid, self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
-        bg_image = Video(source=background_video, allow_stretch=True, keep_ratio=False, state='play', options = {'eos': 'loop'})
-        bg_image.color = [0.3,0.3,0.3,1]
+        bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
+        # keep for video background if we get a player to work on PI
+        # bg_image = Video(source=background_video, allow_stretch=True, keep_ratio=False, state='play', options = {'eos': 'loop'})
+        bg_image.color = [0.4,0.4,0.4,1]
         self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
@@ -1385,11 +1390,13 @@ class ControlGrid(Screen):
                     size_hint =(.45, .5),
                     pos_hint = {'x':.03, 'y':.4},
                     background_down='',
-                    background_color=(0/250, 159/250, 232/250,.85),
+                    background_color=(50/250, 100/250, 255/250,.85),
                     markup=True)
         self.widgets['fans']=fans
+           
         fans.ref='fans'
         fans.bind(on_press=self.fans_switch)
+        
 
         lights=RoundedToggleButton(text=current_language['lights'],
                     size_hint =(.45, .5),
@@ -4813,7 +4820,6 @@ class AccountScreen(Screen):
 
 
 
-
         details_box=RoundedColorLayout(
             bg_color=(0,0,0,.85),
             size_hint =(.35, .4),
@@ -5160,7 +5166,7 @@ class Hood_Control(App):
         settings_setter(self.config_)
         Clock.schedule_once(partial(language_setter,config=self.config_))
         self.context_screen=ScreenManager()
-        # self.context_screen.add_widget(AccountScreen(name='account'))
+        self.context_screen.add_widget(AccountScreen(name='account'))
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
@@ -5172,7 +5178,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         self.context_screen.add_widget(MountScreen(name='mount'))
-        self.context_screen.add_widget(AccountScreen(name='account'))
+        # self.context_screen.add_widget(AccountScreen(name='account'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)

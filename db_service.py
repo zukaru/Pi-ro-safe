@@ -1,5 +1,13 @@
 import pyrebase as Firebase
-import asyncio
+import kivy.uix.filechooser as FileChooser
+import os
+
+# Report naming convention
+# mm-dd-yyyy
+# Easily manage and sort relavent reports 
+
+
+reports_dir = r"logs/sys_report"
 
 
 config = {
@@ -16,10 +24,10 @@ config = {
 
 class Db_service():
 
-    
 
     def __init__(self) -> None:
         self.FSR = "FSR"
+        self.email = ""
 
         self.FSSRList = []
 
@@ -34,21 +42,44 @@ class Db_service():
 
         # Init auth service
         self.auth = firebase.auth()
+        self.getUserEmail
 
 
-    # Will try signing in. If user is not found, will try creating an account.
-    def authUser(self, email, pwd):
+
+    def authUser(self, email: str, password: str) -> None:
+        '''Attempts to sign in.
+        If user is not found, will try creating an account.
+        '''
         try:
-            self.user = self.auth.sign_in_with_email_and_password(email, pwd)
+            self.user = self.auth.sign_in_with_email_and_password(email, password)
+            print(self.user)
+            self.email = self.user["email"]
+
         except Exception as e:
-            #Assumption is that any exception is from email not being found
-            #Should actually check error message to confirm email isn't found
+            # Assumption is that any exception is from email not being found
+            # TODO Should check error message to confirm email is not found
             print(e)
-            self.user = self.auth.create_user_with_email_and_password(email, pwd)
+            self.user = self.auth.create_user_with_email_and_password(email, password)
 
 
-    def addReport(self, file):
-        self.sb.child(self["user"]).put(file, self["user"])
+
+    def getUserEmail(self) -> str:
+        if self.user["email"]:
+            return self.user["email"]
+        else:
+            return "Email not found"
+
+    def getCurrentUser(self):
+        print(self.auth.current_user)
+
+
+    
+
+
+    def addReport(self):
+        with open(reports_dir) as report:
+            report.read()
+        self.sb.child(self["user"]).put(report, self["user"])
 
 
     def getReport(self, file):
@@ -60,31 +91,32 @@ class Db_service():
     
 
     # Get list of fire suppression system reports saved in storage bucket
-    def getReportList(self):
+    def getCloudReportList(self):
+        unSyncedReports = []
         localReports = []
+        cloudReports = []
+
+        if len(cloudReports) == len(localReports):
+            return
+        
+        elif len(cloudReports) > len(localReports):
+            # do some type of
+            pass
         reports = self.sb.list_files()
         for report in reports:
-            print(dir(report))
-            print(report.metadata)
-            print(report.public_url)
-            localReports.append(report)
-        return localReports.copy()
+            print(report.name)
             
+            # print(report.metadata)
+            # print(report.public_url)
+            # localReports.append(dir(report))
+            
+        return localReports.copy()
 
 
 
 
-    def stream_handler(message):
+    def stream_handler(self, message):
         print(message["event"]) # put
         print(message["path"]) # /-K7yGTTEp7O549EzTYtI
         print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
-        
-
-    
-    # No need to add reports from devices?
-    # def addFSSRToList(self, FSSR):
-    #     pass
-
-    # def removeFSSRFromList(): 
-    #     pass
-
+        self.db.stream()
