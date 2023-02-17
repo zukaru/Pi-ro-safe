@@ -188,7 +188,7 @@ class RoundedToggleButton(ToggleButton):
      2- RoundedToggleButton toggles on_release.
      this is accomplisehed by overwriting these methods:
 
-     def _do_press(self):
+    def _do_press(self):
         pass
 
     def _do_release(self, *args):
@@ -201,7 +201,11 @@ class RoundedToggleButton(ToggleButton):
 
         self._release_group(self)
         self.state = 'normal' if self.state == 'down' else 'down'
-        '''
+
+    **WARNING**
+    The on_release method will change states AFTER callbacks have been dispatched,
+    so any callbacks depending on a button object being passed along with a 
+    state will need to reverse the expected state value.'''
 
     def __init__(self,**kwargs):
         super(RoundedToggleButton,self).__init__(**kwargs)
@@ -1337,17 +1341,17 @@ class AnimatedCarousel(Carousel):
 
 class ControlGrid(Screen):
     def fans_switch(self,button):
-        if button.state == 'down':
+        if button.state == 'normal':
             logic.fs.moli['exhaust']=1
             logic.fs.moli['mau']=1
-        elif button.state == 'normal':
+        elif button.state == 'down':
             logic.fs.moli['exhaust']=0
             logic.fs.moli['mau']=0
 
     def lights_switch(self,button):
-        if button.state == 'down':
+        if button.state == 'normal':
             logic.fs.moli['lights']=1
-        elif button.state == 'normal':
+        elif button.state == 'down':
             logic.fs.moli['lights']=0
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
@@ -1382,7 +1386,7 @@ class ControlGrid(Screen):
                     markup=True)
         self.widgets['fans']=fans
         fans.ref='fans'
-        fans.bind(on_press=self.fans_switch)
+        fans.bind(on_release=self.fans_switch)
 
         lights=RoundedToggleButton(text=current_language['lights'],
                     size_hint =(.45, .5),
@@ -1392,7 +1396,7 @@ class ControlGrid(Screen):
                     markup=True)
         self.widgets['lights']=lights
         lights.ref='lights'
-        lights.bind(on_press=self.lights_switch)
+        lights.bind(on_release=self.lights_switch)
 
         clock_label=ClockText(
             markup=True,
