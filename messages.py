@@ -106,7 +106,7 @@ conducted five months ago.
 Next month a system technician will attempt to 
 schedule a visit to service and inspect your system.''',
                             'Upcoming System Inspection',
-                            1,
+                            5,
                             Interval(month=5)),
             'sys_6':Message('System Inspection',
                             'System Inspection Due',
@@ -117,7 +117,7 @@ due for a semi-annual service and inspection.
 This month a system technician will attempt to 
 schedule a visit to service and inspect your system.''',
                             'System Inspection Due',
-                            2,
+                            6,
                             Interval(month=6)),
             'sys_7':Message('System Inspection',
                             'System Inspection Past Due',
@@ -128,7 +128,7 @@ due for a semi-annual service and inspection.
 Please contact your service company to
 schedule a visit to service and inspect your system.''',
                             'System Inspection Due',
-                            3,
+                            7,
                             Interval(month=7))}
 
     def refresh_active_messages(self,*args):

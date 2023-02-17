@@ -820,15 +820,16 @@ class Messenger(ButtonBehavior,FloatLayout,LabelColor):
             return
         if not App.get_running_app().config_.getboolean('preferences','evoke'):
             return
-        if random.randint(0,5)==0:
-            cg.widget_fade()
-            cl.fade()
-            Clock.schedule_once(cg.widget_fade,5)
-            self.clock_stack['widget_fade']=cg.widget_fade
-            Clock.schedule_once(cl.fade,5)
-            self.clock_stack['fade']=cl.fade
-            if wc.opacity==0:
-                cg.widgets['widget_carousel'].index=1
+        if messages.active_messages[0].gravity>=10\
+            or random.randint(0,10)-messages.active_messages[0].gravity<=0:
+                cg.widget_fade()
+                cl.fade()
+                Clock.schedule_once(cg.widget_fade,5)
+                self.clock_stack['widget_fade']=cg.widget_fade
+                Clock.schedule_once(cl.fade,5)
+                self.clock_stack['fade']=cl.fade
+                if wc.opacity==0:
+                    cg.widgets['widget_carousel'].index=1
 
     def _delete_clock(self,*args):
         if 'widget_fade' in self.clock_stack:
