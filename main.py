@@ -1374,9 +1374,27 @@ class ControlGrid(Screen):
         super(ControlGrid, self).__init__(**kwargs)
         self.cols = 2
         self.widgets={}
+        self.ud={}
         bg_image = Image(source=background_image, allow_stretch=True, keep_ratio=False)
         self._keyboard=Window.request_keyboard(self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
+
+        self.value_up=Animation(value=1000,d=4.2,t='in_out_quad')
+        self.value_down=Animation(value=0,d=1,t='in_out_circ')
+        self.fade=Animation(opacity=0,d=1)
+        self._fade_in=Animation(opacity=1,d=.5)
+
+        def remove_ramp(*args):
+            if 'ramp_progress' in self.widgets:
+                self.remove_widget(self.widgets['ramp_progress'])
+                del self.widgets['ramp_progress']
+            if 'event_bar' in self.ud:
+                Clock.unschedule(self.ud['event_bar'])
+                del self.ud['event_bar']
+            if 'ramp_text' in self.widgets:
+                self.remove_widget(self.widgets['ramp_text'])
+                del self.widgets['ramp_text']
+        self.fade.bind(on_complete=remove_ramp)
 
         fans=RoundedToggleButton(text=current_language['fans'],
                     size_hint =(.45, .5),
@@ -1387,6 +1405,7 @@ class ControlGrid(Screen):
         self.widgets['fans']=fans
         fans.ref='fans'
         fans.bind(on_release=self.fans_switch)
+        fans.bind(on_release=self.ramp_animate)
 
         lights=RoundedToggleButton(text=current_language['lights'],
                     size_hint =(.45, .5),
@@ -1567,6 +1586,75 @@ class ControlGrid(Screen):
         self.add_widget(fs_logo)
         self.add_widget(clock_label)
 
+    def ramp_animate(self,button,*args):
+        fb=self.widgets['fans'] #fans button
+
+        def fade_out(*args):
+            if 'ramp_progress' not in self.widgets:
+                return
+            if 'ramp_text' not in self.widgets:
+                return
+
+            self.fade.cancel(self.widgets['ramp_progress'])
+            self.fade.cancel(self.widgets['ramp_text'])
+            self.fade.start(self.widgets['ramp_progress'])
+            self.fade.start(self.widgets['ramp_text'])
+            self.value_up.cancel(self.widgets['ramp_progress'])
+            if self.widgets['ramp_progress'].value<1000:
+                self.value_down.start(self.widgets['ramp_progress'])
+
+
+        def fade_in(*args):
+            if 'ramp_progress' not in self.widgets:
+                ramp_progress=CircularProgressBar()
+                ramp_progress.widget_size=int(fb.height*.9)
+                ramp_progress._background_colour=(0,0,0,0)
+                ramp_progress._progress_colour=(.1,.1,.1,.85)
+                self.widgets['ramp_progress']=ramp_progress
+                ramp_progress.pos=self.widgets['fans'].center
+                ramp_progress.opacity=0
+                self.add_widget(ramp_progress)
+            self.value_down.cancel(self.widgets['ramp_progress'])
+            self.value_up.start(self.widgets['ramp_progress'])
+
+            if 'ramp_text' not in self.widgets:
+                ramp_text=Label(
+                    text=current_language['ramp_text'],
+                    markup=True,
+                    pos = (
+                        fb.right-fb.width/2-50,
+                        fb.top-fb.height/5*3-50))
+                self.widgets['ramp_text']=ramp_text
+                ramp_text.ref='ramp_text'
+                ramp_text.opacity=0
+                self.add_widget(ramp_text)
+
+            def progress_bar_update(dt,*args):
+                self.widgets['ramp_progress'].pos=self.widgets['fans'].center
+                self.widgets['ramp_text'].pos=(
+                    fb.right-fb.width/2-self.widgets['ramp_text'].width/2,
+                    fb.top-fb.height/5*3-self.widgets['ramp_text'].height/2)
+                if self.widgets['ramp_progress'].value >= 1000: # Checks to see if progress_bar.value has met 1000
+                    fade_out()
+                    return False # Returning False schedule is canceled and won't repeat
+
+            if 'event_bar' not in self.ud:
+                Clock.schedule_interval(progress_bar_update,.01)
+                self.ud['event_bar'] = progress_bar_update
+
+            self.fade.cancel(self.widgets['ramp_progress'])
+            self.fade.cancel(self.widgets['ramp_text'])
+            if self.widgets['ramp_text'].opacity<1:
+                self._fade_in.start(self.widgets['ramp_text'])
+            if self.widgets['ramp_progress'].opacity<1:
+                self._fade_in.start(self.widgets['ramp_progress'])
+
+        if button.state=='down':
+            #if fans are turned off
+            fade_out()
+        if button.state=='normal':
+            #if fans are turned on
+            fade_in()
 
     def widget_fade(self,*args):
         if not (self.widgets['clock_label'].opacity==0 or self.widgets['clock_label'].opacity==1):

@@ -1,6 +1,7 @@
 english={
     'quick' : "[size=50][b][color=#000000]  Fans+Lights [/color][/b][/size]",
     'fans' : "[size=32][b][color=#000000] Fans [/color][/b][/size]",
+    'ramp_text' : "[size=20][b][i][color=#000000]Ramp In Progress",
     'lights' : "[size=32][b][color=#000000] Lights [/color][/b][/size]",
     'version_info' : '''[size=16][color=#000000]      Hood Control[/size]
 [size=22][i]-Version 1.0.0-[/i][/color][/size]''',
