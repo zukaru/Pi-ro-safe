@@ -4182,6 +4182,48 @@ class PinScreen(Screen):
             self.widgets['mount_overlay'].dismiss()
         mount_cancel.bind(on_release=mount_cancel_func)
 
+        device_reload_overlay=PinPop('device_reload')
+        self.popups.append(device_reload_overlay)
+        self.widgets['device_reload_overlay']=device_reload_overlay
+        device_reload_overlay.ref='device_reload_overlay'
+        device_reload_overlay.widgets['overlay_layout']=device_reload_overlay.overlay_layout
+
+        device_reload_text=Label(
+            text=current_language['device_reload_text'],
+            markup=True,
+            size_hint =(1,.6),
+            pos_hint = {'x':0, 'y':.35},)
+        self.widgets['device_reload_text']=device_reload_text
+        device_reload_text.ref='device_reload_text'
+
+        device_reload_confirm=RoundedButton(text=current_language['device_reload_confirm'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.05, 'y':.05},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['device_reload_confirm']=device_reload_confirm
+        device_reload_confirm.ref='device_reload_confirm'
+
+        device_reload_cancel=RoundedButton(text=current_language['device_reload_cancel'],
+                        size_hint =(.35, .25),
+                        pos_hint = {'x':.6, 'y':.05},
+                        background_down='',
+                        background_color=(245/250, 216/250, 41/250,.9),
+                        markup=True)
+        self.widgets['device_reload_cancel']=device_reload_cancel
+        device_reload_cancel.ref='device_reload_cancel'
+
+        def device_reload_confirm_func(button):
+            logic.devices=[]
+            logic.get_devices()
+            self.widgets['device_reload_overlay'].dismiss()
+        device_reload_confirm.bind(on_release=device_reload_confirm_func)
+
+        def device_reload_cancel_func(button):
+            self.widgets['device_reload_overlay'].dismiss()
+        device_reload_cancel.bind(on_release=device_reload_cancel_func)
+
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_text)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_confirm)
         self.widgets['reset_overlay'].widgets['overlay_layout'].add_widget(reset_cancel)
@@ -4200,6 +4242,9 @@ class PinScreen(Screen):
         self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_text)
         self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_confirm)
         self.widgets['mount_overlay'].widgets['overlay_layout'].add_widget(mount_cancel)
+        self.widgets['device_reload_overlay'].widgets['overlay_layout'].add_widget(device_reload_text)
+        self.widgets['device_reload_overlay'].widgets['overlay_layout'].add_widget(device_reload_confirm)
+        self.widgets['device_reload_overlay'].widgets['overlay_layout'].add_widget(device_reload_cancel)
 
         seperator_line=Image(source=gray_seperator_line,
                     allow_stretch=True,

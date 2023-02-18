@@ -25,3 +25,6 @@ class Pindex:
 
     def p8521(pin_screen):
         pin_screen.widgets['mount_overlay'].open()
+
+    def p4862(pin_screen):
+        pin_screen.widgets['device_reload_overlay'].open()

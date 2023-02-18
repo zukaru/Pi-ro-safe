@@ -126,6 +126,10 @@ DISABLE for 3 seconds.
     'admin_text' : '[size=30][color=#000000] Enable Admin mode? [/color][/size]',
     'admin_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'admin_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'device_reload_overlay' : 'Reload Devices',
+    'device_reload_text' : '[size=30][color=#000000]Reload all devices from device_list.json?[/color][/size]',
+    'device_reload_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'device_reload_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
     'report_pending_overlay' : 'Report Pending',
     'report_pending_text' : '''[size=30][color=#000000] Enable/Disable system report 
  pending changes watermark? [/color][/size]''',
