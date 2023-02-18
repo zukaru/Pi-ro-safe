@@ -5606,7 +5606,13 @@ class Hood_Control(App):
         Clock.schedule_interval(self.context_screen.get_screen('main').widgets['clock_label'].update, 1)
         Clock.schedule_once(messages.refresh_active_messages)
         Clock.schedule_interval(messages.refresh_active_messages,10)
+        Window.bind(on_request_close=self.exit_check)
         return self.context_screen
+
+    def exit_check(*args):
+        print('main.py Hood_control.exit_check(): on_request_close')
+        # return True  # block app's exit
+        return False  # let the app close
 
 def settings_setter(config):
     heat_duration=config['preferences']['heat_timer']
