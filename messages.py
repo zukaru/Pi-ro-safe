@@ -19,14 +19,17 @@ recurrence:    length of Interval
 '''
 
 
-import configparser,os
+import configparser,os,json
 from datetime import date,datetime,timedelta
 from dataclasses import dataclass,field
 
 if os.name == 'nt':
     preferences_path='logs/configurations/hood_control.ini'
+    pushed_messages_path='logs/configurations/pushed_messages.json'
+
 if os.name == 'posix':
     preferences_path='/home/pi/Pi-ro-safe/logs/configurations/hood_control.ini'
+    pushed_messages_path='/home/pi/Pi-ro-safe/logs/configurations/pushed_messages.json'
 
 @dataclass
 class Interval:
@@ -182,6 +185,45 @@ schedule a visit to service and inspect your system.''',
             if message:
                 self._active_messages.append(message)
 
+    def push(self,json_msg,*args):
+        '''Push a new message to be handled.
+        
+        `Messages` will be stored in a file, and then processed
+        alongsisde in-built `Messages`.
+        Pushed `Messages` will have one additional attribute
+        in order to determine when to clear them: lifetime
+
+        Pushed `Messages` need to be able to conform to an
+        in-built message.
+
+        E.g the same parameters are required.
+
+        :params:
+        `name=name`
+        `title=title`
+        `body=body`
+        `card=card`
+        `gravity=gravity`
+        `recurrence=recurrence`
+
+        In addition pushed `Messages` need
+        two extra attributes:
+
+        `lifetime=lifetime`
+        `category=category`
+
+        these will be parsed out of the json file
+        and a `Message` will be instantiated
+        by :method:`refresh_active_messages`
+        '''
+
+        with open(pushed_messages_path,'r+') as data_base:
+            data=json.load(data_base)
+            index_pos=len(data.keys())+1
+            data[f'message_{index_pos}']=json_msg
+            data_base.seek(0)
+            json.dump(data, data_base, indent=4, skipkeys=True)
+            data_base.truncate()
 
     def get_gravity(self,item):
         return item.gravity
