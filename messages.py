@@ -148,7 +148,8 @@ schedule a visit to service and inspect your system.''',
         
         after all current messages have been added
         filter_active_messages() is called to reduce each
-        category of message to a single entry.'''
+        category of message to a single entry.
+        '''
         self._active_messages=[]
         for message in self.index.values():
             if message.recurrence==0:
@@ -184,17 +185,64 @@ schedule a visit to service and inspect your system.''',
         for message in CATEGORIES:
             if message:
                 self._active_messages.append(message)
+        for message in self.retrieve():
+            self._active_messages.append(message)
+
+    def retrieve(self,*args):
+        '''Retrieve stored `Messages` from pushed_messages.json file.
+        
+        `Messages` will also be filtered and deleted from file
+        if they have expired. (`timestamp`+`lifetime`<`datetime.now`)
+        '''
+        with open(pushed_messages_path,'r+') as data_base:
+            data=json.load(data_base)
+            expired=[]
+            for key,message in data.items():
+                if datetime.fromisoformat(message['timestamp'])+timedelta(days=int(message['lifetime']))<datetime.now():
+                    expired.append(key)
+            if expired:
+                for i in expired:
+                    del data[i]
+            data_base.seek(0)
+            json.dump(data, data_base, indent=4, skipkeys=True)
+            data_base.truncate()
+        msg_list=[]
+        for i in data.values():
+            msg=Message(
+                i['name'],
+                i['title'],
+                i['body'],
+                i['card'],
+                i['gravity'],
+                0)
+            msg.lifetime=i['lifetime']
+            msg_list.append(msg)
+        return msg_list
 
     def push(self,json_msg,*args):
         '''Push a new message to be handled.
         
         `Messages` will be stored in a file, and then processed
         alongsisde in-built `Messages`.
-        Pushed `Messages` will have one additional attribute
-        in order to determine when to clear them: lifetime
+        Pushed `Messages` will have an attribute in
+        order to determine when to clear them: `lifetime`.
+
+        A `timestamp` will be added to a message when pushed.
+
+        pushed `Messages` do not need a `recurrence` parameter
+
+
+        sample format of pushed message:
+
+            {"name": `str`,
+            "title": `str`,
+            "body": `str` (multi-line),
+            "card": `str`,
+            "gravity": `int`(in range of 0-10),
+            "lifetime": `int`(amount of days message will stay on device)}
 
         Pushed `Messages` need to be able to conform to an
-        in-built message.
+        in-built message. (albeit without recurrence)
 
         E.g the same parameters are required.
 
@@ -204,22 +252,21 @@ schedule a visit to service and inspect your system.''',
         `body=body`
         `card=card`
         `gravity=gravity`
-        `recurrence=recurrence`
 
         In addition pushed `Messages` need
-        two extra attributes:
+        one extra attribute:
 
         `lifetime=lifetime`
-        `category=category`
 
         these will be parsed out of the json file
         and a `Message` will be instantiated
-        by :method:`refresh_active_messages`
+        by :method:`filter_active_messages`
         '''
 
         with open(pushed_messages_path,'r+') as data_base:
             data=json.load(data_base)
             index_pos=len(data.keys())+1
+            json_msg['timestamp']=str(datetime.now())
             data[f'message_{index_pos}']=json_msg
             data_base.seek(0)
             json.dump(data, data_base, indent=4, skipkeys=True)
@@ -239,3 +286,16 @@ schedule a visit to service and inspect your system.''',
         return self._active_messages
 
 messages=MessageHandler()
+
+# example to push message:
+# 
+# test_data={
+#     "name":"name",
+#     "title":"title",
+#     "body":"body",
+#     "card":"card",
+#     "gravity":"gravity",
+#     "lifetime":"5"}
+
+# messages.push(test_data)
+# print(messages.retrieve())
