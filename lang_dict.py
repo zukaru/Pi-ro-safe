@@ -1,4 +1,4 @@
-from db_service import Db_service
+from server import Db_service
 
 english={
     'quick' : "[size=50][b][color=#000000]  Fans+Lights [/color][/b][/size]",

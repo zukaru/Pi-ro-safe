@@ -1,5 +1,7 @@
 import pyrebase as Firebase
 import kivy.uix.filechooser as FileChooser
+import logic
+import threading as th
 import os
 
 # Report naming convention
@@ -9,6 +11,13 @@ import os
 
 reports_dir = r"logs/sys_report"
 
+schema = {
+    "lights_on": False,
+    "fans_on": False,
+    "sys_report_list": [],
+    "messages": []
+}
+
 
 config = {
         "apiKey": "AIzaSyBahiTuqQJcg9FJg1nexARrcAVi7lb_uZI",
@@ -17,15 +26,18 @@ config = {
         "storageBucket": "pyrosafe-472f3.appspot.com",
         "messagingSenderId": "930622732610",
         "appId": "1:930622732610:web:5cbb23878bb4c664c4b0db",
-        "databaseURL": "https://pyrosafe-472f3-default-rtdb.firebaseio.com/",
-        "serviceAccount":"firebase_private_credentials.json"
+        "databaseURL": "https://pyrosafe-472f3-default-rtdb.firebaseio.com/"
         }
+
+
+
 
 
 class Db_service():
 
 
     def __init__(self) -> None:
+        
         self.FSR = "FSR"
         self.email = ""
 
@@ -52,15 +64,28 @@ class Db_service():
         '''
         try:
             self.user = self.auth.sign_in_with_email_and_password(email, password)
+            data = {"email": self.user["email"]}
+            # self.db.child("users").push(data, self.user["idToken"])
             print(self.user)
-            self.email = self.user["email"]
+            
 
         except Exception as e:
             # Assumption is that any exception is from email not being found
             # TODO Should check error message to confirm email is not found
             print(e)
             self.user = self.auth.create_user_with_email_and_password(email, password)
-
+            
+            
+        finally:
+            self.email = self.user["email"]
+            self.path = "users/" + self.user["localId"]
+            self.token = self.user["idToken"]
+            self.uid = self.user["localId"]
+            self.dbStream = self.db.child(self.path).stream(self.stream_handler,self.token)
+            self.db.child(self.path).update({"email": self.email}, self.token)
+            refresh_token = th.Timer(5, print,["testing"])
+            refresh_token.start()
+          
 
 
     def getUserEmail(self) -> str:
@@ -73,6 +98,17 @@ class Db_service():
         print(self.auth.current_user)
 
 
+    def toggleLights(self, lights_on: int):
+        data = {"lights_on": lights_on}
+        self.db.child(self.path).update(data, self.token)
+
+
+
+    
+
+    def toggleFans(self, fans_on: int):
+        data = {"fans_on": fans_on}
+        self.db.child(self.path).update(data, self.token)
     
 
 
@@ -114,9 +150,22 @@ class Db_service():
 
 
 
+    def debounceFunc(self, cb, arg: list):
+        try:
+            self.light_deb
+        except NameError:
+            self.light_deb = th.Timer(2, cb, arg)  
+            self.light_deb.start()
+        else:
+            self.light_deb.cancel()
+            
+        
+
+
+
 
     def stream_handler(self, message):
+        print(message)
         print(message["event"]) # put
         print(message["path"]) # /-K7yGTTEp7O549EzTYtI
         print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
-        self.db.stream()

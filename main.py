@@ -5,6 +5,8 @@ import random
 from datetime import datetime
 from kivy.config import Config
 
+from threading import Timer
+
 from device_classes.exhaust import Exhaust
 from device_classes.mau import Mau
 from device_classes.light import Light
@@ -16,16 +18,16 @@ from device_classes.switch_fans import SwitchFans
 from device_classes.heat_sensor import HeatSensor
 
 
-from db_service import Db_service
+from server import Db_service
 
-db_service = Db_service()
+server = Db_service()
 
-db_service.authUser("testing{}@gmail.com".format(random.randint(1, 10)), "123456")
+server.authUser("testing{}@gmail.com".format(random.randint(1, 5)), "123456")
 
 
-db_service.getCurrentUser()
 
-db_service.getReportList()
+
+
 from messages import messages
 
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
@@ -1352,12 +1354,22 @@ class ControlGrid(Screen):
         elif button.state == 'normal':
             logic.fs.moli['exhaust']=0
             logic.fs.moli['mau']=0
+        try:
+            server.toggleFans(logic.fs.moli['exhaust'])
+        except Exception as e:
+            print(e)
 
     def lights_switch(self,button):
+        
         if button.state == 'down':
             logic.fs.moli['lights']=1
         elif button.state == 'normal':
             logic.fs.moli['lights']=0
+        try:
+            server.debounceFunc(server.toggleLights, [logic.fs.moli['lights']])
+        except Exception as e:
+            print(e)
+        
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1]=='m':
@@ -5233,4 +5245,5 @@ finally:
     print("devices saved")
     logic.clean_exit()
     print("pins set as inputs")
+    server.dbStream.close()
     quit()
