@@ -35,11 +35,15 @@ config = {
 
 class Db_service():
 
+    
+
 
     def __init__(self) -> None:
+
+    
+        self.light_deb = False
+        self.devices = self.Devices()
         
-        self.FSR = "FSR"
-        self.email = ""
 
         self.FSSRList = []
 
@@ -55,6 +59,8 @@ class Db_service():
         # Init auth service
         self.auth = firebase.auth()
         self.getUserEmail
+
+        
 
 
 
@@ -81,12 +87,39 @@ class Db_service():
             self.path = "users/" + self.user["localId"]
             self.token = self.user["idToken"]
             self.uid = self.user["localId"]
-            self.dbStream = self.db.child(self.path).stream(self.stream_handler,self.token)
+            self.db_light_stream = self.db.child(self.path).child(self.devices.lights).stream(self.light_stream_handler,self.token)
+            self.db_exhaust_stream = self.db.child(self.path).child(self.devices.exhaust).stream(self.exhaust_stream_handler,self.token)
             self.db.child(self.path).update({"email": self.email}, self.token)
-            refresh_token = th.Timer(5, print,["testing"])
-            refresh_token.start()
-          
 
+            ''' TODO Token expires after 1 hour.
+            Add recurring timer or interval to refresh token every 45-55 min.
+            self.auth.refresh(self.token)
+            '''
+            
+          
+    def light_stream_handler(self, message):
+        print(message)
+        print(message["event"]) # put
+        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+        '''TODO Add light stream functionality here
+        '''
+
+    def exhaust_stream_handler(self, message):
+        print(message)
+        print(message["event"]) # put
+        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+        '''TODO Add exhuast stream functionality here
+        '''
+
+    def message_stream_handler(self, message):
+        print(message)
+        print(message["event"]) # put
+        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+        '''TODO Add message stream functionality here
+        '''
 
     def getUserEmail(self) -> str:
         if self.user["email"]:
@@ -98,19 +131,10 @@ class Db_service():
         print(self.auth.current_user)
 
 
-    def toggleLights(self, lights_on: int):
-        data = {"lights_on": lights_on}
-        self.db.child(self.path).update(data, self.token)
-
-
-
-    
-
-    def toggleFans(self, fans_on: int):
-        data = {"fans_on": fans_on}
+    def toggleDevice(self, device: str, status: int):
+        data = {device: status}
         self.db.child(self.path).update(data, self.token)
     
-
 
     def addReport(self):
         with open(reports_dir) as report:
@@ -149,23 +173,25 @@ class Db_service():
         return localReports.copy()
 
 
-
     def debounceFunc(self, cb, arg: list):
-        try:
-            self.light_deb
-        except NameError:
-            self.light_deb = th.Timer(2, cb, arg)  
-            self.light_deb.start()
-        else:
-            self.light_deb.cancel()
-            
-        
+        '''TODO Functionality:
+        Wrapper or decorator for button clicks specifically
+        Take a callback and argument list
+        Check if this SPECIFIC timer exists
+        (so you can have multiple debounce running simultaneously)
+        If timer exists, cancel timer
+        If timer does not exist, start new timer and pass in arg list and callback
+        '''
+        # if self.light_deb:
+        #     self.light_deb.cancel()
+        #     self.light_deb = False
+        # else:
+        #     self.light_deb = th.Timer(2, cb, arg)  
+        #     self.light_deb.start()
+        pass
 
-
-
-
-    def stream_handler(self, message):
-        print(message)
-        print(message["event"]) # put
-        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
-        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+    class Devices:
+        def __init__(self) -> None:
+            self.exhaust = 'exhaust'
+            self.lights = 'lights'
+            self.mau = 'mau'

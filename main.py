@@ -1355,7 +1355,7 @@ class ControlGrid(Screen):
             logic.fs.moli['exhaust']=0
             logic.fs.moli['mau']=0
         try:
-            server.toggleFans(logic.fs.moli['exhaust'])
+            server.toggleDevice(server.devices.exhaust , logic.fs.moli['exhaust'])
         except Exception as e:
             print(e)
 
@@ -1366,7 +1366,7 @@ class ControlGrid(Screen):
         elif button.state == 'normal':
             logic.fs.moli['lights']=0
         try:
-            server.debounceFunc(server.toggleLights, [logic.fs.moli['lights']])
+            server.toggleDevice(server.devices.lights , logic.fs.moli['lights'])
         except Exception as e:
             print(e)
         
@@ -5245,5 +5245,6 @@ finally:
     print("devices saved")
     logic.clean_exit()
     print("pins set as inputs")
-    server.dbStream.close()
+    server.db_light_stream.close()
+    server.db_exhaust_stream.close()
     quit()
