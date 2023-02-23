@@ -1359,6 +1359,9 @@ class ControlGrid(Screen):
         except Exception as e:
             print(e)
 
+
+    
+
     def lights_switch(self,button):
         
         if button.state == 'down':
@@ -1366,7 +1369,7 @@ class ControlGrid(Screen):
         elif button.state == 'normal':
             logic.fs.moli['lights']=0
         try:
-            server.toggleDevice(server.devices.lights , logic.fs.moli['lights'])
+            server.toggleDevice(server.devices.lights, logic.fs.moli['lights'])
         except Exception as e:
             print(e)
         
@@ -5178,7 +5181,7 @@ class Hood_Control(App):
         settings_setter(self.config_)
         Clock.schedule_once(partial(language_setter,config=self.config_))
         self.context_screen=ScreenManager()
-        self.context_screen.add_widget(AccountScreen(name='account'))
+        # self.context_screen.add_widget(AccountScreen(name='account'))
         self.context_screen.add_widget(ControlGrid(name='main'))
         self.context_screen.add_widget(ActuationScreen(name='alert'))
         self.context_screen.add_widget(SettingsScreen(name='settings'))
@@ -5190,7 +5193,7 @@ class Hood_Control(App):
         self.context_screen.add_widget(DocumentScreen(name='documents'))
         self.context_screen.add_widget(TroubleScreen(name='trouble'))
         self.context_screen.add_widget(MountScreen(name='mount'))
-        # self.context_screen.add_widget(AccountScreen(name='account'))
+        self.context_screen.add_widget(AccountScreen(name='account'))
         listener_event=Clock.schedule_interval(partial(listen, self.context_screen),.75)
         device_update_event=Clock.schedule_interval(partial(logic.update_devices),.75)
         device_save_event=Clock.schedule_interval(partial(logic.save_devices),600)

@@ -35,17 +35,11 @@ config = {
 
 class Db_service():
 
-    
-
-
     def __init__(self) -> None:
-
-    
-        self.light_deb = False
+        # self.devices is a namespace for the
+        # String values of database keys
+        # To ensure naming consistency
         self.devices = self.Devices()
-        
-
-        self.FSSRList = []
 
         # Init firebase instance
         firebase = Firebase.initialize_app(config)
@@ -58,11 +52,7 @@ class Db_service():
 
         # Init auth service
         self.auth = firebase.auth()
-        self.getUserEmail
-
         
-
-
 
     def authUser(self, email: str, password: str) -> None:
         '''Attempts to sign in.
@@ -70,8 +60,6 @@ class Db_service():
         '''
         try:
             self.user = self.auth.sign_in_with_email_and_password(email, password)
-            data = {"email": self.user["email"]}
-            # self.db.child("users").push(data, self.user["idToken"])
             print(self.user)
             
 
@@ -80,6 +68,7 @@ class Db_service():
             # TODO Should check error message to confirm email is not found
             print(e)
             self.user = self.auth.create_user_with_email_and_password(email, password)
+            print(self.user)
             
             
         finally:
@@ -173,24 +162,10 @@ class Db_service():
         return localReports.copy()
 
 
-    def debounceFunc(self, cb, arg: list):
-        '''TODO Functionality:
-        Wrapper or decorator for button clicks specifically
-        Take a callback and argument list
-        Check if this SPECIFIC timer exists
-        (so you can have multiple debounce running simultaneously)
-        If timer exists, cancel timer
-        If timer does not exist, start new timer and pass in arg list and callback
-        '''
-        # if self.light_deb:
-        #     self.light_deb.cancel()
-        #     self.light_deb = False
-        # else:
-        #     self.light_deb = th.Timer(2, cb, arg)  
-        #     self.light_deb.start()
-        pass
-
     class Devices:
+        '''This namespace contains string
+        values for database key name consistency
+        '''
         def __init__(self) -> None:
             self.exhaust = 'exhaust'
             self.lights = 'lights'
