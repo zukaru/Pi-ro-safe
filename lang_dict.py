@@ -3,6 +3,7 @@ from server import Db_service
 english={
     'quick' : "[size=50][b][color=#000000]  Fans+Lights [/color][/b][/size]",
     'fans' : "[size=32][b][color=#000000] Fans [/color][/b][/size]",
+    'ramp_text' : "[size=20][b][i][color=#000000]Ramp In Progress",
     'lights' : "[size=32][b][color=#000000] Lights [/color][/b][/size]",
     'version_info' : '''[size=16][color=#000000]      Hood Control[/size]
 [size=22][i]-Version 1.0.0-[/i][/color][/size]''',
@@ -10,7 +11,16 @@ english={
 [size=22][i]-Version 1.0.0-[/i][/color][/size]''',
     'alert' : "[size=75][b][color=#000000]  System Activated [/color][/b][/size]",
     'alert_acknowledged' : "[size=32][b][color=#000000]System Activated\n       -Fire Safe-\n   270-761-0637 [/color][/b][/size]",
-    'acknowledge' : "[size=32][b][color=#000000] Acknowledge [/color][/b][/size]",
+    'acknowledge' : "[size=28][color=#ffffff]Acknowledge",
+    'service' : "[size=28][color=#ffffff]Service",
+    'dialogue_title' : "[size=28][b][color=#ffffff]Information:",
+    'dialogue_body' : '''[size=20][color=#ffffff]The fire suppression system was
+activated through manual release or
+the auto-detection of a fire.
+All devices have been shut down and
+the exhaust fan(s) has been activated
+in accordance with applicable codes.
+''',
     'reset' : "[size=32][b][color=#000000] Reset [/color][/b][/size]",
     'settings_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'logs' : "[size=32][b][color=#000000]  Devices [/color][/b][/size]",
@@ -30,6 +40,7 @@ PO Box 1071, Murray, Kentucky
 \n\n\n
 Copyright © 2022 Fire Safe Extinguisher - All Rights Reserved.[/color][/size]""",
     'about_back' : "[size=30][b][color=#000000]  Back [/color][/b][/size]",
+    'enter' : "[size=30][b][color=#000000]Enter",
     'report_back' : "[size=50][b][color=#000000]  Back [/color][/b][/size]",
     'report_back_main' : "[size=50][b][color=#000000]  Close Menu [/color][/b][/size]",
     'no_report_info_title' : "[color=#ffffff][size=30][b]System Report Not Found:[/color][/b][/size]",
@@ -117,6 +128,10 @@ DISABLE for 3 seconds.
     'admin_text' : '[size=30][color=#000000] Enable Admin mode? [/color][/size]',
     'admin_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
     'admin_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
+    'device_reload_overlay' : 'Reload Devices',
+    'device_reload_text' : '[size=30][color=#000000]Reload all devices from device_list.json?[/color][/size]',
+    'device_reload_confirm' : '[size=30][b][color=#000000] Continue [/color][/b][/size]',
+    'device_reload_cancel' : '[size=30][b][color=#000000] Cancel [/color][/b][/size]',
     'report_pending_overlay' : 'Report Pending',
     'report_pending_text' : '''[size=30][color=#000000] Enable/Disable system report 
  pending changes watermark? [/color][/size]''',

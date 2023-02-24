@@ -4,6 +4,17 @@ import logic
 import threading as th
 import os
 
+
+
+#   TODO: 
+#       . Make firebase account with fire safe email
+#       . Change config object for app with new config data
+#       . On firebase start Auth, Realtime database, and storage 
+#           then configure their rules respectively
+#       . Create debounce function for writing to database
+#       . Implement 4
+#       
+
 # Report naming convention
 # mm-dd-yyyy
 # Easily manage and sort relavent reports 
@@ -52,7 +63,7 @@ class Db_service():
 
         # Init auth service
         self.auth = firebase.auth()
-        
+
 
     def authUser(self, email: str, password: str) -> None:
         '''Attempts to sign in.
@@ -86,27 +97,27 @@ class Db_service():
             '''
             
           
-    def light_stream_handler(self, message):
-        print(message)
-        print(message["event"]) # put
-        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
-        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+    def light_stream_handler(self, response):
+        print(response)
+        print(response["event"]) # put
+        print(response["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(response["data"]) # {'title': 'Pyrebase', "body": "etc..."}
         '''TODO Add light stream functionality here
         '''
 
-    def exhaust_stream_handler(self, message):
-        print(message)
-        print(message["event"]) # put
-        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
-        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+    def exhaust_stream_handler(self, response):
+        print(response)
+        print(response["event"]) # put
+        print(response["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(response["data"]) # {'title': 'Pyrebase', "body": "etc..."}
         '''TODO Add exhuast stream functionality here
         '''
 
-    def message_stream_handler(self, message):
-        print(message)
-        print(message["event"]) # put
-        print(message["path"]) # /-K7yGTTEp7O549EzTYtI
-        print(message["data"]) # {'title': 'Pyrebase', "body": "etc..."}
+    def message_stream_handler(self, response):
+        print(response)
+        print(response["event"]) # put
+        print(response["path"]) # /-K7yGTTEp7O549EzTYtI
+        print(response["data"]) # {'title': 'Pyrebase', "body": "etc..."}
         '''TODO Add message stream functionality here
         '''
 
